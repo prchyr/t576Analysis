@@ -1,0 +1,31 @@
+#ifndef T576EVENT_BASE_H
+#define T576EVENT_BASE_H
+
+#include "TROOT.h"
+#include "TRint.h"
+#include "TSystem.h"
+#include "TRandom.h"
+#include "TObject.h"
+#include "TFile.h"
+#include "TH1F.h"
+#include "TString.h"
+#include "TTree.h"
+#include "TGraph.h"
+#include "TGraph2D.h"
+
+#include <vector>
+
+#include "CLHEP/Units/PhysicalConstants.h"
+#include "CLHEP/Vector/LorentzVector.h"
+#include "CLHEP/Vector/ThreeVector.h"
+#include "RadioScatterEvent.hh"
+#include "RSEventSummary.hh"
+
+using namespace CLHEP;
+using namespace std;
+
+
+class t576Event : public TObject{
+public:
+  class Scope;
+  class Surf;
