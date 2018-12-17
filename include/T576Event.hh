@@ -24,16 +24,16 @@ using namespace CLHEP;
 using namespace std;
 
 
-class t576Event : public TObject{
+class T576Event : public TObject{
 public:
   //constructors
-  t576Event(){}
-  //load a t576 event
-  t576Event(int run_major, int run_minor, int event):loadEvent(run_major, run_minor){}
-  //load a t576 event from a radio scatter event
-  t576Event(RadioScatterEvent *rs):loadEvent(rs){}
-  //load a t576 event from the generic tree in the raw capture files
-  t576Event(TTree * tree):loadEvent(tree){}
+  T576Event(){}
+  //load a T576 event
+  T576Event(int run_major, int run_minor, int event){loadEvent(run_major, run_minor, event);}
+  //load a T576 event from a radio scatter event
+  //T576Event(int run_major, int run_minor,RadioScatterEvent *rs):loadEvent(run_major, run_minor, rs){}
+  //load a T576 event from the generic tree in the raw capture files
+  T576Event(int run_major, int run_minor,TTree * tree){loadEvent(run_major, run_minor, tree);}
 
 
   //global info for all channels in an event.
@@ -42,18 +42,22 @@ public:
   double frequency;
   double power;
   Hep3Vector txPos;
-  int major, minor;
+  int major, minor, event;
 
-
+  void loadEvent(int run_major, int run_minor, int event);
+  //  void loadEvent(int run_major, int run_minor, RadioScatterEvent *rs);
+  void loadEvent(int run_major, int run_minor, TTree *tree);
   //the two DAQs. 
   class Scope;
   class Surf;
 private:
   int fRunLoaded=0;
 
+
+public:
   class Scope {
   public:
-    Hep3Vector pos[4]={(0.,0.,0.)};
+    Hep3Vector pos[4];
     TGraph * ch[4]={0};
     double * time;
     ClassDefNV(Scope, 1);
@@ -62,7 +66,7 @@ private:
 
   class Surf{
   public:
-    Hep3Vector pos[12]={(0.,0.,0.)};
+    Hep3Vector pos[12];
     TGraph * ch[12]={0};
     double * time;
 
@@ -74,5 +78,7 @@ private:
     
     ClassDefNV(Surf, 1);
   };
-  ClassDefNV(t576Event, 1);
-}
+  ClassDefNV(T576Event, 1);
+};
+
+#endif

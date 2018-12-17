@@ -24,17 +24,17 @@ find_package(ROOT REQUIRED COMPONENTS RIO Tree)
 include(${ROOT_USE_FILE})
 #add_definitions(${ROOT_CXX_FLAGS})
 
-if(DEFINED ENV{T576_DIR})
-  set(T576_INCLUDE_DIR $ENV{T576_DIR}/include)
+if(DEFINED ENV{T576_SOURCE_DIR})
+  set(T576_INCLUDE_DIR $ENV{T576_SOURCE_DIR}/include)
 else()
-  set(T576_INCLUDE_DIR ./include)
+  set(T576_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 endif()
 
 if(DEFINED ENV{T576_INSTALL_DIR})
-  set(T576_INSTALL_DIR $ENV{T576_INSTALL_DIR}/include/t576)
+  set(T576_INSTALL_DIR $ENV{T576_INSTALL_DIR})
   set(LIB_INSTALL_DIR $ENV{T576_INSTALL_DIR}/lib)
 else()
-  set(T576_INSTALL_DIR /usr/local/include/t576)
+  set(T576_INSTALL_DIR /usr/local/)
   set(LIB_INSTALL_DIR /usr/local/lib)
 endif()
 
@@ -45,8 +45,8 @@ include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include ${CLHEP_
 # Locate sources and headers for this project
 # NB: headers are included so they will show up in IDEs
 #
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc ${T576_INCLUDE_DIR}/*.cc)
-file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh ${T576_INCLUDE_DIR}/*.hh)
+file(GLOB sources ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src/*.cc ${T576_INCLUDE_DIR}/*.cc)
+file(GLOB headers ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include/*.hh ${T576_INCLUDE_DIR}/*.hh)
 
 file(GLOB SOURCE_FILES ${T576_INCLUDE_DIR}/*.cc ${CLHEP_INCLUDE_DIR}/Vector/*.icc ${CLHEP_INCLUDE_DIR}/Units/*.icc)
 file(GLOB HEADER_FILES ${T576_INCLUDE_DIR}/*.hh ${CLHEP_INCLUDE_DIR}/Vector/*.h ${CLHEP_INCLUDE_DIR}/Units/*.h)# ${GSL_INCLUDE_DIRS}/gsl/*.h)
@@ -54,7 +54,7 @@ file(GLOB HEADER_FILES ${T576_INCLUDE_DIR}/*.hh ${CLHEP_INCLUDE_DIR}/Vector/*.h 
 
 #make the ROOT dictionaries and shared object library for reading the event tree
 
-ROOT_GENERATE_DICTIONARY(G__t576 ${HEADER_FILES} LINKDEF ${T576_INCLUDE_DIR}/LinkDef.h)
+ROOT_GENERATE_DICTIONARY(G__t576 ${HEADER_FILES} LINKDEF ${T576_INCLUDE_DIR}/../LinkDef.h)
 
 
 add_library(t576 SHARED ${SOURCE_FILES} G__t576.cxx)
@@ -68,8 +68,8 @@ target_link_libraries(t576 ${ROOT_LIBRARIES} CLHEP::Vector)
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
 #install(TARGETS slac DESTINATION ${PROJECT_BINARY_DIR}/bin)
-install (FILES ${T576_INCLUDE_DIR}/AntennaPositions.hh DESTINATION ${T576_INSTALL_DIR})
-install (FILES ${T576_INCLUDE_DIR}/AntennaPositions.cc DESTINATION ${T576_INSTALL_DIR})
+install (FILES ${T576_INCLUDE_DIR}/T576Event.hh DESTINATION ${T576_INSTALL_DIR}/include/t576)
+install (FILES ${PROJECT_SOURCE_DIR}/src/T576Event.cc DESTINATION ${T576_INSTALL_DIR}/src/t576)
 
 install (FILES ${PROJECT_BINARY_DIR}/libt576_rdict.pcm DESTINATION ${LIB_INSTALL_DIR})
 
