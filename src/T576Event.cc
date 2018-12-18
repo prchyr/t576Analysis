@@ -23,9 +23,13 @@ int T576Event::checkStatus(){
   }
   
   fIndexTree=(TTree*)indexFile->Get("indexTree");
-  fIndexTree->SetBranchAddress("filename", &filename);
+  fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
   fIndexTree->SetBranchAddress("major", &major);
   fIndexTree->SetBranchAddress("minor", &minor);
+  fIndexTree->SetBranchAddress("subEvNo", &subEvNo);
+  fIndexTree->SetBranchAddress("scopeEvNo", &scopeEvNo);
+  fIndexTree->SetBranchAddress("surfEvNo", &surfEvNo);
+  
   fIndexBuilt=1;
   fIndexTree->BuildIndex("scopeEvNo", "scopeEvNo");
   fScopeEvNoIndex=(TTreeIndex*)fIndexTree->GetTreeIndex();
@@ -68,15 +72,15 @@ int T576Event::loadEvent(int run_major, int run_minor,int event){
   }
   
   cout<<"asdf"<<endl;
-  //  fIndexTree->SetBranchAddress("filename", &filename);
+  //  fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
   fIndexTree->SetTreeIndex(fMajorMinorIndex);
   fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(run_major, run_minor));
   //  fIndexTree->GetEntry(0);
-  //  cout<<filename->Data();
-  TString scopeFilename=filename->Data();
+  //  cout<<scopeFilename->Data();
+  TString scopeScopeFilename=scopeFilename->Data();
   //open the file
-  //cout<<scopeFilename<<endl;
-  auto file=TFile::Open(directory+scopeFilename);
+  //cout<<scopeScopeFilename<<endl;
+  auto file=TFile::Open(directory+scopeScopeFilename);
   auto tree=(TTree*)file->Get("tree");
   
 
@@ -155,10 +159,10 @@ int T576Event::buildEventIndex(int force){
   //cout<<"asdf"<<endl;
   TFile * index= new TFile(install_dir+"/share/t576/eventIndex.root", "recreate");
   TTree *indexTree = new TTree("indexTree", "index of events");
-  TString filename;
+  TString scopeFilename;
   int maj=0, min=0, subEvNo=0, scopeEvNo=0, surfEvNo=0;
   ULong64_t tstamp;
-  indexTree->Branch("filename", &filename);
+  indexTree->Branch("scopeFilename", &scopeFilename);
   indexTree->Branch("major", &major);
   indexTree->Branch("minor", &minor);
   indexTree->Branch("subEvNo", &subEvNo);
@@ -172,7 +176,7 @@ int T576Event::buildEventIndex(int force){
   TSystemDirectory dir(directory, directory);
   TList *files = dir.GetListOfFiles();
   //    cout<<files->GetEntries()<<endl;
-  //find the filename
+  //find the scopeFilename
   
   if(files){
     files->Sort();
@@ -201,11 +205,11 @@ int T576Event::buildEventIndex(int force){
 	  int nentries=tree->GetEntries();
 	  if(nentries>0){
 	    for(int j=0;j<nentries;j++){
-	      //cout<<filename<<" "<<major<<" "<<minor<<" "<<subEvNo<<" "<<scopeEvNo<<endl;
+	      //cout<<scopeFilename<<" "<<major<<" "<<minor<<" "<<subEvNo<<" "<<scopeEvNo<<endl;
 	      tree->GetEntry(j);
 	      subEvNo=j;
-	      //	      filename=const_cast<char*>(fname.Data());
-	      filename=fname;
+	      //	      scopeFilename=const_cast<char*>(fname.Data());
+	      scopeFilename=fname;
 	      indexTree->Fill();
 	      scopeEvNo++;
 	    }

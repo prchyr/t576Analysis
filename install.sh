@@ -12,7 +12,7 @@ export T576_SOURCE_DIR=$top_dir
 
 if [ -z "$1" ]
 then
-    if [ -z "$T576_INSTALL_DIR"]
+    if [ -z "$T576_INSTALL_DIR" ]
     then
 	echo "No install directory specified. will install to /usr/local"
 	export T576_INSTALL_DIR=/usr/local
