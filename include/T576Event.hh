@@ -36,7 +36,9 @@ public:
   T576Event(){checkStatus();}
   //load a T576 event
   //  T576Event(int run_major, int run_minor, int event){;}
-  T576Event(int run_major, int run_minor, int event):{
+  T576Event(int run_major, int run_minor, int event){
+    major=run_major;
+    minor=run_minor;
     checkStatus();
     loadEvent(run_major, run_minor,event);
   }
@@ -56,7 +58,9 @@ public:
   ULong64_t timestamp;
   double frequency;
   double power;
-  TString * filename=new TString();
+  int subEvNo, scopeEvNo, surfEvNo, evNo;
+  TString * scopeFilename=new TString();
+  TString * surfFilename=new TString();
   Hep3Vector txPos;
   int major, minor, event;
 
