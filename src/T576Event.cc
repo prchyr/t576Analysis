@@ -163,8 +163,8 @@ int T576Event::buildEventIndex(int force){
   int maj=0, min=0, subEvNo=0, scopeEvNo=0, surfEvNo=0;
   ULong64_t tstamp;
   indexTree->Branch("scopeFilename", &scopeFilename);
-  indexTree->Branch("major", &major);
-  indexTree->Branch("minor", &minor);
+  indexTree->Branch("major", &maj);
+  indexTree->Branch("minor", &min);
   indexTree->Branch("subEvNo", &subEvNo);
   indexTree->Branch("scopeEvNo", &scopeEvNo);
   indexTree->Branch("surfEvNo", &surfEvNo);
@@ -189,7 +189,7 @@ int T576Event::buildEventIndex(int force){
       TSystemFile *file=(TSystemFile*)files->At(i);
       //delete(filen);
       fname = file->GetName();
-      cout.flush()<<fname<<"                  \r";
+
       if(!file->IsDirectory()&&!file->IsZombie()){//is the file there
 	TString majorstr=fname(17);//get the run major
 	maj=majorstr.Atoi(); 
@@ -197,25 +197,30 @@ int T576Event::buildEventIndex(int force){
 	TString substr1=fname(19, 999);
 	TString minorstr=substr1(0, substr1.First("."));//get run minor
 	//cout<<minorstr<<endl;
-	if(minorstr.IsDec()&&maj>0){//check that it isn't 'test' or something
+	if(minorstr.IsDec()){//check that it isn't 'test' or something
 	  min=minorstr.Atoi();
+	  //cout<<min<<endl;
 	  auto inFile=TFile::Open(directory+fname);//open the file
-	  TTree *tree = (TTree*)inFile->Get("tree");
-	  tree->SetBranchAddress("timestamp", &tstamp);
-	  int nentries=tree->GetEntries();
-	  if(nentries>0){
-	    for(int j=0;j<nentries;j++){
-	      //cout<<scopeFilename<<" "<<major<<" "<<minor<<" "<<subEvNo<<" "<<scopeEvNo<<endl;
-	      tree->GetEntry(j);
-	      subEvNo=j;
-	      //	      scopeFilename=const_cast<char*>(fname.Data());
-	      scopeFilename=fname;
-	      indexTree->Fill();
-	      scopeEvNo++;
+	  if(inFile){
+	    TTree *tree = (TTree*)inFile->Get("tree");
+	    if(tree){
+	      tree->SetBranchAddress("timestamp", &tstamp);
+	      int nentries=tree->GetEntries();
+	      cout.flush()<<fname<<"                  \r";	      
+	      for(int j=0;j<nentries;j++){
+		//cout<<scopeFilename<<" "<<major<<" "<<minor<<" "<<subEvNo<<" "<<scopeEvNo<<endl;
+		tree->GetEntry(j);
+		subEvNo=j;
+		//	      scopeFilename=const_cast<char*>(fname.Data());
+		scopeFilename=fname;
+		indexTree->Fill();
+		scopeEvNo++;
+	      }
 	    }
 	  }
-	  inFile->Close();
-	  //delete(inFile);
+	  //inFile->Close();
+	    
+	  delete(inFile);
 	  //delete(tree);
 	}
 
