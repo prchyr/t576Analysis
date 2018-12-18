@@ -23,13 +23,13 @@ int T576Event::loadEvent(int run_major, int run_minor,int event){
   TString ends_with=major+"_"+minor;
   TString filename=fFilename;
   
+  TSystemDirectory dir(directory, directory);
+  TList *files = dir.GetListOfFiles();
 
   //check that this file isn't already loaded, if it is, save some time
   if(filename.EndsWith(ends_with+".root")){
     goto skip;
   }
-  TSystemDirectory dir(directory, directory);
-  TList *files = dir.GetListOfFiles();
 
   //find the filename
   if(files){
