@@ -3,58 +3,80 @@
 using namespace CLHEP;
 using namespace std;
 
-// T576Event::T576Event(int run_major, int run_minor,int event){
-//   loadEvent(int run_major, int run_minor,int event);
-// }
+
+
+
+//on construction, check that the data directory structure is good and indexed.
+int T576Event::checkStatus(){
+  fInstallDir=getenv("T576_INSTALL_DIR");
+  if(fInstallDir==""){
+    fInstallDir="/usr/local";
+  }
+
+  TFile* indexFile;
+  indexFile=TFile::Open(fInstallDir+"/share/t576/eventIndex.root");
+
+  if(!indexFile){
+    cout<<"event index not built yet. building..."<<endl;
+    buildEventIndex();
+    indexFile=TFile::Open(fInstallDir+"/share/t576/eventIndex.root");
+  }
+  
+  fIndexTree=(TTree*)indexFile->Get("indexTree");
+  fIndexTree->SetBranchAddress("filename", &filename);
+  fIndexTree->SetBranchAddress("major", &major);
+  fIndexTree->SetBranchAddress("minor", &minor);
+  fIndexBuilt=1;
+  fIndexTree->BuildIndex("scopeEvNo", "scopeEvNo");
+  fScopeEvNoIndex=(TTreeIndex*)fIndexTree->GetTreeIndex();
+  fIndexTree->BuildIndex("major", "minor");
+  fMajorMinorIndex=(TTreeIndex*)fIndexTree->GetTreeIndex();
+
+}
+
 
 
 int T576Event::loadEvent(int run_major, int run_minor,int event){
-  TString major=TString::Itoa(run_major, 10);
-  TString minor=TString::Itoa(run_minor, 10);
+
+  //TString major=TString::Itoa(run_major, 10);
+  //TString minor=TString::Itoa(run_minor, 10);
   
+  if(fIndexBuilt==0){
+    cout<<"event index not built yet. building..."<<endl;
+    buildEventIndex();
+  }
+  
+  // TString install_dir=getenv("T576_INSTALL_DIR");
+  // if(install_dir==""){
+  //   install_dir="/usr/local";
+  // }
+
+  // TFile* indexFile;
+  // indexFile=TFile::Open(install_dir+"/share/t576/eventIndex.root");
+
+  // if(indexFile->IsZombie()){
+  //   cout<<"event index not built yet. building..."<<endl;
+  //   buildEventIndex();
+  //   indexFile=TFile::Open(install_dir+"/share/t576/eventIndex.root");
+  // }
+
   TString top_dir = getenv("T576_DATA_DIR");
   TString directory=top_dir+"/root/";
-  
   if(!directory){
     cout<<"T576_DATA_DIR not set. please set this flag so that the data can be found. this should be the top directory inside of which is py/ and root/."<<endl;
     return (-1);
   }
   
-  TString ends_with=major+"_"+minor;
-  TString filename=fFilename;
-  
-  TSystemDirectory dir(directory, directory);
-  TList *files = dir.GetListOfFiles();
-
-  //check that this file isn't already loaded, if it is, save some time
-  if(filename.EndsWith(ends_with+".root")){
-    goto skip;
-  }
-
-  //find the filename
-  if(files){
-    TSystemFile *file;
-    TString fname;
-    TString ext = ".root";
-    TIter next(files);
-    while((file=(TSystemFile*)next())){
-      fname = file->GetName();
-      if(!file->IsDirectory()&&fname.EndsWith(ends_with+ext)){
-	filename=fname;
-	//	cout<<filename<<endl;
-      }
-    }
-    delete (file);
-  }
-  delete (files);
-  if(!filename){
-    cout<<"file not found!"<<endl;
-    return (-1);
-  }
-
-
- skip:
-  auto file=TFile::Open(directory+filename);
+  cout<<"asdf"<<endl;
+  //  fIndexTree->SetBranchAddress("filename", &filename);
+  fIndexTree->SetTreeIndex(fMajorMinorIndex);
+  fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(run_major, run_minor));
+  //  fIndexTree->GetEntry(0);
+  //  cout<<filename->Data();
+  TString scopeFilename=filename->Data();
+  //open the file
+  //cout<<scopeFilename<<endl;
+  auto file=TFile::Open(directory+scopeFilename);
   auto tree=(TTree*)file->Get("tree");
   
 
@@ -65,9 +87,12 @@ int T576Event::loadEvent(int run_major, int run_minor,int event){
   tree->SetBranchAddress("time", scope.time);
   tree->SetBranchAddress("timestamp", &timestamp);
   tree->GetEntry(event);
-  
+
+  //check the length of the record.
   auto length=sizeof(scope.time)/sizeof(*scope.time);
 
+  //fill the event graphs for the scope.
+  //fix the first and last values, which were recorded incorrectly
   scope.time[0]=0.;
   scope.time[19999]=scope.time[19998]+.05;
   for(int i=0;i<4;i++){
@@ -75,33 +100,136 @@ int T576Event::loadEvent(int run_major, int run_minor,int event){
     *scope.gr[i]=*graph;
     delete(graph);
   }
-
+  
   delete(tree);
-
+  file->Close();
+  //delete(file);
+  getCharge(scope.gr[3]);
+  
+  //  delete (files);
+  
+  
   return 1;
 }
 
-//constructor with a tree
 
-int T576Event::loadEvent(int run_major, int run_minor,TTree * tree){
-  //double * ch[4];
-  //  double * time;
-  //ULong64_t timestamp;
-  tree->SetBranchAddress("ch1", scope.ch[0]);
-  tree->SetBranchAddress("ch2", scope.ch[1]);
-  tree->SetBranchAddress("ch3", scope.ch[2]);
-  tree->SetBranchAddress("ch4", scope.ch[3]);
-  tree->SetBranchAddress("time", scope.time);
-  tree->SetBranchAddress("timestamp", &timestamp);
+int T576Event::getCharge(TGraph *ict){
+  double tot=0.;
+  for(int i=0;i<ict->GetN();i++){
+    tot+=ict->GetY()[i];
+  }
+  double xval=ict->GetX()[10]-ict->GetX()[9];
 
-  auto length=sizeof(scope.time)/sizeof(*scope.time);
+  charge = .4*tot*xval;
+  return 1;
+}
 
-  for(int i=0;i<4;i++){
-    auto graph=new TGraph(length, scope.time, scope.ch[i]);
-    *scope.gr[i]=*graph;
-    delete(graph);
+int T576Event::Scope::getAntennaPositions(int run_major, int run_minor){
+
+  
+}
+
+int T576Event::Surf::getAntennaPositions(int run_major, int run_minor){
+
+
+}
+
+
+int T576Event::buildEventIndex(int force){
+  TString install_dir=getenv("T576_INSTALL_DIR");
+  if(install_dir==""){
+    install_dir="/usr/local";
+  }
+  
+
+  ifstream indexFile;
+  indexFile.open(install_dir+"/share/t576/eventIndex.root");
+  if(indexFile&&force==0){
+    cout<<"event index already built."<<endl;
+    return 1;
+  }
+  else if(indexFile&&force==1){
+    cout<<"event index already built, forcing rebuild.."<<endl;
   }
 
-  //  charge=getCharge(scope.ch[3]);
+  //cout<<"asdf"<<endl;
+  TFile * index= new TFile(install_dir+"/share/t576/eventIndex.root", "recreate");
+  TTree *indexTree = new TTree("indexTree", "index of events");
+  TString filename;
+  int maj=0, min=0, subEvNo=0, scopeEvNo=0, surfEvNo=0;
+  ULong64_t tstamp;
+  indexTree->Branch("filename", &filename);
+  indexTree->Branch("major", &major);
+  indexTree->Branch("minor", &minor);
+  indexTree->Branch("subEvNo", &subEvNo);
+  indexTree->Branch("scopeEvNo", &scopeEvNo);
+  indexTree->Branch("surfEvNo", &surfEvNo);
+  indexTree->Branch("tstamp", &tstamp);
+
+  TString top_dir = getenv("T576_DATA_DIR");
+  TString directory=top_dir+"/root/";
   
+  TSystemDirectory dir(directory, directory);
+  TList *files = dir.GetListOfFiles();
+  //    cout<<files->GetEntries()<<endl;
+  //find the filename
+  
+  if(files){
+    files->Sort();
+    int nfiles=files->GetEntries();
+    TString fname;
+    TString ext = ".root";
+    //TObject *obj;
+    //    TIter next(files);
+    for(int i=0;i<nfiles;i++){
+      TSystemFile *file=(TSystemFile*)files->At(i);
+      //delete(filen);
+      fname = file->GetName();
+      cout.flush()<<fname<<"                  \r";
+      if(!file->IsDirectory()&&!file->IsZombie()){//is the file there
+	TString majorstr=fname(17);//get the run major
+	maj=majorstr.Atoi(); 
+	//cout<<majorstr<<" ";
+	TString substr1=fname(19, 999);
+	TString minorstr=substr1(0, substr1.First("."));//get run minor
+	//cout<<minorstr<<endl;
+	if(minorstr.IsDec()&&major>0){//check that it isn't 'test' or something
+	  min=minorstr.Atoi();
+	  auto inFile=TFile::Open(directory+fname);//open the file
+	  TTree *tree = (TTree*)inFile->Get("tree");
+	  tree->SetBranchAddress("timestamp", &tstamp);
+	  int nentries=tree->GetEntries();
+	  if(nentries>0){
+	    for(int j=0;j<nentries;j++){
+	      //cout<<filename<<" "<<major<<" "<<minor<<" "<<subEvNo<<" "<<scopeEvNo<<endl;
+	      tree->GetEntry(j);
+	      subEvNo=j;
+	      //	      filename=const_cast<char*>(fname.Data());
+	      filename=fname;
+	      indexTree->Fill();
+	      scopeEvNo++;
+	    }
+	  }
+	  inFile->Close();
+	  //delete(inFile);
+	  //delete(tree);
+	}
+
+      }
+      delete(file);
+    }
+  }
+
+    //delete (file);
+  //}
+  else{
+    cout<<"no files! check directory."<<endl;
+    return -1;
+  }
+  index->Write();
+  index->Close();
+
+  fIndexBuilt=1;
+  
+  return 1;
 }

@@ -14,9 +14,11 @@
 #include "TH1F.h"
 #include "TString.h"
 #include "TTree.h"
+#include "TTreeIndex.h"
 #include "TGraph.h"
 #include "TGraph2D.h"
-
+#include <iostream>
+#include <fstream>
 #include <vector>
 
 #include "CLHEP/Units/PhysicalConstants.h"
@@ -31,9 +33,13 @@ using namespace std;
 class T576Event : public TObject{
 public:
   //constructors
-  T576Event(){}
+  T576Event(){checkStatus();}
   //load a T576 event
-  T576Event(int run_major, int run_minor, int event){loadEvent(run_major, run_minor, event);}
+  //  T576Event(int run_major, int run_minor, int event){;}
+  T576Event(int run_major, int run_minor, int event):{
+    checkStatus();
+    loadEvent(run_major, run_minor,event);
+  }
   //load a T576 event from a radio scatter event
   //T576Event(int run_major, int run_minor,RadioScatterEvent *rs):loadEvent(run_major, run_minor, rs){}
   //load a T576 event from the generic tree in the raw capture files
@@ -50,18 +56,24 @@ public:
   ULong64_t timestamp;
   double frequency;
   double power;
+  TString * filename=new TString();
   Hep3Vector txPos;
   int major, minor, event;
 
   int loadEvent(int run_major, int run_minor, int event);
   //  void loadEvent(int run_major, int run_minor, RadioScatterEvent *rs);
   int loadEvent(int run_major, int run_minor, TTree *inTree);
-
+  int getCharge(TGraph * ict);
+  int buildEventIndex(int force=0);
+  int checkStatus();
   
 private:
   int fRunLoaded=0;
-  TString fFilename;
-
+  TString fScopeFilename, fInstallDir;
+  int fIndexBuilt=0;
+  TTreeIndex * fScopeEvNoIndex, *fMajorMinorIndex;
+  TTree *fIndexTree=new TTree();
+  
 public:
   class Scope {
   public:
@@ -70,6 +82,7 @@ public:
     //    TGraph *fGr=new TGraph();
     TGraph * gr[4]={new TGraph(), new TGraph(),new TGraph(),new TGraph()};
     double  time[20000];
+    int getAntennaPositions(int run_major, int run_minor);
   private:
 
     ClassDefNV(Scope, 1);
@@ -84,6 +97,7 @@ public:
     double  time[1024];
 
     TGraph2D * map=0;
+    int getAntennaPositions(int run_major, int run_minor);
   private:
     TGraph2D *buildMap(int mmStep=500);
     int fMapMade=0;
