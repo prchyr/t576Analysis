@@ -197,7 +197,7 @@ int T576Event::buildEventIndex(int force){
 	TString substr1=fname(19, 999);
 	TString minorstr=substr1(0, substr1.First("."));//get run minor
 	//cout<<minorstr<<endl;
-	if(minorstr.IsDec()&&major>0){//check that it isn't 'test' or something
+	if(minorstr.IsDec()&&maj>0){//check that it isn't 'test' or something
 	  min=minorstr.Atoi();
 	  auto inFile=TFile::Open(directory+fname);//open the file
 	  TTree *tree = (TTree*)inFile->Get("tree");
