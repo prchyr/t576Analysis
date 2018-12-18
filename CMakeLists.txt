@@ -39,7 +39,7 @@ else()
 endif()
 
 
-include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include ${CLHEP_INCLUDE_DIR} ${ROOT_INCLUDE_DIRS} ${T576_INCLUDE_DIR} ${T576_INCLUDE_DIR}/../)
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include ${CLHEP_INCLUDE_DIR} ${ROOT_INCLUDE_DIRS} ${T576_INCLUDE_DIR} ${T576_INCLUDE_DIR}/../)
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
@@ -48,7 +48,7 @@ include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include ${CLHEP_
 file(GLOB sources ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src/*.cc ${T576_INCLUDE_DIR}/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include/*.hh ${T576_INCLUDE_DIR}/*.hh)
 
-file(GLOB SOURCE_FILES ${T576_INCLUDE_DIR}/*.cc ${CLHEP_INCLUDE_DIR}/Vector/*.icc ${CLHEP_INCLUDE_DIR}/Units/*.icc)
+file(GLOB SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.cc ${CLHEP_INCLUDE_DIR}/Vector/*.icc ${CLHEP_INCLUDE_DIR}/Units/*.icc)
 file(GLOB HEADER_FILES ${T576_INCLUDE_DIR}/*.hh ${CLHEP_INCLUDE_DIR}/Vector/*.h ${CLHEP_INCLUDE_DIR}/Units/*.h)# ${GSL_INCLUDE_DIRS}/gsl/*.h)
 
 
@@ -70,6 +70,8 @@ target_link_libraries(t576 ${ROOT_LIBRARIES} CLHEP::Vector)
 #install(TARGETS slac DESTINATION ${PROJECT_BINARY_DIR}/bin)
 install (FILES ${T576_INCLUDE_DIR}/T576Event.hh DESTINATION ${T576_INSTALL_DIR}/include/t576)
 install (FILES ${PROJECT_SOURCE_DIR}/src/T576Event.cc DESTINATION ${T576_INSTALL_DIR}/src/t576)
+
+install (FILES ${PROJECT_SOURCE_DIR}/share/test.tt DESTINATION ${T576_INSTALL_DIR}/share/t576)
 
 install (FILES ${PROJECT_BINARY_DIR}/libt576_rdict.pcm DESTINATION ${LIB_INSTALL_DIR})
 

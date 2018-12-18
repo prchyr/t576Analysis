@@ -7,6 +7,10 @@
 #include "TRandom.h"
 #include "TObject.h"
 #include "TFile.h"
+#include "TSystemDirectory.h"
+#include "TList.h"
+//#include "TIter.h"
+#include "TSystemFile.h"
 #include "TH1F.h"
 #include "TString.h"
 #include "TTree.h"
@@ -33,33 +37,41 @@ public:
   //load a T576 event from a radio scatter event
   //T576Event(int run_major, int run_minor,RadioScatterEvent *rs):loadEvent(run_major, run_minor, rs){}
   //load a T576 event from the generic tree in the raw capture files
-  T576Event(int run_major, int run_minor,TTree * tree){loadEvent(run_major, run_minor, tree);}
+  T576Event(int run_major, int run_minor,TTree * inTree){;}//{loadEvent(run_major, run_minor, tree);}
 
+
+
+  //the two DAQs. 
+  class Scope;
+  class Surf;
 
   //global info for all channels in an event.
   double charge;
-  long timestamp;
+  ULong64_t timestamp;
   double frequency;
   double power;
   Hep3Vector txPos;
   int major, minor, event;
 
-  void loadEvent(int run_major, int run_minor, int event);
+  int loadEvent(int run_major, int run_minor, int event);
   //  void loadEvent(int run_major, int run_minor, RadioScatterEvent *rs);
-  void loadEvent(int run_major, int run_minor, TTree *tree);
-  //the two DAQs. 
-  class Scope;
-  class Surf;
+  int loadEvent(int run_major, int run_minor, TTree *inTree);
+
+  
 private:
   int fRunLoaded=0;
-
+  TString fFilename;
 
 public:
   class Scope {
   public:
     Hep3Vector pos[4];
-    TGraph * ch[4]={0};
-    double * time;
+    double  ch[4][20000];
+    //    TGraph *fGr=new TGraph();
+    TGraph * gr[4]={new TGraph(), new TGraph(),new TGraph(),new TGraph()};
+    double  time[20000];
+  private:
+
     ClassDefNV(Scope, 1);
   };
 
@@ -67,8 +79,9 @@ public:
   class Surf{
   public:
     Hep3Vector pos[12];
-    TGraph * ch[12]={0};
-    double * time;
+    double  ch[12][1024];
+    TGraph * gr[12]={new TGraph()};
+    double  time[1024];
 
     TGraph2D * map=0;
   private:
@@ -78,6 +91,13 @@ public:
     
     ClassDefNV(Surf, 1);
   };
+
+  //public things
+  Surf surf;
+  Scope scope;
+
+
+  
   ClassDefNV(T576Event, 1);
 };
 
