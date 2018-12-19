@@ -32,60 +32,76 @@ using namespace std;
 
 class T576Event : public TObject{
 public:
-  //constructors
+  /************constructors**********/
   T576Event(){checkStatus();}
-  //load a T576 event
-  //  T576Event(int run_major, int run_minor, int event){;}
+  //load a T576 event using run major and minor. actual file name not needed.
   T576Event(int run_major, int run_minor, int event){
     major=run_major;
     minor=run_minor;
     checkStatus();
-    loadEvent(run_major, run_minor,event);
+    loadScopeEvent(run_major, run_minor,event);
   }
-  //load a T576 event from a radio scatter event
-  //T576Event(int run_major, int run_minor,RadioScatterEvent *rs):loadEvent(run_major, run_minor, rs){}
-  //load a T576 event from the generic tree in the raw capture files
-  T576Event(int run_major, int run_minor,TTree * inTree){;}//{loadEvent(run_major, run_minor, tree);}
 
-
-
+  /*************globals for every event*****************/
   //the two DAQs. 
   class Scope;
   class Surf;
 
-  //global info for all channels in an event.
+  //useful variables, gathered from the run log for each event.
+  Hep3Vector txPos;
   double charge;
   ULong64_t timestamp;
   double frequency;
   double power;
+  //various event numbering indices.
   int subEvNo, scopeEvNo, surfEvNo, evNo;
+  //accesors for the file names associated with the event.
   TString * scopeFilename=new TString();
   TString * surfFilename=new TString();
-  Hep3Vector txPos;
-  int major, minor, event;
+  int major, minor;
 
-  int loadEvent(int run_major, int run_minor, int event);
-  //  void loadEvent(int run_major, int run_minor, RadioScatterEvent *rs);
-  int loadEvent(int run_major, int run_minor, TTree *inTree);
-  int getCharge(TGraph * ict);
+  /****************operational functions*****************/
+  
+  //load an event from a particular run file. actual file name not needed, just the major and minor associated with it. so XXXXrun4_6.root event number 15 is loaded by doing loadScopeEvent(4, 6, 15); 
+  int loadScopeEvent(int run_major, int run_minor, int event);
+  //load an event using a running scope event number index. this index is built the first time the T576Event class is used, starting at 0 for the first event in run 0_0 and going upward.
+  //when you use this, the correct positions and stuff will be loaded for the correct run etc.
+  int loadScopeEvent(int event);
+  //build the event index ROOT file which allows for rapid grabbing of the right data (done once, first time you use the class. you can also force a re-build if you change the data directory [don't.]) 
   int buildEventIndex(int force=0);
+  //run on construction to make sure the indexing is valid and useable.
   int checkStatus();
+
+
+  /**************utility and analysis functions**************/
+
+  //get the charge in this event from the ict trace.
+  double getCharge(TGraph * ict);
+
   
 private:
-  int fRunLoaded=0;
+  double fInterpLevel=1.;
   TString fScopeFilename, fInstallDir;
   int fIndexBuilt=0;
   TTreeIndex * fScopeEvNoIndex, *fMajorMinorIndex;
   TTree *fIndexTree=new TTree();
+  TTree *fEventTree=new TTree();
+  TFile *fEventFile=new TFile();
   
 public:
   class Scope {
   public:
+    //receiver positions
     Hep3Vector pos[4];
+    //double arrays for the individual traces
     double  ch[4][20000];
-    //    TGraph *fGr=new TGraph();
-    TGraph * gr[4]={new TGraph(), new TGraph(),new TGraph(),new TGraph()};
+    //and the x axis time of the recorded traces
     double  time[20000];
+    //tgraphs of each event channel
+    TGraph * gr[4]={new TGraph(), new TGraph(),new TGraph(),new TGraph()};
+
+
+    //loads the antenna position iformation into the pos[] above, using the run log.
     int getAntennaPositions(int run_major, int run_minor);
   private:
 
@@ -111,8 +127,8 @@ public:
   };
 
   //public things
-  Surf surf;
-  Scope scope;
+  Surf * surf=new Surf();
+  Scope * scope=new Scope();
 
 
   

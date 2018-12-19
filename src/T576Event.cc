@@ -6,7 +6,7 @@ using namespace std;
 
 
 
-//on construction, check that the data directory structure is good and indexed.
+//on construction, check that the data directory structure is good and indexed. if not, build an index file for quick grabbing of events.
 int T576Event::checkStatus(){
   fInstallDir=getenv("T576_INSTALL_DIR");
   if(fInstallDir==""){
@@ -38,9 +38,9 @@ int T576Event::checkStatus(){
 
 }
 
+//load a scope event using a run major/minor combination and event within that file
 
-
-int T576Event::loadEvent(int run_major, int run_minor,int event){
+int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
 
   //TString major=TString::Itoa(run_major, 10);
   //TString minor=TString::Itoa(run_minor, 10);
@@ -71,44 +71,129 @@ int T576Event::loadEvent(int run_major, int run_minor,int event){
     return (-1);
   }
   
-  cout<<"asdf"<<endl;
+  //cout<<"asdf"<<endl;
   //  fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
   fIndexTree->SetTreeIndex(fMajorMinorIndex);
   fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(run_major, run_minor));
   //  fIndexTree->GetEntry(0);
   //  cout<<scopeFilename->Data();
-  TString scopeScopeFilename=scopeFilename->Data();
+  TString thisScopeFilename=scopeFilename->Data();
+  if(thisScopeFilename==fScopeFilename)goto fileSkip;
+
+  fScopeFilename=thisScopeFilename;
   //open the file
-  //cout<<scopeScopeFilename<<endl;
-  auto file=TFile::Open(directory+scopeScopeFilename);
-  auto tree=(TTree*)file->Get("tree");
+  //  cout<<scopeScopeFilename<<endl;
+  fEventFile=TFile::Open(directory+thisScopeFilename);
+  fEventTree=(TTree*)fEventFile->Get("tree");
   
 
-  tree->SetBranchAddress("ch1", scope.ch[0]);
-  tree->SetBranchAddress("ch2", scope.ch[1]);
-  tree->SetBranchAddress("ch3", scope.ch[2]);
-  tree->SetBranchAddress("ch4", scope.ch[3]);
-  tree->SetBranchAddress("time", scope.time);
-  tree->SetBranchAddress("timestamp", &timestamp);
-  tree->GetEntry(event);
+  fEventTree->SetBranchAddress("ch1", scope->ch[0]);
+  fEventTree->SetBranchAddress("ch2", scope->ch[1]);
+  fEventTree->SetBranchAddress("ch3", scope->ch[2]);
+  fEventTree->SetBranchAddress("ch4", scope->ch[3]);
+  fEventTree->SetBranchAddress("time", scope->time);
+  fEventTree->SetBranchAddress("timestamp", &timestamp);
+
+
+ fileSkip:
+  if(event>fEventTree->GetEntries()){
+    cout<<"event number too high! this major/minor combination only contains "<<fEventTree->GetEntries()<<" events."<<endl<<"select another event number, or call loadScopeEvent(event) or loadSurfEvent(event) without major/minor to use overall event index"<<endl;
+    return (-1);
+  }
+
+  fEventTree->GetEntry(event);
 
   //check the length of the record.
-  auto length=sizeof(scope.time)/sizeof(*scope.time);
+  auto length=sizeof(scope->time)/sizeof(*scope->time);
 
-  //fill the event graphs for the scope.
+  //fill the event graphs for the scope->
   //fix the first and last values, which were recorded incorrectly
-  scope.time[0]=0.;
-  scope.time[19999]=scope.time[19998]+.05;
+  scope->time[0]=0.;
+  scope->time[19999]=scope->time[19998]+.05;
   for(int i=0;i<4;i++){
-    auto graph=new TGraph(length, scope.time, scope.ch[i]);
-    *scope.gr[i]=*graph;
+    auto graph=new TGraph(length, scope->time, scope->ch[i]);
+    *scope->gr[i]=*graph;
     delete(graph);
   }
   
-  delete(tree);
-  file->Close();
+  //delete(tree);
+  fEventFile->Close();
   //delete(file);
-  getCharge(scope.gr[3]);
+  getCharge(scope->gr[3]);
+  
+  //  delete (files);
+  
+  
+  return 1;
+  }
+
+
+//load an event from the global scope event number index 
+int T576Event::loadScopeEvent(int event){
+
+  if(fIndexBuilt==0){
+    cout<<"event index not built yet. building..."<<endl;
+    buildEventIndex();
+  }
+
+  TString top_dir = getenv("T576_DATA_DIR");
+  TString directory=top_dir+"/root/";
+  if(!directory){
+    cout<<"T576_DATA_DIR not set. please set this flag so that the data can be found. this should be the top directory inside of which is py/ and root/."<<endl;
+    return (-1);
+  }
+  
+  //cout<<"asdf"<<endl;
+  //  fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
+  fIndexTree->SetTreeIndex(fScopeEvNoIndex);
+  fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(event, event));
+  //  fIndexTree->GetEntry(0);
+  //  cout<<thisScopeFilename->Data();
+  TString thisScopeFilename=scopeFilename->Data();
+  //open the file
+  //  cout<<thisScopeFilename<<endl<<" "<<fScopeFilename<<endl;
+  if(thisScopeFilename==fScopeFilename)goto fileSkip;
+
+  cout<<thisScopeFilename<<endl;
+  fEventFile=TFile::Open(directory+thisScopeFilename);
+  fEventTree=(TTree*)fEventFile->Get("tree");
+
+  //  memset(scope->ch, 0, sizeof(scope->ch));
+  //memset(scope->gr, 0, sizeof(scope->gr));
+
+  fEventTree->SetBranchAddress("ch1", scope->ch[0]);
+  fEventTree->SetBranchAddress("ch2", scope->ch[1]);
+  fEventTree->SetBranchAddress("ch3", scope->ch[2]);
+  fEventTree->SetBranchAddress("ch4", scope->ch[3]);
+  fEventTree->SetBranchAddress("time", scope->time);
+  fEventTree->SetBranchAddress("timestamp", &timestamp);
+
+  fScopeFilename=thisScopeFilename;
+  fileSkip:
+  if(subEvNo>=fEventTree->GetEntries()){
+    cout<<"event number too high! this major/minor combination only contains "<<fEventTree->GetEntries()<<" events."<<endl<<"select another event number, or call loadEvent(event) without major/minor to use overall event index"<<endl;
+  }
+
+  fEventTree->GetEntry(event);
+
+  //check the length of the record.
+  auto length=sizeof(scope->time)/sizeof(*scope->time);
+
+  //fill the event graphs for the scope->
+  //fix the first and last values, which were recorded incorrectly
+  scope->time[0]=0.;
+  scope->time[19999]=scope->time[19998]+.05;
+  for(int i=0;i<4;i++){
+    auto graph=new TGraph(length, scope->time, scope->ch[i]);
+    *scope->gr[i]=*graph;
+    delete(graph);
+  }
+  
+  //delete(tree);
+
+  if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
+  //delete(file);
+  getCharge(scope->gr[3]);
   
   //  delete (files);
   
@@ -117,7 +202,7 @@ int T576Event::loadEvent(int run_major, int run_minor,int event){
 }
 
 
-int T576Event::getCharge(TGraph *ict){
+double T576Event::getCharge(TGraph *ict){
   double tot=0.;
   for(int i=0;i<ict->GetN();i++){
     tot+=ict->GetY()[i];
@@ -125,7 +210,7 @@ int T576Event::getCharge(TGraph *ict){
   double xval=ict->GetX()[10]-ict->GetX()[9];
 
   charge = .4*tot*xval;
-  return 1;
+  return charge;
 }
 
 int T576Event::Scope::getAntennaPositions(int run_major, int run_minor){
@@ -228,7 +313,6 @@ int T576Event::buildEventIndex(int force){
       delete(file);
     }
   }
-
     //delete (file);
   //}
   else{
@@ -237,6 +321,8 @@ int T576Event::buildEventIndex(int force){
   }
   index->Write();
   index->Close();
+  delete(index);
+  delete(indexTree);
 
   fIndexBuilt=1;
   
