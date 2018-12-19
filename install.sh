@@ -28,8 +28,15 @@ fi
 
 
 mkdir -p build &&
+    cp example/test.cc build/
     cd build
+
 
 cmake $top_dir &&
     make -B -j4 &&
-    make install
+    make install && 
+    echo "testing a compile of an example script" &&
+    g++ test.cc -o test `root-config --cflags --glibs --libs` -lt576 &&
+    cp test $T576_INSTALL_DIR/share/t576 &&
+    echo "complete."
+
