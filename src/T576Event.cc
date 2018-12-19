@@ -170,8 +170,9 @@ int T576Event::loadScopeEvent(int event){
 
   fScopeFilename=thisScopeFilename;
   fileSkip:
-  if(subEvNo>=fEventTree->GetEntries()){
-    cout<<"event number too high! this major/minor combination only contains "<<fEventTree->GetEntries()<<" events."<<endl<<"select another event number, or call loadEvent(event) without major/minor to use overall event index"<<endl;
+  if(event>=fIndexTree->GetEntries()){
+    cout<<"event number too high!"<<endl;
+    return -1;
   }
 
   fEventTree->GetEntry(event);
