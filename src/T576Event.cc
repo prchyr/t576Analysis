@@ -152,27 +152,29 @@ int T576Event::loadScopeEvent(int event){
   TString thisScopeFilename=scopeFilename->Data();
   //open the file
   //  cout<<thisScopeFilename<<endl<<" "<<fScopeFilename<<endl;
-  if(thisScopeFilename==fScopeFilename)goto fileSkip;
+  if(thisScopeFilename!=fScopeFilename){
 
-  cout<<thisScopeFilename<<endl;
-  fEventFile=TFile::Open(directory+thisScopeFilename);
-  fEventTree=(TTree*)fEventFile->Get("tree");
+    cout<<thisScopeFilename<<endl;
+    fEventFile=TFile::Open(directory+thisScopeFilename);
+    fEventTree=(TTree*)fEventFile->Get("tree");
 
-  //  memset(scope->ch, 0, sizeof(scope->ch));
-  //memset(scope->gr, 0, sizeof(scope->gr));
+    //  memset(scope->ch, 0, sizeof(scope->ch));
+    //memset(scope->gr, 0, sizeof(scope->gr));
 
-  fEventTree->SetBranchAddress("ch1", scope->ch[0]);
-  fEventTree->SetBranchAddress("ch2", scope->ch[1]);
-  fEventTree->SetBranchAddress("ch3", scope->ch[2]);
-  fEventTree->SetBranchAddress("ch4", scope->ch[3]);
-  fEventTree->SetBranchAddress("time", scope->time);
-  fEventTree->SetBranchAddress("timestamp", &timestamp);
+    fEventTree->SetBranchAddress("ch1", scope->ch[0]);
+    fEventTree->SetBranchAddress("ch2", scope->ch[1]);
+    fEventTree->SetBranchAddress("ch3", scope->ch[2]);
+    fEventTree->SetBranchAddress("ch4", scope->ch[3]);
+    fEventTree->SetBranchAddress("time", scope->time);
+    fEventTree->SetBranchAddress("timestamp", &timestamp);
 
-  fScopeFilename=thisScopeFilename;
-  fileSkip:
+    fScopeFilename=thisScopeFilename;
+
+  }
+
   if(event>=fIndexTree->GetEntries()){
     cout<<"event number too high!"<<endl;
-    return -1;
+    return 0;
   }
 
   fEventTree->GetEntry(event);
@@ -313,6 +315,7 @@ int T576Event::buildEventIndex(int force){
       }
       delete(file);
     }
+    
   }
     //delete (file);
   //}
@@ -320,11 +323,13 @@ int T576Event::buildEventIndex(int force){
     cout<<"no files! check directory."<<endl;
     return -1;
   }
+  
   index->Write();
   index->Close();
+//delete(indexTree);
   delete(index);
-  delete(indexTree);
-
+  cout<<endl<<"index built"<<endl;
+  
   fIndexBuilt=1;
   
   return 1;

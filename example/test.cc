@@ -4,14 +4,15 @@ int main(){
   time_t time_start, time_end;
   time(&time_start);
   auto ev=new T576Event();
+  int eventCount=0;
   for(int i=0;i<50000;i++){
-    ev->loadScopeEvent(i);
+    eventCount+=ev->loadScopeEvent(i);
     cout.flush()<<i<<"     \r";
   }
   time(&time_end);
   cout.flush();
   //  cout<<time_end<<" "<<time_start<<endl;
-  printf("read first 10k events in %li seconds.\n", time_end-time_start); 
+  printf("read first %i events in %li seconds.\n", eventCount, time_end-time_start); 
   delete(ev);
   exit(0);
 }
