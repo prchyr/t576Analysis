@@ -62,7 +62,7 @@ add_library(t576 SHARED ${SOURCE_FILES} G__t576.cxx)
 
 
 target_link_libraries(t576 ${ROOT_LIBRARIES} CLHEP::Vector)
-
+#target_link_libraries(test ${ROOT_LIBRARIES} t576)
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
