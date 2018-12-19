@@ -38,5 +38,6 @@ cmake $top_dir &&
     echo "testing a compile of an example script" &&
     g++ test.cc -o test `root-config --cflags --glibs --libs` -lt576 &&
     cp test $T576_INSTALL_DIR/share/t576 &&
-    echo "complete."
+    echo "complete." &&
+    echo " try running $T576_INSTALL_DIR/share/t576/test "
 
