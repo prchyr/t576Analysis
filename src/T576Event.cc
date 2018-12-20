@@ -18,7 +18,11 @@ int T576Event::checkStatus(){
 
   if(!indexFile){
     cout<<endl<<"but that's OK! event index is not built yet. you may see zombies. this is also OK. "<<endl<<"building..."<<endl;
-    buildEventIndex();
+    int build=buildEventIndex();
+    if(build==0){
+      cout<<"can't build event index. set T576_DATA_DIR to your data directory. it is currently set to: "<<getenv("T576_DATA_DIR")<<endl;
+      return 0;
+    }
     indexFile=TFile::Open(fInstallDir+"/share/t576/eventIndex.root");
   }
   
@@ -49,6 +53,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
     cout<<"event index not built yet. building..."<<endl;
     buildEventIndex();
   }
+
   
   // TString install_dir=getenv("T576_INSTALL_DIR");
   // if(install_dir==""){
@@ -65,11 +70,13 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
   // }
 
   TString top_dir = getenv("T576_DATA_DIR");
-  TString directory=top_dir+"/root/";
-  if(!directory){
+
+  if(top_dir==""){
     cout<<"T576_DATA_DIR not set. please set this flag so that the data can be found. this should be the top directory inside of which is py/ and root/."<<endl;
-    return (-1);
+    return (0);
   }
+  
+  TString directory=top_dir+"/root/";
   
   //cout<<"asdf"<<endl;
   //  fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
@@ -137,11 +144,14 @@ int T576Event::loadScopeEvent(int event){
   }
 
   TString top_dir = getenv("T576_DATA_DIR");
-  TString directory=top_dir+"/root/";
-  if(!directory){
+
+  if(top_dir==""){
     cout<<"T576_DATA_DIR not set. please set this flag so that the data can be found. this should be the top directory inside of which is py/ and root/."<<endl;
-    return (-1);
+    return (0);
   }
+
+  TString directory=top_dir+"/root/";
+
   
   //cout<<"asdf"<<endl;
   //  fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
@@ -321,7 +331,7 @@ int T576Event::buildEventIndex(int force){
   //}
   else{
     cout<<"no files! check directory."<<endl;
-    return -1;
+    return 0;
   }
   
   index->Write();

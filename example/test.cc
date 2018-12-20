@@ -10,10 +10,10 @@ int main(){
     eventCount+=ev->loadScopeEvent(i);
     cout.flush()<<i<<"     \r";
   }
-  ev->scope->gr[3]->Draw("al");
+
   time(&time_end);
   cout.flush();
-  //  cout<<time_end<<" "<<time_start<<endl;
+
   printf("read first %i events in %li seconds.\n", eventCount, time_end-time_start); 
   delete(ev);
   exit(0);
