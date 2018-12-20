@@ -35,9 +35,7 @@ mkdir -p build &&
 cmake $top_dir &&
     make -B -j4 &&
     make install && 
-    echo "testing a compile of an example script" &&
-    g++ test.cc -o test `root-config --cflags --glibs --libs` -lt576 &&
-    cp test $T576_INSTALL_DIR/share/t576 &&
-    echo "complete." &&
-    echo " try running $T576_INSTALL_DIR/share/t576/test "
+    echo "a test script has been compiled. try running" &&
+    echo "$T576_INSTALL_DIR/share/t576/loadEvents"
+
 

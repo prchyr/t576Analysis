@@ -8,14 +8,14 @@ using namespace std;
 
 //on construction, check that the data directory structure is good and indexed. if not, build an index file for quick grabbing of events.
 int T576Event::checkStatus(){
+  //where to look for things.
   fInstallDir=getenv("T576_INSTALL_DIR");
   if(fInstallDir==""){
     fInstallDir="/usr/local";
   }
-
+  //find/make the event index file.
   TFile* indexFile;
   indexFile=TFile::Open(fInstallDir+"/share/t576/eventIndex.root");
-
   if(!indexFile){
     cout<<endl<<"but that's OK! event index is not built yet. you may see zombies. this is also OK. "<<endl<<"building..."<<endl;
     int build=buildEventIndex();
@@ -25,7 +25,7 @@ int T576Event::checkStatus(){
     }
     indexFile=TFile::Open(fInstallDir+"/share/t576/eventIndex.root");
   }
-  
+  //build the indices for fast lookup.
   fIndexTree=(TTree*)indexFile->Get("indexTree");
   fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
   fIndexTree->SetBranchAddress("major", &major);
@@ -40,6 +40,29 @@ int T576Event::checkStatus(){
   fIndexTree->BuildIndex("major", "minor");
   fMajorMinorIndex=(TTreeIndex*)fIndexTree->GetTreeIndex();
 
+
+  //load the position/frequency information.
+
+  fRunLog=TFile::Open(fInstallDir+"/share/t576/runLog.root");
+  fRunLogTree=(TTree*)fRunLog->Get("runLogTree");
+  fRunLogTree->SetBranchAddress("major", &major);
+  fRunLogTree->SetBranchAddress("minor", &minor);
+  fRunLogTree->SetBranchAddress("frequency", &frequency);
+  fRunLogTree->SetBranchAddress("power", &power);
+  fRunLogTree->SetBranchAddress("txOn", &txOn);
+  fRunLogTree->SetBranchAddress("polarization", &polarization);
+  fRunLogTree->SetBranchAddress("txDist", &txDist);
+  fRunLogTree->SetBranchAddress("scopeDist", scope->dist);
+  fRunLogTree->SetBranchAddress("txAng", &txAng);
+  fRunLogTree->SetBranchAddress("scopeAng", scope->ang);
+  fRunLogTree->SetBranchAddress("antennaType", antennaType);
+  fRunLogTree->SetBranchAddress("isGood", &isGood);
+  fRunLogTree->SetBranchAddress("surfOn", &surfOn);
+  fRunLogTree->SetBranchAddress("surfAng", surf->ang);
+  fRunLogTree->SetBranchAddress("surfDist", surf->dist);
+  //build an index for this tree. we keep the tree open, but save the index too. 
+  fRunLogTree->BuildIndex("major", "minor");
+  fRunLogIndex=(TTreeIndex*)fRunLogTree->GetTreeIndex();
 }
 
 //load a scope event using a run major/minor combination and event within that file
@@ -82,6 +105,13 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
   //  fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
   fIndexTree->SetTreeIndex(fMajorMinorIndex);
   fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(run_major, run_minor));
+  fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(run_major, run_minor));
+
+  txPos.setRThetaPhi(txDist, txAng*pi/180., pi);
+
+  for(int i=0;i<4;i++){
+    scope->pos[i].setRThetaPhi(scope->dist[i], scope->ang[i]*pi/180., pi);
+  }
   //  fIndexTree->GetEntry(0);
   //  cout<<scopeFilename->Data();
   TString thisScopeFilename=scopeFilename->Data();
@@ -157,6 +187,13 @@ int T576Event::loadScopeEvent(int event){
   //  fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
   fIndexTree->SetTreeIndex(fScopeEvNoIndex);
   fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(event, event));
+  fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(major, minor));
+  //  cout<<txDist<<" "<<txAng<<endl;
+  txPos.setRThetaPhi(txDist, txAng*pi/180., pi);
+  
+  for(int i=0;i<4;i++){
+    scope->pos[i].setRThetaPhi(scope->dist[i], scope->ang[i]*pi/180., pi);
+  }
   //  fIndexTree->GetEntry(0);
   //  cout<<thisScopeFilename->Data();
   TString thisScopeFilename=scopeFilename->Data();
@@ -164,7 +201,7 @@ int T576Event::loadScopeEvent(int event){
   //  cout<<thisScopeFilename<<endl<<" "<<fScopeFilename<<endl;
   if(thisScopeFilename!=fScopeFilename){
 
-    cout<<thisScopeFilename<<endl;
+    //cout<<thisScopeFilename<<endl;
     fEventFile=TFile::Open(directory+thisScopeFilename);
     fEventTree=(TTree*)fEventFile->Get("tree");
 

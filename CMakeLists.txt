@@ -58,7 +58,8 @@ ROOT_GENERATE_DICTIONARY(G__t576 ${HEADER_FILES} LINKDEF ${T576_INCLUDE_DIR}/../
 
 
 add_library(t576 SHARED ${SOURCE_FILES} G__t576.cxx)
-
+add_executable(loadEvents ${PROJECT_SOURCE_DIR}/example/loadEvents.cc)
+target_link_libraries(loadEvents ${ROOT_LIBRARIES} t576)
 
 
 target_link_libraries(t576 ${ROOT_LIBRARIES} CLHEP::Vector)
@@ -71,12 +72,15 @@ target_link_libraries(t576 ${ROOT_LIBRARIES} CLHEP::Vector)
 install (FILES ${T576_INCLUDE_DIR}/T576Event.hh DESTINATION ${T576_INSTALL_DIR}/include/t576)
 install (FILES ${PROJECT_SOURCE_DIR}/src/T576Event.cc DESTINATION ${T576_INSTALL_DIR}/src/t576)
 
-install (FILES ${PROJECT_SOURCE_DIR}/share/test.tt DESTINATION ${T576_INSTALL_DIR}/share/t576)
+install (FILES ${PROJECT_SOURCE_DIR}/share/runLog.root DESTINATION ${T576_INSTALL_DIR}/share/t576)
 
 install (FILES ${PROJECT_BINARY_DIR}/libt576_rdict.pcm DESTINATION ${LIB_INSTALL_DIR})
-
-
-#install (FILES ${PROJECT_BINARY_DIR}/libRSEventSummary_rdict.pcm DESTINATION ${LIB_INSTALL_DIR})
-
 install (TARGETS t576 LIBRARY DESTINATION ${LIB_INSTALL_DIR})
-#install (TARGETS RSEventSummary LIBRARY DESTINATION ${LIB_INSTALL_DIR})
+
+
+install(TARGETS loadEvents DESTINATION ${T576_INSTALL_DIR}/share/t576)
+
+
+
+
+

@@ -49,16 +49,29 @@ public:
 
   //useful variables, gathered from the run log for each event.
   Hep3Vector txPos;
+  double txAng, txDist;
   double charge;
   ULong64_t timestamp;
   double frequency;
   double power;
+  double antennaType[6]={0.,0.,0.,0.,0.,0.};
   //various event numbering indices.
   int subEvNo, scopeEvNo, surfEvNo, evNo;
   //accesors for the file names associated with the event.
   TString * scopeFilename=new TString();
   TString * surfFilename=new TString();
-  int major, minor;
+
+  //useful flags and info
+  //run major and minor
+  int major=0, minor=0;
+  //is the tx on
+  int txOn=0;
+  //is the surf on
+  int surfOn=0;
+  //polarization (0=V, 1=H)
+  int polarization=0;
+  //is the event good?
+  int isGood=0;
 
   /****************operational functions*****************/
   
@@ -80,19 +93,23 @@ public:
 
   
 private:
+
   double fInterpLevel=1.;
   TString fScopeFilename, fInstallDir;
   int fIndexBuilt=0;
-  TTreeIndex * fScopeEvNoIndex, *fMajorMinorIndex;
+  TTreeIndex * fScopeEvNoIndex, *fMajorMinorIndex, *fRunLogIndex;
   TTree *fIndexTree=new TTree();
   TTree *fEventTree=new TTree();
   TFile *fEventFile=new TFile();
+  TFile * fRunLog= new TFile();
+  TTree * fRunLogTree = new TTree();
   
 public:
   class Scope {
   public:
     //receiver positions
     Hep3Vector pos[4];
+    double dist[4], ang[4];
     //double arrays for the individual traces
     double  ch[4][20000];
     //and the x axis time of the recorded traces
@@ -104,7 +121,7 @@ public:
     //loads the antenna position iformation into the pos[] above, using the run log.
     int getAntennaPositions(int run_major, int run_minor);
   private:
-
+    
     ClassDefNV(Scope, 1);
   };
 
@@ -112,14 +129,17 @@ public:
   class Surf{
   public:
     Hep3Vector pos[12];
+    double dist[12], ang[12];
     double  ch[12][1024];
     TGraph * gr[12]={new TGraph()};
     double  time[1024];
 
     TGraph2D * map=0;
     int getAntennaPositions(int run_major, int run_minor);
-  private:
     TGraph2D *buildMap(int mmStep=500);
+
+  private:
+
     int fMapMade=0;
 
     
