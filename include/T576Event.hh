@@ -17,6 +17,9 @@
 #include "TTreeIndex.h"
 #include "TGraph.h"
 #include "TGraph2D.h"
+#include "TMath.h"
+#include "Math/Interpolator.h"
+#include "Math/InterpolationTypes.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -84,17 +87,19 @@ public:
   int buildEventIndex(int force=0);
   //run on construction to make sure the indexing is valid and useable.
   int checkStatus();
-
+  //set the interpolation level
+  void setInterpGsNs(double value){fInterpGsNs=value;};
 
   /**************utility and analysis functions**************/
 
   //get the charge in this event from the ict trace.
   double getCharge(TGraph * ict);
-
+  //provide a graph and a pointer to a graph, and the desired samplerate in GS/s
+  int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph);
   
 private:
 
-  double fInterpLevel=1.;
+  double fInterpGsNs=0.;
   TString fScopeFilename, fInstallDir;
   int fIndexBuilt=0;
   TTreeIndex * fScopeEvNoIndex, *fMajorMinorIndex, *fRunLogIndex;

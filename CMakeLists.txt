@@ -20,7 +20,7 @@ find_package(CLHEP REQUIRED)
 #use the ROOT things
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 #list(APPEND CMAKE_PREFIX_PATH $ENV{CLHEP_ROOT_DIR})
-find_package(ROOT REQUIRED COMPONENTS RIO Tree)
+find_package(ROOT REQUIRED COMPONENTS RIO Tree MathMore)
 include(${ROOT_USE_FILE})
 #add_definitions(${ROOT_CXX_FLAGS})
 

@@ -1,6 +1,6 @@
 the basic analysis framework for t576.
 
-TODO: implement the reading of the SURF. for now we just have the scope data here. implement positions of antennas/ freq of tx/ pos of tx/etc.
+TODO: implement the reading of the SURF. for now we just have the scope data here. fix the positions for some remaining events (run 4 mostly)
 
 
 ****************Dependencies******************
@@ -117,6 +117,17 @@ ev->scope->pos[2]
 //these event-by-event variables are all loaded up when you call ev->loadScopeEvent(event number). 
 
 
+************Data******************************
+
+this will look for data in the directory you specify with T576_DATA_DIR. if you have a full copy of the data, it should be in the format
+
+/path/to/t576/run2/(root/ py/) where root/ and py/ are under run2/. therefore, for this structure, you'd put
+
+export T576_DATA_DIR=/path/to/t576/run2
+
+in your .bashrc. this will let the program find the data.
+
+FILENAMES: all of the filenames are stored with a timestamp then the run major and the run minor, e.g. 20181031122345run1_999.root where 1 is the major, 999 is the minor. the timestamp just helps to sort the files. the major and minor are used to index in root. 
 
 *************Problems******************
 

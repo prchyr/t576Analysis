@@ -65,33 +65,23 @@ int T576Event::checkStatus(){
   fRunLogIndex=(TTreeIndex*)fRunLogTree->GetTreeIndex();
 }
 
+
+
+
+
+
+
+
+
+
+
 //load a scope event using a run major/minor combination and event within that file
 
 int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
-
-  //TString major=TString::Itoa(run_major, 10);
-  //TString minor=TString::Itoa(run_minor, 10);
-  
   if(fIndexBuilt==0){
     cout<<"event index not built yet. building..."<<endl;
     buildEventIndex();
   }
-
-  
-  // TString install_dir=getenv("T576_INSTALL_DIR");
-  // if(install_dir==""){
-  //   install_dir="/usr/local";
-  // }
-
-  // TFile* indexFile;
-  // indexFile=TFile::Open(install_dir+"/share/t576/eventIndex.root");
-
-  // if(indexFile->IsZombie()){
-  //   cout<<"event index not built yet. building..."<<endl;
-  //   buildEventIndex();
-  //   indexFile=TFile::Open(install_dir+"/share/t576/eventIndex.root");
-  // }
-
   TString top_dir = getenv("T576_DATA_DIR");
 
   if(top_dir==""){
@@ -101,8 +91,6 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
   
   TString directory=top_dir+"/root/";
   
-  //cout<<"asdf"<<endl;
-  //  fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
   fIndexTree->SetTreeIndex(fMajorMinorIndex);
   fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(run_major, run_minor));
   fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(run_major, run_minor));
@@ -112,27 +100,30 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
   for(int i=0;i<4;i++){
     scope->pos[i].setRThetaPhi(scope->dist[i], scope->ang[i]*pi/180., pi);
   }
-  //  fIndexTree->GetEntry(0);
-  //  cout<<scopeFilename->Data();
+
   TString thisScopeFilename=scopeFilename->Data();
-  if(thisScopeFilename==fScopeFilename)goto fileSkip;
+  //if the file is already open, save some time
+  if(thisScopeFilename!=fScopeFilename){
 
-  fScopeFilename=thisScopeFilename;
-  //open the file
-  //  cout<<scopeScopeFilename<<endl;
-  fEventFile=TFile::Open(directory+thisScopeFilename);
-  fEventTree=(TTree*)fEventFile->Get("tree");
+    fScopeFilename=thisScopeFilename;
+
+    //open the file
+
+    fEventFile=TFile::Open(directory+thisScopeFilename);
+    fEventTree=(TTree*)fEventFile->Get("tree");
   
+    //set addresses
+  
+    fEventTree->SetBranchAddress("ch1", scope->ch[0]);
+    fEventTree->SetBranchAddress("ch2", scope->ch[1]);
+    fEventTree->SetBranchAddress("ch3", scope->ch[2]);
+    fEventTree->SetBranchAddress("ch4", scope->ch[3]);
+    fEventTree->SetBranchAddress("time", scope->time);
+    fEventTree->SetBranchAddress("timestamp", &timestamp);
 
-  fEventTree->SetBranchAddress("ch1", scope->ch[0]);
-  fEventTree->SetBranchAddress("ch2", scope->ch[1]);
-  fEventTree->SetBranchAddress("ch3", scope->ch[2]);
-  fEventTree->SetBranchAddress("ch4", scope->ch[3]);
-  fEventTree->SetBranchAddress("time", scope->time);
-  fEventTree->SetBranchAddress("timestamp", &timestamp);
-
-
- fileSkip:
+  
+  }
+  
   if(event>fEventTree->GetEntries()){
     cout<<"event number too high! this major/minor combination only contains "<<fEventTree->GetEntries()<<" events."<<endl<<"select another event number, or call loadScopeEvent(event) or loadSurfEvent(event) without major/minor to use overall event index"<<endl;
     return (-1);
@@ -148,9 +139,15 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
   scope->time[0]=0.;
   scope->time[19999]=scope->time[19998]+.05;
   for(int i=0;i<4;i++){
-    auto graph=new TGraph(length, scope->time, scope->ch[i]);
-    *scope->gr[i]=*graph;
-    delete(graph);
+    TGraph * graph=new TGraph(length, scope->time, scope->ch[i]);
+
+    if(fInterpGsNs>0.){
+      getInterpolatedGraph(graph, scope->gr[i]);
+    }
+    else{
+      *scope->gr[i]=*graph;
+    }
+    //delete(graph);
   }
   
   //delete(tree);
@@ -233,14 +230,18 @@ int T576Event::loadScopeEvent(int event){
   //fix the first and last values, which were recorded incorrectly
   scope->time[0]=0.;
   scope->time[19999]=scope->time[19998]+.05;
-  for(int i=0;i<4;i++){
-    auto graph=new TGraph(length, scope->time, scope->ch[i]);
-    *scope->gr[i]=*graph;
+ for(int i=0;i<4;i++){
+    TGraph * graph=new TGraph(length, scope->time, scope->ch[i]);
+
+    if(fInterpGsNs>0.){
+      getInterpolatedGraph(graph, scope->gr[i]);
+    }
+    else{
+      *scope->gr[i]=*graph;
+    }
     delete(graph);
   }
   
-  //delete(tree);
-
   if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
   //delete(file);
   getCharge(scope->gr[3]);
@@ -262,6 +263,36 @@ double T576Event::getCharge(TGraph *ict){
   charge = .4*tot*xval;
   return charge;
 }
+
+
+int T576Event::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph){
+  ROOT::Math::Interpolator interp(inGraph->GetN(), ROOT::Math::Interpolation::kAKIMA);
+  interp.SetData(inGraph->GetN(), inGraph->GetX(), inGraph->GetY());
+
+  //get dt, assuming even sampling.
+  double inDt=inGraph->GetX()[50]-inGraph->GetX()[49];
+  double inGsPerNs=1./inDt;
+
+  double outDt=1./fInterpGsNs;
+
+  int samps=(int) (inGraph->GetN()*(fInterpGsNs/inGsPerNs));
+
+  vector<double> xx, yy;
+  for(int i=0;i<samps;i++){
+    double time = i*outDt;
+    xx.push_back(time);
+    yy.push_back(interp.Eval(time));
+  }
+
+  auto tempGr=new TGraph(xx.size(), &xx[0], &yy[0]);
+  *outGraph=*tempGr;
+  delete(tempGr);
+			 
+
+  return 1;
+}
+
+
 
 int T576Event::Scope::getAntennaPositions(int run_major, int run_minor){
 
