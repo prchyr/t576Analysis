@@ -2,13 +2,15 @@
 
 int main(){
   time_t time_start, time_end;
-  time(&time_start);
+
   auto ev=new T576Event();
   int eventCount=0;
   for(int i=0;i<50000;i++){
+    if(i==1)time(&time_start);
     eventCount+=ev->loadScopeEvent(i);
     cout.flush()<<i<<"     \r";
   }
+  ev->scope->gr[3]->Draw("al");
   time(&time_end);
   cout.flush();
   //  cout<<time_end<<" "<<time_start<<endl;

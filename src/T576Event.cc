@@ -17,7 +17,7 @@ int T576Event::checkStatus(){
   indexFile=TFile::Open(fInstallDir+"/share/t576/eventIndex.root");
 
   if(!indexFile){
-    cout<<"event index not built yet. building..."<<endl;
+    cout<<endl<<"but that's OK! event index is not built yet. you may see zombies. this is also OK. "<<endl<<"building..."<<endl;
     buildEventIndex();
     indexFile=TFile::Open(fInstallDir+"/share/t576/eventIndex.root");
   }
@@ -328,7 +328,8 @@ int T576Event::buildEventIndex(int force){
   index->Close();
 //delete(indexTree);
   delete(index);
-  cout<<endl<<"index built"<<endl;
+  cout.flush();
+  cout<<endl<<"index built."<<endl;
   
   fIndexBuilt=1;
   
