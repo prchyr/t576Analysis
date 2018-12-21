@@ -7,7 +7,7 @@ TODO: implement the reading of the SURF. for now we just have the scope data her
 
 there are 2 dependencies for this software:
 
-1)ROOT:
+1) ROOT:
 
 https://root.cern.ch/downloading-root
 
@@ -60,33 +60,35 @@ and it will compile, install, and then run a little test macro that you can run 
 2) the simpler install just omits the T576_INSTALL_DIR step, putting everything in /usr/local (good for install on your own machine)
 
 
-****************Using**********************
+# Using:
 
 to use inside of root is simple, just point ROOT to the t576 library that you just made on installation. i recommend doing this in your rootlogon.C file by adding this line like so:
-
+```c++
 gROOT->ProcessLine(".L $T576_INSTALL_DIR/lib/libt576.so");
-
+```
 or if you didn't set $T576_INSTALL_DIR, do
-
+``` c++
 gROOT->ProcessLine(".L /usr/local/lib/libt576.so");
-
+```
 
 
 to use the software in your own standalone programs, just include the header and compile against the root libraries and the t576 library like so:
 
+```c++
 #include "t576/T576Event.hh"
-
+```
 and compile with
-
+```bash
 g++ your_script.cc -o your_script `root-config --cflags --glibs --libs` -lt576
-
+```
 this assumes that you have $T576_INSTALL_DIR/include in your include path. it should be already, if you set $T576_INSTALL_DIR to something sensible, or you can always add it to your CPLUS_INCLUDE_PATH.
 
 
-*******************t576 event class******************
+# T576Event class
 
 this is the main workhorse. you can load an event by run number or by an overall index number, which is generated the first time you use the class. if you run the example that is built on installation, this will be built at that time.
 
+```c++
 //make a new T576 event
 
 T576Event * ev = new T576Event();
@@ -110,21 +112,23 @@ cout<<ev->major<<" "<<ev->minor<<endl;
 cout<<ev->scopeFilename->Data()<<endl;
 
 //there are other useful things like
-ev->charge
+ev->charge;
 //which gives you the charge from the ICT. also
-ev->scope->pos[2]
-//would give you an Hep3Vector of the position of the channel 3 antenna.
+ev->scope->pos[2];
+//would give you an Hep3Vector of the position of the channel 3 antenna, such that you can acces the z dimension like
+double z = ev->scope->pos[2].z();
 //these event-by-event variables are all loaded up when you call ev->loadScopeEvent(event number). 
+```
 
-
-************Data******************************
+# Data:
 
 this will look for data in the directory you specify with T576_DATA_DIR. if you have a full copy of the data, it should be in the format
 
 /path/to/t576/run2/(root/ py/) where root/ and py/ are under run2/. therefore, for this structure, you'd put
 
+```bash
 export T576_DATA_DIR=/path/to/t576/run2
-
+```
 in your .bashrc. this will let the program find the data.
 
 FILENAMES: all of the filenames are stored with a timestamp then the run major and the run minor, e.g. 20181031122345run1_999.root where 1 is the major, 999 is the minor. the timestamp just helps to sort the files. the major and minor are used to index in root. 
