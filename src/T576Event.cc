@@ -147,7 +147,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
     else{
       *scope->gr[i]=*graph;
     }
-    //delete(graph);
+    delete(graph);
   }
   
   //delete(tree);
@@ -169,7 +169,7 @@ int T576Event::loadScopeEvent(int event){
     cout<<"event index not built yet. building..."<<endl;
     buildEventIndex();
   }
-
+  
   TString top_dir = getenv("T576_DATA_DIR");
 
   if(top_dir==""){
@@ -184,6 +184,10 @@ int T576Event::loadScopeEvent(int event){
   //  fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
   fIndexTree->SetTreeIndex(fScopeEvNoIndex);
   fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(event, event));
+
+  //loadScopeEvent(major, minor, subEvNo);
+  //return 1;
+
   fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(major, minor));
   //  cout<<txDist<<" "<<txAng<<endl;
   txPos.setRThetaPhi(txDist, txAng*pi/180., pi);
@@ -191,13 +195,15 @@ int T576Event::loadScopeEvent(int event){
   for(int i=0;i<4;i++){
     scope->pos[i].setRThetaPhi(scope->dist[i], scope->ang[i]*pi/180., pi);
   }
+  if(major<1)return 0;
   //  fIndexTree->GetEntry(0);
-  //  cout<<thisScopeFilename->Data();
+  //  cout<<major<<" "<<minor<<endl;
   TString thisScopeFilename=scopeFilename->Data();
   //open the file
   //  cout<<thisScopeFilename<<endl<<" "<<fScopeFilename<<endl;
   if(thisScopeFilename!=fScopeFilename){
 
+    fEventFile->Close();
     //cout<<thisScopeFilename<<endl;
     fEventFile=TFile::Open(directory+thisScopeFilename);
     fEventTree=(TTree*)fEventFile->Get("tree");
@@ -221,16 +227,19 @@ int T576Event::loadScopeEvent(int event){
     return 0;
   }
 
-  fEventTree->GetEntry(event);
+
+
+  fEventTree->GetEntry(subEvNo);
 
   //check the length of the record.
   auto length=sizeof(scope->time)/sizeof(*scope->time);
-
+  if(length!=20000)cout<<length;
+  //  if(minor==4)  cout<<major<<" "<<minor<<" "<<subEvNo<<" "<<length<<" "<<fEventTree->GetEntries()<<endl;
   //fill the event graphs for the scope->
   //fix the first and last values, which were recorded incorrectly
   scope->time[0]=0.;
   scope->time[19999]=scope->time[19998]+.05;
- for(int i=0;i<4;i++){
+  for(int i=0;i<4;i++){
     TGraph * graph=new TGraph(length, scope->time, scope->ch[i]);
 
     if(fInterpGsNs>0.){
@@ -239,7 +248,7 @@ int T576Event::loadScopeEvent(int event){
     else{
       *scope->gr[i]=*graph;
     }
-    delete(graph);
+   delete(graph);
   }
   
   if(subEvNo==fEventTree->GetEntries())fEventFile->Close();

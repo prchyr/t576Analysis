@@ -4,11 +4,14 @@ int main(){
   time_t time_start, time_end;
 
   auto ev=new T576Event();
+  //  ev->setInterpGsNs(20.);
   int eventCount=0;
   for(int i=0;i<50000;i++){
     if(i==1)time(&time_start);
+  
     eventCount+=ev->loadScopeEvent(i);
     cout.flush()<<i<<"     \r";
+  
   }
 
   time(&time_end);

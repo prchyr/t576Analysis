@@ -28,14 +28,13 @@ fi
 
 
 mkdir -p build &&
-    cp example/test.cc build/
     cd build
 
 
 cmake $top_dir &&
     make -B -j4 &&
     make install && 
-    echo "a test script has been compiled. try running" &&
-    echo "$T576_INSTALL_DIR/share/t576/loadEvents"
+    echo "a test script has been compiled. try running:" &&
+    echo " $T576_INSTALL_DIR/share/t576/loadEvents"
 
 

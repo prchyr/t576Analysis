@@ -100,9 +100,11 @@ public:
 private:
 
   double fInterpGsNs=0.;
-  TString fScopeFilename, fInstallDir;
+  TString fScopeFilename="20181025191401run0_4.root", fInstallDir="20181025191401run0_4.root";
   int fIndexBuilt=0;
-  TTreeIndex * fScopeEvNoIndex, *fMajorMinorIndex, *fRunLogIndex;
+  TTreeIndex * fScopeEvNoIndex=new TTreeIndex();
+  TTreeIndex *fMajorMinorIndex=new TTreeIndex();
+  TTreeIndex *fRunLogIndex=new TTreeIndex();
   TTree *fIndexTree=new TTree();
   TTree *fEventTree=new TTree();
   TFile *fEventFile=new TFile();
