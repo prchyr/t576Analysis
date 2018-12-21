@@ -52,8 +52,9 @@ cd t576Analysis
 export CLHEP_DIR=/path/to/clhep/build/directory
 export T576_INSTALL_DIR=/path/to/your/fav/install/dir
 export T576_DATA_DIR=/path/to/t576/data
-```
+
 ./install.sh
+```
 
 and it will compile, install, and then run a little test macro that you can run to see that everything worked correctly.
 
@@ -94,7 +95,8 @@ this is the main workhorse. you can load an event by run number or by an overall
 T576Event * ev = new T576Event();
 
 //load an event by run major, run minor, and event number within that file
-//NOTE: you don't need to have the exact filename. they have timestamps etc in the names, but this will find it just based on the major and minor.
+//NOTE: you don't need to have the exact filename. they have timestamps etc
+//in the names, but this will find it just based on the major and minor.
 
 ev->loadScopeEvent(4, 6, 1);
 
@@ -105,7 +107,8 @@ ev->scope->gr[3]->Draw("al");
 //then you can try loading an event a different way:
 ev->loadScopeEvent(27000);
 
-//which will load whatever was the 27,000th event taken by the scope. to find out what run that was in,
+//which will load whatever was the 27,000th event taken by the scope.
+//to find out what run that was in,
 
 cout<<ev->major<<" "<<ev->minor<<endl;
 //or
@@ -115,9 +118,13 @@ cout<<ev->scopeFilename->Data()<<endl;
 ev->charge;
 //which gives you the charge from the ICT. also
 ev->scope->pos[2];
-//would give you an Hep3Vector of the position of the channel 3 antenna, such that you can acces the z dimension like
+//would give you an Hep3Vector of the position of the channel 3 antenna,
+//such that you can acces the z dimension like
+
 double z = ev->scope->pos[2].z();
-//these event-by-event variables are all loaded up when you call ev->loadScopeEvent(event number). 
+
+//these event-by-event variables are all loaded up when you call
+//ev->loadScopeEvent(event number). 
 ```
 
 # Data:
@@ -133,7 +140,7 @@ in your .bashrc. this will let the program find the data.
 
 FILENAMES: all of the filenames are stored with a timestamp then the run major and the run minor, e.g. 20181031122345run1_999.root where 1 is the major, 999 is the minor. the timestamp just helps to sort the files. the major and minor are used to index in root. 
 
-*************Problems******************
+# Problems:
 
 are going to happen. email me.
 
