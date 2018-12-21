@@ -3,7 +3,7 @@ the basic analysis framework for t576.
 TODO: implement the reading of the SURF. for now we just have the scope data here. fix the positions for some remaining events (run 4 mostly)
 
 
-#Dependencies
+# Dependencies:
 
 there are 2 dependencies for this software:
 
@@ -27,7 +27,7 @@ once installed, add "export CLHEP_DIR=/path/to/clhep/build" to your .bashrc, rep
 
 
 
-#Install
+# Install:
 
 this software uses CMAKE. it does a pretty good job of finding things, as long as it knows roughly where to look. therefore, for this software, you need to set a couple of environment variables. first they are described, then examples are given. skip there if you don't like reading. 
 
