@@ -28,18 +28,32 @@ int T576Event::checkStatus(){
   //build the indices for fast lookup.
   fIndexTree=(TTree*)indexFile->Get("indexTree");
   fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
+  fIndexTree->SetBranchAddress("surfFilename", &surfFilename);
   fIndexTree->SetBranchAddress("major", &major);
   fIndexTree->SetBranchAddress("minor", &minor);
+  fIndexTree->SetBranchAddress("surfNEvents", &surfNEvents);
+  fIndexTree->SetBranchAddress("scopeNEvents", &scopeNEvents);
   fIndexTree->SetBranchAddress("subEvNo", &subEvNo);
   fIndexTree->SetBranchAddress("scopeEvNo", &scopeEvNo);
   fIndexTree->SetBranchAddress("surfEvNo", &surfEvNo);
+  fIndexTree->SetBranchAddress("scopeTime", &scopeTime);
+  fIndexTree->SetBranchAddress("surfTime", &surfTime);
   
   fIndexBuilt=1;
   fIndexTree->BuildIndex("scopeEvNo", "scopeEvNo");
   fScopeEvNoIndex=(TTreeIndex*)fIndexTree->GetTreeIndex();
+  fIndexTree->BuildIndex("surfEvNo", "surfEvNo");
+  fSurfEvNoIndex=(TTreeIndex*)fIndexTree->GetTreeIndex();
+  fIndexTree->BuildIndex("surfTime", "surfTime");
+  fSurfTimeIndex=(TTreeIndex*)fIndexTree->GetTreeIndex();
+  fIndexTree->BuildIndex("scopeTime", "scopeTime");
+  fScopeTimeIndex=(TTreeIndex*)fIndexTree->GetTreeIndex();
   fIndexTree->BuildIndex("major", "minor");
   fMajorMinorIndex=(TTreeIndex*)fIndexTree->GetTreeIndex();
 
+  fIndexTree->GetEntry(fIndexTree->GetEntries()-1);
+  fNEntriesScope=scopeEvNo;
+  fNEntriesSurf=surfEvNo;
 
   //load the position/frequency information.
 
@@ -63,6 +77,9 @@ int T576Event::checkStatus(){
   //build an index for this tree. we keep the tree open, but save the index too. 
   fRunLogTree->BuildIndex("major", "minor");
   fRunLogIndex=(TTreeIndex*)fRunLogTree->GetTreeIndex();
+
+  fSurfData=(short*) calloc(60000000, sizeof(short));
+  fSurfTimes=(double*) calloc(20000, sizeof(double));
 }
 
 
@@ -131,7 +148,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
 
   fEventTree->GetEntry(event);
 
-  //check the length of the record.
+   //check the length of the record.
   auto length=sizeof(scope->time)/sizeof(*scope->time);
 
   //fill the event graphs for the scope->
@@ -180,14 +197,14 @@ int T576Event::loadScopeEvent(int event){
   TString directory=top_dir+"/root/";
 
   
-  //cout<<"asdf"<<endl;
+  //  cout<<"asdf"<<endl;
   //  fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
   fIndexTree->SetTreeIndex(fScopeEvNoIndex);
   fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(event, event));
 
   //loadScopeEvent(major, minor, subEvNo);
   //return 1;
-
+  //  cout<<fIndexBuilt<<endl;
   fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(major, minor));
   //  cout<<txDist<<" "<<txAng<<endl;
   txPos.setRThetaPhi(txDist, txAng*pi/180., pi);
@@ -200,7 +217,7 @@ int T576Event::loadScopeEvent(int event){
   //  cout<<major<<" "<<minor<<endl;
   TString thisScopeFilename=scopeFilename->Data();
   //open the file
-  //  cout<<thisScopeFilename<<endl<<" "<<fScopeFilename<<endl;
+  //cout<<thisScopeFilename<<endl<<" "<<fScopeFilename<<endl;
   if(thisScopeFilename!=fScopeFilename){
 
     fEventFile->Close();
@@ -222,15 +239,15 @@ int T576Event::loadScopeEvent(int event){
 
   }
 
-  if(event>=fIndexTree->GetEntries()){
+  if(event>=fNEntriesScope){
     cout<<"event number too high!"<<endl;
     return 0;
   }
 
-
-
+  //cout<<"hellpo"<<endl;
+  int subEvNo=event-scopeEvNo;
   fEventTree->GetEntry(subEvNo);
-
+  //cout<<"hi"<<endl;
   //check the length of the record.
   auto length=sizeof(scope->time)/sizeof(*scope->time);
   if(length!=20000)cout<<length;
@@ -254,6 +271,119 @@ int T576Event::loadScopeEvent(int event){
   if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
   //delete(file);
   getCharge(scope->gr[3]);
+  
+  //  delete (files);
+  
+  
+  return 1;
+}
+
+
+//load an event from the global surf event number index 
+int T576Event::loadSurfEvent(int event){
+
+  if(fIndexBuilt==0){
+    cout<<"event index not built yet. building..."<<endl;
+    buildEventIndex();
+  }
+  
+  TString top_dir = getenv("T576_DATA_DIR");
+
+  if(top_dir==""){
+    cout<<"T576_DATA_DIR not set. please set this flag so that the data can be found. this should be the top directory inside of which is py/ and root/."<<endl;
+    return (0);
+  }
+
+  TString directory=top_dir+"/py/dat/";
+
+  
+  //  cout<<"asdf"<<endl;
+  //  fIndexTree->SetBranchAddress("surfFilename", &surfFilename);
+  fIndexTree->SetTreeIndex(fSurfEvNoIndex);
+  fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(event, event));
+
+  //loadSurfEvent(major, minor, subEvNo);
+  //return 1;
+  //  cout<<fIndexBuilt<<endl<<surfNEvents<<endl;;
+  fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(major, minor));
+  //  cout<<txDist<<" "<<txAng<<endl;
+  txPos.setRThetaPhi(txDist, txAng*pi/180., pi);
+  
+  for(int i=0;i<12;i++){
+    surf->pos[i].setRThetaPhi(surf->dist[i], surf->ang[i]*pi/180., pi);
+  }
+  if(major<1)return 0;
+  //  fIndexTree->GetEntry(0);
+  //  cout<<major<<" "<<minor<<endl;
+  TString thisSurfFilename=surfFilename->Data();
+  //open the file
+  //cout<<thisSurfFilename<<endl<<" "<<fSurfFilename<<endl;
+  if(thisSurfFilename!=fSurfFilename){
+    //load the event file
+    TString openf=directory+thisSurfFilename;
+    //cout<<"one"<<endl<<openf.Data()<<endl;;
+    //  cnpy::npz_t dataset = cnpy::npz_load(openf.Data());
+    fDataset = cnpy::npz_load(openf.Data());
+    //cout<<"two"<<endl;
+    //load the data. it is stored as an array of shorts of length (N events) x (12 channels ) x (1024 samples)
+    //cnpy::NpyArray data_arr = dataset["data"];
+    fSurfDataArray = fDataset["data"];
+    //cout<<"three"<<endl;
+    fSurfData=fSurfDataArray.data<short>();
+    //cout<<"four"<<endl<<fSurfData[1]<<" "<<fSurfData[10000]<<endl;
+    //cout<<dat[1]<<" "<<dat[10000]<<endl;
+    //load the times, stored as double
+    //fNEntriesSurf=data_arr.shape[0]/(12*1024);
+    cnpy::NpyArray times_arr = fDataset["times"];
+    fSurfTimes = times_arr.data<double>();
+    //cout<<fSurfTimes[0]<<endl;
+    fSurfFilename=thisSurfFilename;
+}
+
+  //  cout<<fSurfData[1]<<endl;
+  if(event>=fNEntriesSurf){
+    cout<<"event number too high!"<<endl;
+    return 0;
+  }
+  //cout<<surfNEvents<<endl;
+
+  subEvNo=event-surfEvNo;
+  //cout<<event<<" "<<surfEvNo<<" "<<subEvNo<<endl;
+  surfTime=fSurfTimes[subEvNo];
+  //cout<<fSurfTimes[subEvNo]<<endl<<surfTime<<endl;
+  //cout<<"five"<<endl;
+  //cout<<fSurfData[1000000]<<endl;
+  //cout<<"six"<<endl;
+  //increment and index variables for event number and channel number
+  int ev=12*1024;
+  int len=1024;
+  int index1=subEvNo*ev;
+
+  
+  double data[1024];
+  //cast the shorts to doubles for plotting and mathing
+
+  //    int olen=sizeof(fSurfData)/sizeof(*fSurfData);
+  //cout<<olen<<endl;
+  for(int i=0;i<12;i++){
+    int index2=i*len;//i is channel number
+    //cout<<index1<<" "<<index2<<" "<<fSurfData[index1+index2]<<endl;
+    copy(fSurfData+index1+index2, fSurfData+index1+index2+len, surf->ch[i]);
+    //   cout<<i<<endl;
+    TGraph * graph=new TGraph(len, surf->time, surf->ch[i]);
+
+    if(fInterpGsNs>0.){
+      getInterpolatedGraph(graph, surf->gr[i]);
+    }
+    else{
+      *surf->gr[i]=*graph;
+    }
+   delete(graph);
+  }
+  
+  //  if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
+  //delete(file);
+  //  getCharge(surf->gr[3]);
   
   //  delete (files);
   
@@ -334,16 +464,21 @@ int T576Event::buildEventIndex(int force){
   //cout<<"asdf"<<endl;
   TFile * index= new TFile(install_dir+"/share/t576/eventIndex.root", "recreate");
   TTree *indexTree = new TTree("indexTree", "index of events");
-  TString scopeFilename;
-  int maj=0, min=0, subEvNo=0, scopeEvNo=0, surfEvNo=0;
-  ULong64_t tstamp;
+  TString scopeFilename, surfFilename;
+  int maj=0, min=0, subEvNo=0, scopeEvNo=0, surfEvNo=0, scopeNEvents=0, surfNEvents=0;
+  ULong64_t tstampScope, tstampSurf;
   indexTree->Branch("scopeFilename", &scopeFilename);
+  indexTree->Branch("surfFilename", &surfFilename);
   indexTree->Branch("major", &maj);
   indexTree->Branch("minor", &min);
+  indexTree->Branch("scopeNEvents", &scopeNEvents);
+  indexTree->Branch("surfNEvents", &surfNEvents);
   indexTree->Branch("subEvNo", &subEvNo);
   indexTree->Branch("scopeEvNo", &scopeEvNo);
   indexTree->Branch("surfEvNo", &surfEvNo);
-  indexTree->Branch("tstamp", &tstamp);
+  indexTree->Branch("scopeTime", &tstampScope);
+  indexTree->Branch("surfTime", &tstampSurf);
+  indexTree->Branch("tstamp", &tstampScope);
 
   TString top_dir = getenv("T576_DATA_DIR");
   TString directory=top_dir+"/root/";
@@ -379,41 +514,63 @@ int T576Event::buildEventIndex(int force){
 	  if(inFile){
 	    TTree *tree = (TTree*)inFile->Get("tree");
 	    if(tree){
-	      tree->SetBranchAddress("timestamp", &tstamp);
-	      int nentries=tree->GetEntries();
+	      tree->SetBranchAddress("timestamp", &tstampScope);
+	      scopeNEvents=tree->GetEntries();
 	      cout.flush()<<fname<<"                  \r";	      
-	      for(int j=0;j<nentries;j++){
+	      //	      for(int j=0;j<nentries;j++){
 		//cout<<scopeFilename<<" "<<major<<" "<<minor<<" "<<subEvNo<<" "<<scopeEvNo<<endl;
-		tree->GetEntry(j);
-		subEvNo=j;
+		tree->GetEntry(0);
+		//		subEvNo=j;
 		//	      scopeFilename=const_cast<char*>(fname.Data());
 		scopeFilename=fname;
+		//indexTree->Fill();
+
+		surfFilename=getSurfFilename(maj, min);
+		if(surfFilename!="null"){
+		  TString sfname=top_dir+"/py/dat/"+surfFilename;
+		  cnpy::npz_t dataset = cnpy::npz_load(sfname.Data());
+		  //load the data. it is stored as an array of shorts of length (N events) x (12 channels ) x (1024 samples)
+		  cnpy::NpyArray data_arr = dataset["data"];
+		  short* data_short = data_arr.data<short>();
+		  //load the times, stored as double
+		  cnpy::NpyArray times_arr = dataset["times"];
+		  double * times = times_arr.data<double>();
+		  
+		  surfNEvents=data_arr.shape[0]/(12*1024);
+		  tstampSurf=times[0];
+
+		}
+		else{
+		  surfNEvents=0;
+		  tstampSurf=0;
+
+		}
 		indexTree->Fill();
-		scopeEvNo++;
-	      }
+		surfEvNo+=surfNEvents;
+		scopeEvNo+=scopeNEvents;
 	    }
 	  }
 	  //inFile->Close();
-	    
+	
 	  delete(inFile);
 	  //delete(tree);
 	}
-
+      
       }
       delete(file);
     }
-    
+  
   }
-    //delete (file);
+  //delete (file);
   //}
   else{
     cout<<"no files! check directory."<<endl;
     return 0;
   }
-  
+
   index->Write();
   index->Close();
-//delete(indexTree);
+  //delete(indexTree);
   delete(index);
   cout.flush();
   cout<<endl<<"index built."<<endl;
@@ -422,3 +579,150 @@ int T576Event::buildEventIndex(int force){
   
   return 1;
 }
+
+TString T576Event::getSurfFilename(int inMaj, int inMin){
+  TString top_dir = getenv("T576_DATA_DIR");
+  TString directory=top_dir+"/py/dat/";
+  
+  TSystemDirectory dir(directory, directory);
+  TList *files = dir.GetListOfFiles();
+  if(files){
+    files->Sort();
+    int nfiles=files->GetEntries();
+    TString fname;
+    TString ext = ".npz";
+    //TObject *obj;
+    //    TIter next(files);
+    for(int i=0;i<nfiles;i++){
+      TSystemFile *file=(TSystemFile*)files->At(i);
+      //delete(filen);
+      fname = file->GetName();
+
+      if(!file->IsDirectory()){//is the file there
+	TString majorstr=fname(17);//get the run major
+	int maj=majorstr.Atoi();
+	if(inMaj!=maj)continue;
+	//cout<<majorstr<<" ";
+	TString substr1=fname(19, 999);
+	TString minorstr=substr1(0, substr1.First("."));//get run minor
+	//cout<<minorstr<<endl;
+	if(minorstr.IsDec()){//check that it isn't 'test' or something
+	  int min=minorstr.Atoi();
+	  if(inMin!=min)continue;
+	  return fname;
+	}
+      }
+    }
+  }
+  return "null";
+}
+
+// int T576Event::buildEventIndex(int force){
+//   TString install_dir=getenv("T576_INSTALL_DIR");
+//   if(install_dir==""){
+//     install_dir="/usr/local";
+//   }
+  
+
+//   ifstream indexFile;
+//   indexFile.open(install_dir+"/share/t576/eventIndex.root");
+//   if(indexFile&&force==0){
+//     cout<<"event index already built."<<endl;
+//     return 1;
+//   }
+//   else if(indexFile&&force==1){
+//     cout<<"event index already built, forcing rebuild.."<<endl;
+//   }
+
+//   //cout<<"asdf"<<endl;
+//   TFile * index= new TFile(install_dir+"/share/t576/eventIndex.root", "recreate");
+//   TTree *indexTree = new TTree("indexTree", "index of events");
+//   TString scopeFilename;
+//   int maj=0, min=0, subEvNo=0, scopeEvNo=0, surfEvNo=0;
+//   ULong64_t tstamp;
+//   indexTree->Branch("scopeFilename", &scopeFilename);
+//   indexTree->Branch("surfFilename", &surfFilename);
+//   indexTree->Branch("major", &maj);
+//   indexTree->Branch("minor", &min);
+//   indexTree->Branch("subEvNo", &subEvNo);
+//   indexTree->Branch("scopeEvNo", &scopeEvNo);
+//   indexTree->Branch("surfEvNo", &surfEvNo);
+//   indexTree->Branch("tstamp", &tstamp);
+
+//   TString top_dir = getenv("T576_DATA_DIR");
+//   TString directory=top_dir+"/root/";
+  
+//   TSystemDirectory dir(directory, directory);
+//   TList *files = dir.GetListOfFiles();
+//   //    cout<<files->GetEntries()<<endl;
+//   //find the scopeFilename
+  
+//   if(files){
+//     files->Sort();
+//     int nfiles=files->GetEntries();
+//     TString fname;
+//     TString ext = ".root";
+//     //TObject *obj;
+//     //    TIter next(files);
+//     for(int i=0;i<nfiles;i++){
+//       TSystemFile *file=(TSystemFile*)files->At(i);
+//       //delete(filen);
+//       fname = file->GetName();
+
+//       if(!file->IsDirectory()&&!file->IsZombie()){//is the file there
+// 	TString majorstr=fname(17);//get the run major
+// 	maj=majorstr.Atoi(); 
+// 	//cout<<majorstr<<" ";
+// 	TString substr1=fname(19, 999);
+// 	TString minorstr=substr1(0, substr1.First("."));//get run minor
+// 	//cout<<minorstr<<endl;
+// 	if(minorstr.IsDec()){//check that it isn't 'test' or something
+// 	  min=minorstr.Atoi();
+// 	  //cout<<min<<endl;
+// 	  auto inFile=TFile::Open(directory+fname);//open the file
+// 	  if(inFile){
+// 	    TTree *tree = (TTree*)inFile->Get("tree");
+// 	    if(tree){
+// 	      tree->SetBranchAddress("timestamp", &tstamp);
+// 	      int nentries=tree->GetEntries();
+// 	      cout.flush()<<fname<<"                  \r";	      
+// 	      for(int j=0;j<nentries;j++){
+// 		//cout<<scopeFilename<<" "<<major<<" "<<minor<<" "<<subEvNo<<" "<<scopeEvNo<<endl;
+// 		tree->GetEntry(j);
+// 		subEvNo=j;
+// 		//	      scopeFilename=const_cast<char*>(fname.Data());
+// 		scopeFilename=fname;
+// 		indexTree->Fill();
+// 		scopeEvNo++;
+// 	      }
+// 	    }
+// 	  }
+// 	  //inFile->Close();
+	    
+// 	  delete(inFile);
+// 	  //delete(tree);
+// 	}
+
+//       }
+//       delete(file);
+//     }
+    
+//   }
+//     //delete (file);
+//   //}
+//   else{
+//     cout<<"no files! check directory."<<endl;
+//     return 0;
+//   }
+  
+//   index->Write();
+//   index->Close();
+// //delete(indexTree);
+//   delete(index);
+//   cout.flush();
+//   cout<<endl<<"index built."<<endl;
+  
+//   fIndexBuilt=1;
+  
+//   return 1;
+// }

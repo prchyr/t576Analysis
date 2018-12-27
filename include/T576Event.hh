@@ -9,6 +9,7 @@
 #include "TFile.h"
 #include "TSystemDirectory.h"
 #include "TList.h"
+#include "cnpy.h"
 //#include "TIter.h"
 #include "TSystemFile.h"
 #include "TH1F.h"
@@ -54,12 +55,12 @@ public:
   Hep3Vector txPos;
   double txAng, txDist;
   double charge;
-  ULong64_t timestamp;
+  ULong64_t timestamp, scopeTime, surfTime;
   double frequency;
   double power;
   double antennaType[6]={0.,0.,0.,0.,0.,0.};
   //various event numbering indices.
-  int subEvNo, scopeEvNo, surfEvNo, evNo;
+  int subEvNo, scopeEvNo, surfEvNo, evNo, surfNEvents, scopeNEvents;
   //accesors for the file names associated with the event.
   TString * scopeFilename=new TString();
   TString * surfFilename=new TString();
@@ -83,9 +84,12 @@ public:
   //load an event using a running scope event number index. this index is built the first time the T576Event class is used, starting at 0 for the first event in run 0_0 and going upward.
   //when you use this, the correct positions and stuff will be loaded for the correct run etc.
   int loadScopeEvent(int event);
+  //same for surf
+  int loadSurfEvent(int event);
   //build the event index ROOT file which allows for rapid grabbing of the right data (done once, first time you use the class. you can also force a re-build if you change the data directory [don't.]) 
   int buildEventIndex(int force=0);
   //run on construction to make sure the indexing is valid and useable.
+  TString getSurfFilename(int inMaj, int inMin);
   int checkStatus();
   //set the interpolation level
   void setInterpGsNs(double value){fInterpGsNs=value;};
@@ -98,18 +102,27 @@ public:
   int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph);
   
 private:
-
+  int fNEntriesSurf=0, fNEntriesScope=0;
   double fInterpGsNs=0.;
   TString fScopeFilename="20181025191401run0_4.root", fInstallDir="20181025191401run0_4.root";
+  TString fSurfFilename="20181025191401run0_4.py";
   int fIndexBuilt=0;
   TTreeIndex * fScopeEvNoIndex=new TTreeIndex();
+  TTreeIndex * fSurfEvNoIndex=new TTreeIndex();
   TTreeIndex *fMajorMinorIndex=new TTreeIndex();
+  TTreeIndex * fScopeTimeIndex=new TTreeIndex();
+  TTreeIndex * fSurfTimeIndex=new TTreeIndex();
   TTreeIndex *fRunLogIndex=new TTreeIndex();
   TTree *fIndexTree=new TTree();
   TTree *fEventTree=new TTree();
   TFile *fEventFile=new TFile();
+  cnpy::npz_t fDataset;
+  cnpy::NpyArray fSurfDataArray;
+  short * fSurfData;//=(short*) calloc(60000000, sizeof(short));
+  double * fSurfTimes;//=(double*) malloc(20000);
   TFile * fRunLog= new TFile();
   TTree * fRunLogTree = new TTree();
+
   
 public:
   class Scope {
@@ -135,10 +148,16 @@ public:
 
   class Surf{
   public:
+    Surf(){
+      double incr=1./3.2;
+      for(int i=0;i<1024;i++){
+	time[i]=i*incr;
+      }
+    }
     Hep3Vector pos[12];
     double dist[12], ang[12];
     double  ch[12][1024];
-    TGraph * gr[12]={new TGraph()};
+    TGraph * gr[12]={new TGraph(), new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph()};
     double  time[1024];
 
     TGraph2D * map=0;

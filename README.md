@@ -24,10 +24,41 @@ https://proj-clhep.web.cern.ch/proj-clhep/clhep23.html
 and again i recommend installing the latest version (2.4.1 at time of writing). installation is pretty straightforward for this too.
 once installed, add "export CLHEP_DIR=/path/to/clhep/build" to your .bashrc, replacing /path/to/clhep/build with the build directory you used for CLHEP. in there are the files cmake uses to configure things.
 
+3) cnpy:
 
+cnpy is a very nice, simple piece of software that lets us open .npz files (the data type of the SURF) into c++. it compiles using cmake and builds without issue on linux (in my experience.)
 
 
 # Install:
+
+the software uses CMAKE, and you need to set a couple environment variables.T576_INSTALL_DIR is the top directory for the install, under which must be /include /src /share and /lib. if those aren't there, they will be made. T576_DATA_DIR is where the data is, more on that below. the below lines should do the trick:
+
+examples:
+
+1) the full install, specifing your own install path (as you'll need to do on a cluster)
+
+first, add these to your bashrc:
+```bash
+export CLHEP_DIR=/path/to/clhep/build/directory
+export CNPY_DIR=/path/to/cnpy/lib
+export T576_INSTALL_DIR=/path/to/your/fav/install/dir
+export T576_DATA_DIR=/path/to/t576/data
+```
+
+then,
+```bash
+cd /your/fav/source/directory
+git clone https://github.com/prchyr/t576Analysis.git
+cd t576Analysis
+
+./install.sh
+```
+
+and it will compile, install, and then run a little test macro that you can run to see that everything worked correctly.
+
+2) the simpler install just omits the T576_INSTALL_DIR step, putting everything in /usr/local (good for install on your own machine)
+
+details about the above:
 
 this software uses CMAKE. it does a pretty good job of finding things, as long as it knows roughly where to look. therefore, for this software, you need to set a couple of environment variables. first they are described, then examples are given. skip there if you don't like reading. 
 
@@ -37,29 +68,11 @@ First, tell it where to find ROOT. this is usually done already when you run the
 
 next, tell it where CMAKE can find CLHEP (as above). this is the build directory you made when you installed CLHEP. it can be inside of the CLHEP directory, or somewhere else.
 
+next, tell it where CMAKE can find cnpy. similar to CLHEP above, just point to where you installed it.
+
 then, (optional) tell it where you'd like to install the software. if you don't do this, it will install to /usr/local/, meaning that it will put the header files in /usr/local/include, the t576 library into /usr/local/lib, and the share files into /usr/local/share. If you set your own install directory, /your/fav/install/dir, headers will go to /your/fav/install/dir/include, the library will go to /your/fav/install/dir/lib, etc. 
 
 finally, tell it where the t576 data lives. we'll say more about this in the data section below.
-
-examples:
-
-1) the full install, specifing your own install path (as you'll need to do on a cluster)
-```bash
-cd /your/fav/source/directory
-git clone https://github.com/prchyr/t576Analysis.git
-cd t576Analysis
-
-export CLHEP_DIR=/path/to/clhep/build/directory
-export T576_INSTALL_DIR=/path/to/your/fav/install/dir
-export T576_DATA_DIR=/path/to/t576/data
-
-./install.sh
-```
-
-and it will compile, install, and then run a little test macro that you can run to see that everything worked correctly.
-
-2) the simpler install just omits the T576_INSTALL_DIR step, putting everything in /usr/local (good for install on your own machine)
-
 
 # Using:
 
