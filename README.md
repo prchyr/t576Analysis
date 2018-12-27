@@ -22,12 +22,17 @@ clhep is a really great library for doing physics things with code. it has datat
 https://proj-clhep.web.cern.ch/proj-clhep/clhep23.html
 
 and again i recommend installing the latest version (2.4.1 at time of writing). installation is pretty straightforward for this too.
-once installed, add "export CLHEP_DIR=/path/to/clhep/build" to your .bashrc, replacing /path/to/clhep/build with the build directory you used for CLHEP. in there are the files cmake uses to configure things.
+
 
 3) cnpy:
 
-cnpy is a very nice, simple piece of software that lets us open .npz files (the data type of the SURF) into c++. it compiles using cmake and builds without issue on linux (in my experience.)
+cnpy is a very nice, lightweight library that lets us open .npz files (the data type of the SURF) into c++. it compiles using cmake and builds without issue on linux (in my experience.)
 
+https://github.com/rogersce/cnpy
+
+future releases will probably eliminate this library in lieu of a hard-coded function.
+
+ ## note: I strongly recommend that 2 and 3 above are installed in the same place, meaning /path/to/install/dir/ contains /lib, /include, /share and so on.
 
 # Install:
 
@@ -35,12 +40,12 @@ the software uses CMAKE, and you need to set a couple environment variables.T576
 
 examples:
 
-1) the full install, specifing your own install path (as you'll need to do on a cluster)
+1) the full install, specifing your own install path (as you'll need to do on a cluster) and using the CMAKE_PREFIX_PATH environment variable to find the dependencies you installed above.
 
 first, add these to your bashrc:
 ```bash
-export CLHEP_DIR=/path/to/clhep/build/directory
-export CNPY_DIR=/path/to/cnpy/lib
+export CLHEP_PREFIX_PATH=$CMAKE_PREFIX_PATH:/path/to/CLHEP/install/dir:/path/to/cnpy/install/dir
+#note that these can be the same. (like /usr/local for example)
 export T576_INSTALL_DIR=/path/to/your/fav/install/dir
 export T576_DATA_DIR=/path/to/t576/data
 ```
@@ -60,15 +65,12 @@ and it will compile, install, and then run a little test macro that you can run 
 
 details about the above:
 
-this software uses CMAKE. it does a pretty good job of finding things, as long as it knows roughly where to look. therefore, for this software, you need to set a couple of environment variables. first they are described, then examples are given. skip there if you don't like reading. 
-
-you need to get the source, and then do some extra steps:
 
 First, tell it where to find ROOT. this is usually done already when you run the "source thisroot.sh" script from root. I'll assume you know what this is already. to know if things are sourced correctly, type "echo $ROOTSYS", and you should get the correct directory to ROOT.
 
-next, tell it where CMAKE can find CLHEP (as above). this is the build directory you made when you installed CLHEP. it can be inside of the CLHEP directory, or somewhere else.
+next, tell it where CMAKE can find CLHEP. you can do that in 2 ways. you can either add the installation path for CLHEP to your CMAKE_PREFIX_PATH, or you can point CMAKE to the CLHEP build directory. this is the build directory you made when you installed CLHEP. it can be inside of the CLHEP directory, or somewhere else.
 
-next, tell it where CMAKE can find cnpy. similar to CLHEP above, just point to where you installed it.
+next, tell it where CMAKE can find cnpy. similar to CLHEP above, just point to where you installed it in whatever way you prefer.
 
 then, (optional) tell it where you'd like to install the software. if you don't do this, it will install to /usr/local/, meaning that it will put the header files in /usr/local/include, the t576 library into /usr/local/lib, and the share files into /usr/local/share. If you set your own install directory, /your/fav/install/dir, headers will go to /your/fav/install/dir/include, the library will go to /your/fav/install/dir/lib, etc. 
 
