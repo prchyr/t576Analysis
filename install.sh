@@ -28,13 +28,17 @@ fi
 
 
 mkdir -p build &&
+    cp $T576_SOURCE_DIR/example/loadEvents.cc build
     cd build
 
 
 cmake $top_dir &&
     make -B -j4 &&
-    make install && 
-    echo "a test script has been compiled. try running:" &&
+    make install &&
+    echo "a test script is being compiled..."
+    g++ -std=c++11  loadEvents.cc -o loadEvents -L$T576_INSTALL_DIR/include `root-config --cflags --glibs --libs` -lt576 
+mv loadEvents $T576_INSTALL_DIR/share
+    echo "done. make sure that T576_INSTALL_DIR/include is in your include path, then try running:" &&
     echo " $T576_INSTALL_DIR/share/t576/loadEvents"
 
 

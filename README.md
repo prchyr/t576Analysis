@@ -32,7 +32,7 @@ https://github.com/rogersce/cnpy
 
 future releases will probably eliminate this library in lieu of a hard-coded function.
 
- ## note: I strongly recommend that 2 and 3 above are installed in the same place, meaning /path/to/install/dir/ contains /lib, /include, /share and so on.
+ ### note: I strongly recommend that 2 and 3 above are installed in the same place, meaning /path/to/install/dir/ contains /lib, /include, /share and so on.
 
 # Install:
 
@@ -44,7 +44,7 @@ examples:
 
 first, add these to your bashrc:
 ```bash
-export CLHEP_PREFIX_PATH=$CMAKE_PREFIX_PATH:/path/to/CLHEP/install/dir:/path/to/cnpy/install/dir
+export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:/path/to/CLHEP/install/dir:/path/to/cnpy/install/dir
 #note that these can be the same. (like /usr/local for example)
 export T576_INSTALL_DIR=/path/to/your/fav/install/dir
 export T576_DATA_DIR=/path/to/t576/data

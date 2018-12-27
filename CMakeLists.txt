@@ -45,8 +45,8 @@ include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src ${PROJECT_SO
 # Locate sources and headers for this project
 # NB: headers are included so they will show up in IDEs
 #
-file(GLOB sources ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src/*.cc ${T576_INCLUDE_DIR}/*.cc)
-file(GLOB headers ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include/*.hh ${T576_INCLUDE_DIR}/*.hh)
+#file(GLOB sources ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src/*.cc ${T576_INCLUDE_DIR}/*.cc)
+#file(GLOB headers ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include/*.hh ${T576_INCLUDE_DIR}/*.hh)
 
 file(GLOB SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.cc ${CLHEP_INCLUDE_DIR}/Vector/*.icc ${CLHEP_INCLUDE_DIR}/Units/*.icc)
 file(GLOB HEADER_FILES ${T576_INCLUDE_DIR}/*.hh ${CLHEP_INCLUDE_DIR}/Vector/*.h ${CLHEP_INCLUDE_DIR}/Units/*.h)# ${GSL_INCLUDE_DIRS}/gsl/*.h)
@@ -58,8 +58,8 @@ ROOT_GENERATE_DICTIONARY(G__t576 ${HEADER_FILES} LINKDEF ${T576_INCLUDE_DIR}/../
 
 
 add_library(t576 SHARED ${SOURCE_FILES} G__t576.cxx)
-add_executable(loadEvents ${PROJECT_SOURCE_DIR}/example/loadEvents.cc)
-target_link_libraries(loadEvents ${ROOT_LIBRARIES} t576 cnpy)
+#add_executable(loadEvents ${PROJECT_SOURCE_DIR}/example/loadEvents.cc ${HEADER_FILES})
+#target_link_libraries(loadEvents ${ROOT_LIBRARIES} t576 cnpy)
 
 
 target_link_libraries(t576 ${ROOT_LIBRARIES} CLHEP::Vector cnpy)
@@ -76,7 +76,7 @@ install (FILES ${PROJECT_SOURCE_DIR}/share/runLog.root DESTINATION ${T576_INSTAL
 
 install (FILES ${PROJECT_BINARY_DIR}/libt576_rdict.pcm DESTINATION ${LIB_INSTALL_DIR})
 install (TARGETS t576 LIBRARY DESTINATION ${LIB_INSTALL_DIR})
-install(TARGETS loadEvents DESTINATION ${T576_INSTALL_DIR}/share/t576)
+#install(TARGETS loadEvents DESTINATION ${T576_INSTALL_DIR}/share/t576)
 
 
 
