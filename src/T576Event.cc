@@ -419,6 +419,7 @@ int T576Event::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph){
   vector<double> xx, yy;
   for(int i=0;i<samps;i++){
     double time = i*outDt;
+    if(time>inGraph->GetX()[inGraph->GetN()-1])continue;
     xx.push_back(time);
     yy.push_back(interp.Eval(time));
   }
@@ -429,18 +430,6 @@ int T576Event::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph){
 			 
 
   return 1;
-}
-
-
-
-int T576Event::Scope::getAntennaPositions(int run_major, int run_minor){
-
-  
-}
-
-int T576Event::Surf::getAntennaPositions(int run_major, int run_minor){
-
-
 }
 
 

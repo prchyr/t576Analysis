@@ -138,8 +138,7 @@ public:
     TGraph * gr[4]={new TGraph(), new TGraph(),new TGraph(),new TGraph()};
 
 
-    //loads the antenna position iformation into the pos[] above, using the run log.
-    int getAntennaPositions(int run_major, int run_minor);
+
   private:
     
     ClassDefNV(Scope, 1);
@@ -161,7 +160,7 @@ public:
     double  time[1024];
 
     TGraph2D * map=0;
-    int getAntennaPositions(int run_major, int run_minor);
+
     TGraph2D *buildMap(int mmStep=500);
 
   private:
