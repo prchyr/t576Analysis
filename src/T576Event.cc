@@ -17,7 +17,7 @@ int T576Event::checkStatus(){
   TFile* indexFile;
   indexFile=TFile::Open(fInstallDir+"/share/t576/eventIndex.root");
   if(!indexFile){
-    cout<<endl<<"but that's OK! event index is not built yet. you may see zombies. this is also OK. This will only happen once."<<endl<<"building..."<<endl;
+    cout<<endl<<"but that's OK! event index is not built yet. it will be built now (it will only happen this one time). you may see zombies below. this is also OK."<<endl<<"building..."<<endl;
     int build=buildEventIndex();
     if(build==0){
       cout<<"can't build event index. set T576_DATA_DIR to your data directory. it is currently set to: "<<getenv("T576_DATA_DIR")<<endl;
