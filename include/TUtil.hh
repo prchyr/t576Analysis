@@ -68,7 +68,7 @@ public:
   
 private:
 
-  static double fN;
+  static int fN;
   static TVirtualFFT *fftr2c;
   static TVirtualFFT *fftc2r;
   ClassDefNV(TUtil, 1);

@@ -69,7 +69,7 @@ target_link_libraries(t576 ${ROOT_LIBRARIES} CLHEP::Vector cnpy)
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
 #install(TARGETS slac DESTINATION ${PROJECT_BINARY_DIR}/bin)
-install (FILES ${T576_INCLUDE_DIR}/T576Event.hh DESTINATION ${T576_INSTALL_DIR}/include/t576)
+install (FILES ${T576_INCLUDE_DIR}/T576Event.hh ${T576_INCLUDE_DIR}/TUtil.hh DESTINATION ${T576_INSTALL_DIR}/include/t576)
 install (FILES ${PROJECT_SOURCE_DIR}/src/T576Event.cc DESTINATION ${T576_INSTALL_DIR}/src/t576)
 
 install (FILES ${PROJECT_SOURCE_DIR}/share/runLog.root DESTINATION ${T576_INSTALL_DIR}/share/t576)
