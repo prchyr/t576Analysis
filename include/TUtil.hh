@@ -40,6 +40,7 @@ public:
 
   static double setN(double val){fN=val;return fN;};
   static double getN(){return fN;}
+  static double vToDbmHz(double sampRateGsNs, double re, double im=0);
   
   class FFT{
   public:
@@ -53,7 +54,7 @@ public:
     static TGraph * psd(TGraph *inGr);
     //return the spectrogram, with various options. 
     static TGraph2D * spectrogram(TGraph *inGr, int nfft=256, int noverlap=0);
-    
+
   private:
 
     ClassDefNV(FFT, 1);
