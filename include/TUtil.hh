@@ -34,13 +34,27 @@
 using namespace CLHEP;
 using namespace std;
 
-
+class TUtilGraph;
 class TUtil : public TObject{
 public:
 
   static double setN(double val){fN=val;return fN;};
   static double getN(){return fN;}
-  static double vToDbmHz(double sampRateGsNs, double re, double im=0);
+  static double vToDbmHz(double bandwidthGsNs, double re, double im=0);
+  static double * makeIndices(int n, double step, double offset=0);
+  static int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGsNs);
+  static TGraph * normalize(TGraph *inGr);
+
+
+
+  class TUtilGraph: public TGraph{
+  public:
+    
+    //TUtilGraph * operator*(const double a);
+  private:
+    ClassDefNV(TUtilGraph, 1);
+  };
+
   
   class FFT{
   public:
@@ -48,6 +62,8 @@ public:
     static TGraph2D * fft(TGraph *inGr);
     //returns the inverse fft of the data. must be structured as above (x axis is the freqs, y axis is the real part of the complex fft, z axis is the imaginary part of the fft.)
     static TGraph * ifft(TGraph2D *inGr);
+    //return the Hilbert transform
+    static TGraph * hilbertTransform(TGraph *inGr);
     //return the Hilbert envelope
     static TGraph * hilbertEnvelope(TGraph *inGr);
     //return the power spectral density in dBm/Hz
@@ -70,8 +86,11 @@ public:
 private:
 
   static int fN;
+  static int fNi;
   static TVirtualFFT *fftr2c;
   static TVirtualFFT *fftc2r;
+  static TGraph2D *fXfrmGr2D;
+  static TGraph * fXfrmGr;
   ClassDefNV(TUtil, 1);
 };
 
