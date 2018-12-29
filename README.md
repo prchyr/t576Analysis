@@ -1,6 +1,6 @@
 the basic analysis framework for t576.
 
-TODO: implement the reading of the SURF. for now we just have the scope data here. fix the positions for some remaining events (run 4 mostly)
+TODO:  fix the positions for some remaining events (run 4 mostly). expand the TUtil class to include the SVD.
 
 
 # Dependencies:
@@ -32,7 +32,7 @@ https://github.com/rogersce/cnpy
 
 future releases will probably eliminate this library in lieu of a hard-coded function.
 
- ### note: I strongly recommend that 2 and 3 above are installed in the same place, meaning /path/to/install/dir/ contains /lib, /include, /share and so on.
+ #### note: I strongly recommend that 2 and 3 above are installed in the same place, meaning /path/to/install/dir/ contains /lib, /include, /share and so on.
 
 # Install:
 
