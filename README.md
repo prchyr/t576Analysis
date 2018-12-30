@@ -149,8 +149,10 @@ ev->surf->gr[9]->Draw("al");
 
 ev->setInterpGsNs(20);
 
-/*which will set the sample rate for all resultant graphs to 20GS/s. subsequent calls to ev->loadSurf[Scope]Event(xx) will have this level of interpolation applied. details are in the source.
-*/
+//which will set the sample rate for all resultant graphs to 20GS/s.
+//subsequent calls to ev->loadSurf[Scope]Event(xx) will have this level
+//of interpolation applied. details are in the source.
+
 
 ```
 future releases will have all sorts of things, like pointing maps and correlations etc.
