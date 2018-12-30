@@ -42,11 +42,7 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include ${CLHEP_INCLUDE_DIR} ${ROOT_INCLUDE_DIRS} ${T576_INCLUDE_DIR} ${T576_INCLUDE_DIR}/../)
 
 #----------------------------------------------------------------------------
-# Locate sources and headers for this project
-# NB: headers are included so they will show up in IDEs
-#
-#file(GLOB sources ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src/*.cc ${T576_INCLUDE_DIR}/*.cc)
-#file(GLOB headers ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/include/*.hh ${T576_INCLUDE_DIR}/*.hh)
+
 
 file(GLOB SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.cc ${CLHEP_INCLUDE_DIR}/Vector/*.icc ${CLHEP_INCLUDE_DIR}/Units/*.icc)
 file(GLOB HEADER_FILES ${T576_INCLUDE_DIR}/*.hh ${CLHEP_INCLUDE_DIR}/Vector/*.h ${CLHEP_INCLUDE_DIR}/Units/*.h)# ${GSL_INCLUDE_DIRS}/gsl/*.h)
@@ -58,18 +54,14 @@ ROOT_GENERATE_DICTIONARY(G__t576 ${HEADER_FILES} LINKDEF ${T576_INCLUDE_DIR}/../
 
 
 add_library(t576 SHARED ${SOURCE_FILES} G__t576.cxx)
-#add_executable(loadEvents ${PROJECT_SOURCE_DIR}/example/loadEvents.cc ${HEADER_FILES})
-#target_link_libraries(loadEvents ${ROOT_LIBRARIES} t576 cnpy)
-
 
 target_link_libraries(t576 ${ROOT_LIBRARIES} CLHEP::Vector cnpy)
-#target_link_libraries(test ${ROOT_LIBRARIES} t576)
+
 
 #----------------------------------------------------------------------------
-# Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
-#
-#install(TARGETS slac DESTINATION ${PROJECT_BINARY_DIR}/bin)
-install (FILES ${T576_INCLUDE_DIR}/T576Event.hh ${T576_INCLUDE_DIR}/TUtil.hh DESTINATION ${T576_INSTALL_DIR}/include/t576)
+
+
+install (FILES ${T576_INCLUDE_DIR}/T576Event.hh ${T576_INCLUDE_DIR}/TUtil.hh ${T576_INCLUDE_DIR}/TUtilGraph.hh DESTINATION ${T576_INSTALL_DIR}/include/t576)
 install (FILES ${PROJECT_SOURCE_DIR}/src/T576Event.cc DESTINATION ${T576_INSTALL_DIR}/src/t576)
 
 install (FILES ${PROJECT_SOURCE_DIR}/share/runLog.root DESTINATION ${T576_INSTALL_DIR}/share/t576)

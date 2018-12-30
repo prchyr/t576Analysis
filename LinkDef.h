@@ -18,6 +18,8 @@
 //#pragma link C++ defined_in "/usr/local/include/CLHEP/Vector/defs.h";
 //#pragma link C++ defined_in "/usr/local/include/CLHEP/Vector/ThreeVector.h";
 #pragma link C++ class T576Event+;
+#pragma link C++ class TUtil+;
+#pragma link C++ class TUtilGraph+;
 //#pragma link C++ class scope;//nested so found by above
 //#pragma link C++ class surf;//nested so found by above
 

@@ -30,6 +30,8 @@
 #include "CLHEP/Vector/LorentzVector.h"
 #include "CLHEP/Vector/ThreeVector.h"
 
+#include "TUtilGraph.hh"
+
 
 using namespace CLHEP;
 using namespace std;
@@ -46,14 +48,6 @@ public:
   static TGraph * normalize(TGraph *inGr);
 
 
-
-  class TUtilGraph: public TGraph{
-  public:
-    
-    //TUtilGraph * operator*(const double a);
-  private:
-    ClassDefNV(TUtilGraph, 1);
-  };
 
   
   class FFT{
