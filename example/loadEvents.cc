@@ -7,7 +7,7 @@ int main(){
   //  ev->setInterpGsNs(20.);
   int eventCount=0;
   cout<<"running through first several thousand events. skipping run 0 because it was a test run..."<<endl;
-  for(int i=0;i<50000;i++){
+  for(int i=0;i<10000;i++){
     if(i==1)time(&time_start);
   
     eventCount+=ev->loadScopeEvent(i);
