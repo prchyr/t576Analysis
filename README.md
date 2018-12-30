@@ -95,9 +95,9 @@ to use the software in your own standalone programs, just include the header and
 ```
 and compile with
 ```bash
-g++ your_script.cc -o your_script `root-config --cflags --glibs --libs` -lt576
+g++ -std=c++11 your_script.cc -o your_script `root-config --cflags --glibs --libs` -L$T576_INSTALL_DIR/include/t576 -lt576
 ```
-this assumes that you have $T576_INSTALL_DIR/include in your include path. it should be already, if you set $T576_INSTALL_DIR to something sensible, or you can always add it to your CPLUS_INCLUDE_PATH.
+ignore the -L flag if you have $T576_INSTALL_DIR/include in your include path.
 
 
 # T576Event class
