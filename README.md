@@ -26,7 +26,9 @@ and again i recommend installing the latest version (2.4.1 at time of writing). 
 
 # Install:
 
-the software uses CMAKE, and you need to set a couple environment variables.T576_INSTALL_DIR is the top directory for the install, under which must be /include /src /share and /lib. (if those aren't there, they will be made.) T576_DATA_DIR is where the data is, more on that below. 2 example installs follow.
+the software uses CMAKE, and you need to set a couple environment variables. T576_INSTALL_DIR is the top directory for the install. headers will install to T576_INSTALL_DIR/include/t576, sources to  T576_INSTALL_DIR/src/t576,  run logs and index files to T576_INSTALL_DIR/share/t576 and the t576 library to T576_INSTALL_DIR/lib. any directories below T576_INSTALL_DIR/ which don't exist will be automatically created.
+
+T576_DATA_DIR is where the data is, more on that below.
 
 to install: 
 
@@ -57,10 +59,10 @@ details about the above:
 
 Firstly for anything to work you need to tell it where to find ROOT. this is usually done already when you run the "source thisroot.sh" script from root. I'll assume you know what this is already. to know if things are sourced correctly, type "echo $ROOTSYS", and you should get the correct directory to ROOT.
 
-next, tell it where CMAKE can find CLHEP. you can do that in 2 ways. you can either add the installation path for CLHEP to your CMAKE_PREFIX_PATH, or you can point CMAKE to the CLHEP build directory. this is the build directory you made when you installed CLHEP. it can be inside of the CLHEP directory, or somewhere else.
+next, tell it where CMAKE can find CLHEP. you can do that in 2 ways. you can either add the installation path for CLHEP to your CMAKE_PREFIX_PATH, or you can point CMAKE to the CLHEP build directory by setting CLHEP_DIR=/path/to/chlep/build. this is the build directory you made when you installed CLHEP. it can be inside of the CLHEP directory, or somewhere else.
 
 
-then, (optional) tell it where you'd like to install the software. if you don't do this, it will install to /usr/local/, meaning that it will put the header files in /usr/local/include, the t576 library into /usr/local/lib, and the share files into /usr/local/share. If you set your own install directory, /your/fav/install/dir, headers will go to /your/fav/install/dir/include, the library will go to /your/fav/install/dir/lib, etc. 
+then, (optional) tell it where you'd like to install the software, as above. if you don't do this, it will install to /usr/local/.
 
 finally, tell it where the t576 data lives. the data directory structure must be /path/to/t576/data/(root/ py/) meaning root/ and py/ live under some common directory. and under py/, lives dat/ and ped/. contact me if there are questions on this.
 
@@ -128,7 +130,17 @@ double z = ev->scope->pos[2].z();
 
 //these event-by-event variables are all loaded up when you call
 //ev->loadScopeEvent(event number). 
+
+//the same can be done for the surf, of course
+ev->surf->loadSurfEvent(9000);
+
+//which will put all the things in the proper place, e.g. to draw a graph
+//for channel 9 in the surf for this event, do
+
+ev->surf->gr[9]->Draw("al");
+
 ```
+future releases will have all sorts of things, like pointing maps and correlations etc.
 
 # Data:
 
