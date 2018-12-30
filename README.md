@@ -24,6 +24,12 @@ https://proj-clhep.web.cern.ch/proj-clhep/clhep23.html
 and again i recommend installing the latest version (2.4.1 at time of writing). installation is pretty straightforward for this too.
 
 
+additionally, this software uses the very nice, lightweight code for reading python .npz and .npy files into c++ ```cnpy```, which can be found at
+
+https://github.com/rogersce/cnpy
+
+we have used the relevant source from cnpy in this project, and lisence info can be found in LICENSE. 
+
 # Install:
 
 the software uses CMAKE, and you need to set a couple environment variables. T576_INSTALL_DIR is the top directory for the install. headers will install to T576_INSTALL_DIR/include/t576, sources to  T576_INSTALL_DIR/src/t576,  run logs and index files to T576_INSTALL_DIR/share/t576 and the t576 library to T576_INSTALL_DIR/lib. any directories below T576_INSTALL_DIR/ which don't exist will be automatically created.
