@@ -13,7 +13,7 @@ https://root.cern.ch/downloading-root
 
 and i recommend installing the latest version. (6.14.06 at time of writing). installing root6 is very straightforward thanks to CMAKE.
 
-be sure, once installed, that you do the "source /path/to/root/bin/thisroot.sh" so that your environment variables are set correctly.
+ #### be sure, once installed, that you do the "source /path/to/root/bin/thisroot.sh" so that your environment variables are set correctly.
 
 2) CLHEP:
 
@@ -24,29 +24,19 @@ https://proj-clhep.web.cern.ch/proj-clhep/clhep23.html
 and again i recommend installing the latest version (2.4.1 at time of writing). installation is pretty straightforward for this too.
 
 
-3) cnpy:
-
-cnpy is a very nice, lightweight library that lets us open .npz files (the data type of the SURF) into c++. it compiles using cmake and builds without issue on linux (in my experience.)
-
-https://github.com/rogersce/cnpy
-
-future releases will probably eliminate this library in lieu of a hard-coded function.
-
- #### note: I strongly recommend that 2 and 3 above are installed in the same place, meaning /path/to/install/dir/ is a general install directory like /usr/local.
-
 # Install:
 
-the software uses CMAKE, and you need to set a couple environment variables.T576_INSTALL_DIR is the top directory for the install, under which must be /include /src /share and /lib. if those aren't there, they will be made. T576_DATA_DIR is where the data is, more on that below. the below lines should do the trick:
+the software uses CMAKE, and you need to set a couple environment variables.T576_INSTALL_DIR is the top directory for the install, under which must be /include /src /share and /lib. (if those aren't there, they will be made.) T576_DATA_DIR is where the data is, more on that below. 2 example installs follow.
 
-examples:
-
-1) the full install, specifing your own install path (as you'll need to do on a cluster) and using the CMAKE_PREFIX_PATH environment variable to find the dependencies you installed above.
+to install: 
 
 first, add these to your bashrc:
 ```bash
-export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:/path/to/CLHEP/install/dir:/path/to/cnpy/install/dir
-#note that these ^^ can be the same. (like /usr/local for example)
+#point to the build directory for CLHEP, which conatains CLHEPConfig.cmake
+export CLHEP_DIR=/path/to/CLHEP/build/dir
+#point to where you want the tools installed. default is /usr/local
 export T576_INSTALL_DIR=/path/to/your/fav/install/dir
+#point to the t576 data. 
 export T576_DATA_DIR=/path/to/t576/data
 ```
 
@@ -59,22 +49,20 @@ cd t576Analysis
 ./install.sh
 ```
 
-and it will compile, install, and then run a little test macro that you can run to see that everything worked correctly.
+and it will compile, install, and then compile a little test macro that you can run to see that everything worked correctly.
 
-2) the simpler install just omits the T576_INSTALL_DIR step, putting everything in /usr/local (good for install on your own machine)
 
 details about the above:
 
 
-First, tell it where to find ROOT. this is usually done already when you run the "source thisroot.sh" script from root. I'll assume you know what this is already. to know if things are sourced correctly, type "echo $ROOTSYS", and you should get the correct directory to ROOT.
+Firstly for anything to work you need to tell it where to find ROOT. this is usually done already when you run the "source thisroot.sh" script from root. I'll assume you know what this is already. to know if things are sourced correctly, type "echo $ROOTSYS", and you should get the correct directory to ROOT.
 
 next, tell it where CMAKE can find CLHEP. you can do that in 2 ways. you can either add the installation path for CLHEP to your CMAKE_PREFIX_PATH, or you can point CMAKE to the CLHEP build directory. this is the build directory you made when you installed CLHEP. it can be inside of the CLHEP directory, or somewhere else.
 
-next, tell it where CMAKE can find cnpy. similar to CLHEP above, just point to where you installed it in whatever way you prefer.
 
 then, (optional) tell it where you'd like to install the software. if you don't do this, it will install to /usr/local/, meaning that it will put the header files in /usr/local/include, the t576 library into /usr/local/lib, and the share files into /usr/local/share. If you set your own install directory, /your/fav/install/dir, headers will go to /your/fav/install/dir/include, the library will go to /your/fav/install/dir/lib, etc. 
 
-finally, tell it where the t576 data lives. we'll say more about this in the data section below.
+finally, tell it where the t576 data lives. the data directory structure must be /path/to/t576/data/(root/ py/) meaning root/ and py/ live under some common directory. and under py/, lives dat/ and ped/. contact me if there are questions on this.
 
 # Using:
 

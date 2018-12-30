@@ -11,11 +11,15 @@ cmake_minimum_required(VERSION 2.8.10 FATAL_ERROR)
 project(t576)
 
 
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 unset(CMAKE_MODULE_PATH)
 #use the CLHEP things
 #will generate a bunch of library modules CLHEP::stuff that can be linked to
 find_package(CLHEP REQUIRED)
+find_package(ZLIB REQUIRED)
+
+
+
 #find_package(GSL REQUIRED)
 #use the ROOT things
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
@@ -39,13 +43,13 @@ else()
 endif()
 
 
-include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include ${CLHEP_INCLUDE_DIR} ${ROOT_INCLUDE_DIRS} ${T576_INCLUDE_DIR} ${T576_INCLUDE_DIR}/../)
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include ${CLHEP_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS} ${ROOT_INCLUDE_DIRS} ${T576_INCLUDE_DIR} ${T576_INCLUDE_DIR}/../)
 
 #----------------------------------------------------------------------------
 
 
-file(GLOB SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.cc ${CLHEP_INCLUDE_DIR}/Vector/*.icc ${CLHEP_INCLUDE_DIR}/Units/*.icc)
-file(GLOB HEADER_FILES ${T576_INCLUDE_DIR}/*.hh ${CLHEP_INCLUDE_DIR}/Vector/*.h ${CLHEP_INCLUDE_DIR}/Units/*.h)# ${GSL_INCLUDE_DIRS}/gsl/*.h)
+file(GLOB SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*.cc ${PROJECT_SOURCE_DIR}/src/*.cpp ${CLHEP_INCLUDE_DIR}/Vector/*.icc ${CLHEP_INCLUDE_DIR}/Units/*.icc)
+file(GLOB HEADER_FILES ${T576_INCLUDE_DIR}/*.h ${T576_INCLUDE_DIR}/*.hh ${CLHEP_INCLUDE_DIR}/Vector/*.h ${CLHEP_INCLUDE_DIR}/Units/*.h)# ${GSL_INCLUDE_DIRS}/gsl/*.h)
 
 
 #make the ROOT dictionaries and shared object library for reading the event tree
@@ -55,13 +59,13 @@ ROOT_GENERATE_DICTIONARY(G__t576 ${HEADER_FILES} LINKDEF ${T576_INCLUDE_DIR}/../
 
 add_library(t576 SHARED ${SOURCE_FILES} G__t576.cxx)
 
-target_link_libraries(t576 ${ROOT_LIBRARIES} CLHEP::Vector cnpy)
+target_link_libraries(t576 ${ROOT_LIBRARIES} CLHEP::Vector ${ZLIB_LIBRARIES})# cnpy)
 
 
 #----------------------------------------------------------------------------
 
 
-install (FILES ${T576_INCLUDE_DIR}/T576Event.hh ${T576_INCLUDE_DIR}/TUtil.hh ${T576_INCLUDE_DIR}/TUtilGraph.hh DESTINATION ${T576_INSTALL_DIR}/include/t576)
+install (FILES ${T576_INCLUDE_DIR}/T576Event.hh ${T576_INCLUDE_DIR}/TUtil.hh ${T576_INCLUDE_DIR}/cnpy.h ${T576_INCLUDE_DIR}/TUtilGraph.hh DESTINATION ${T576_INSTALL_DIR}/include/t576)
 install (FILES ${PROJECT_SOURCE_DIR}/src/T576Event.cc DESTINATION ${T576_INSTALL_DIR}/src/t576)
 
 install (FILES ${PROJECT_SOURCE_DIR}/share/runLog.root DESTINATION ${T576_INSTALL_DIR}/share/t576)

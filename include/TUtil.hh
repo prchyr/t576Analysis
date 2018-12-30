@@ -1,3 +1,8 @@
+/*
+copyright s. prohira and the T576 collaboration 2018
+released under the GNU General Public License version 3
+*/
+
 #ifndef TUTIL_BASE_H
 #define TUTIL_BASE_H
 
@@ -46,7 +51,7 @@ public:
   static double * makeIndices(int n, double step, double offset=0);
   static int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGsNs);
   static TGraph * normalize(TGraph *inGr);
-
+  static TGraph * getChunkOfGraphFine(TGraph *ingr, double start, double end);
 
 
   

@@ -1,3 +1,8 @@
+/*
+copyright s. prohira and the T576 collaboration 2018
+released under the GNU General Public License version 3
+*/
+
 #include "T576Event.hh"
 
 using namespace CLHEP;
@@ -296,17 +301,12 @@ int T576Event::loadSurfEvent(int run_major, int run_minor, int event){
 
   TString directory=top_dir+"/py/dat/";
 
-  
-  //  cout<<"asdf"<<endl;
-  //  fIndexTree->SetBranchAddress("surfFilename", &surfFilename);
   fIndexTree->SetTreeIndex(fMajorMinorIndex);
   fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(run_major, run_minor));
 
-  //loadSurfEvent(major, minor, subEvNo);
-  //return 1;
-  //  cout<<fIndexBuilt<<endl<<surfNEvents<<endl;;
+
   fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(major, minor));
-  //  cout<<txDist<<" "<<txAng<<endl;
+
   txPos.setRThetaPhi(txDist, txAng*pi/180., pi);
   
   for(int i=0;i<12;i++){
@@ -321,82 +321,65 @@ int T576Event::loadSurfEvent(int run_major, int run_minor, int event){
     cout<<"event number too large for this major/minor combination"<<endl;
     return 0;
   }
-  //  fIndexTree->GetEntry(0);
-  //  cout<<major<<" "<<minor<<endl;
-  TString thisSurfFilename=surfFilename->Data();
-  //open the file
-  //cout<<thisSurfFilename<<endl<<" "<<fSurfFilename<<endl;
-  if(thisSurfFilename!=fSurfFilename){
-    //load the event file
-    TString openf=directory+thisSurfFilename;
-    //cout<<"one"<<endl<<openf.Data()<<endl;;
-    //  cnpy::npz_t dataset = cnpy::npz_load(openf.Data());
-    fDataset = cnpy::npz_load(openf.Data());
-    //cout<<"two"<<endl;
-    //load the data. it is stored as an array of shorts of length (N events) x (12 channels ) x (1024 samples)
-    //cnpy::NpyArray data_arr = dataset["data"];
-    fSurfDataArray = fDataset["data"];
-    //cout<<"three"<<endl;
-    fSurfData=fSurfDataArray.data<short>();
-    //cout<<"four"<<endl<<fSurfData[1]<<" "<<fSurfData[10000]<<endl;
-    //cout<<dat[1]<<" "<<dat[10000]<<endl;
-    //load the times, stored as double
-    //fNEntriesSurf=data_arr.shape[0]/(12*1024);
-    cnpy::NpyArray times_arr = fDataset["times"];
-    fSurfTimes = times_arr.data<double>();
-    //cout<<fSurfTimes[0]<<endl;
-    fSurfFilename=thisSurfFilename;
-}
 
-  //  cout<<fSurfData[1]<<endl;
-  if(event>=fNEntriesSurf){
-    cout<<"event number too high!"<<endl;
-    return 0;
-  }
-  //cout<<surfNEvents<<endl;
+  if(loadSurfEvent(surfEvNo)==1)return 1;
+  else return 0;
+//   TString thisSurfFilename=surfFilename->Data();
+//   //open the file
 
-  subEvNo=event;//-surfEvNo;
-  //cout<<event<<" "<<surfEvNo<<" "<<subEvNo<<endl;
-  surfTime=fSurfTimes[subEvNo];
-  //cout<<fSurfTimes[subEvNo]<<endl<<surfTime<<endl;
-  //cout<<"five"<<endl;
-  //cout<<fSurfData[1000000]<<endl;
-  //cout<<"six"<<endl;
-  //increment and index variables for event number and channel number
-  int ev=12*1024;
-  int len=1024;
-  int index1=subEvNo*ev;
+//   if(thisSurfFilename!=fSurfFilename){
+//     //load the event file
+//     TString openf=directory+thisSurfFilename;
 
-  
-  double data[1024];
-  //cast the shorts to doubles for plotting and mathing
+//     fDataset = cnpy::npz_load(openf.Data());
 
-  //    int olen=sizeof(fSurfData)/sizeof(*fSurfData);
-  //cout<<olen<<endl;
-  for(int i=0;i<12;i++){
-    int index2=i*len;//i is channel number
-    //cout<<index1<<" "<<index2<<" "<<fSurfData[index1+index2]<<endl;
-    copy(fSurfData+index1+index2, fSurfData+index1+index2+len, surf->ch[i]);
-    //   cout<<i<<endl;
-    TGraph * graph=new TGraph(len, surf->time, surf->ch[i]);
+//     //load the data. it is stored as an array of shorts of length (N events) x (12 channels ) x (1024 samples)
 
-    if(fInterpGsNs>0.){
-      getInterpolatedGraph(graph, surf->gr[i]);
-    }
-    else{
-      *surf->gr[i]=*graph;
-    }
-   delete(graph);
-  }
-  
-  //  if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
-  //delete(file);
-  //  getCharge(surf->gr[3]);
-  
-  //  delete (files);
-  
-  
-  return 1;
+//     fSurfDataArray = fDataset["data"];
+
+//     fSurfData=fSurfDataArray.data<short>();
+
+//     cnpy::NpyArray times_arr = fDataset["times"];
+//     fSurfTimes = times_arr.data<double>();
+
+//     fSurfFilename=thisSurfFilename;
+// }
+
+
+//   if(event>=fNEntriesSurf){
+//     cout<<"event number too high!"<<endl;
+//     return 0;
+//   }
+
+
+//   subEvNo=event;//-surfEvNo;
+
+//   surfTime=fSurfTimes[subEvNo];
+
+//   //increment and index variables for event number and channel number
+//   int ev=12*1024;
+//   int len=1024;
+//   int index1=subEvNo*ev;
+
+//   //cast the shorts to doubles for plotting and mathing  
+//   double data[1024];
+
+//   for(int i=0;i<12;i++){
+//     int index2=i*len;//i is channel number
+//     copy(fSurfData+index1+index2, fSurfData+index1+index2+len, surf->ch[i]);
+
+//     TGraph * graph=new TGraph(len, surf->time, surf->ch[i]);
+
+//     if(fInterpGsNs>0.){
+//       getInterpolatedGraph(graph, surf->gr[i]);
+//     }
+//     else{
+//       *surf->gr[i]=*graph;
+//     }
+//    delete(graph);
+//   }
+
+
 }
 
 
@@ -419,98 +402,77 @@ int T576Event::loadSurfEvent(int event){
 
   TString directory=top_dir+"/py/dat/";
 
-  
-  //  cout<<"asdf"<<endl;
-  //  fIndexTree->SetBranchAddress("surfFilename", &surfFilename);
+ 
   fIndexTree->SetTreeIndex(fSurfEvNoIndex);
   fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(event, event));
 
-  //loadSurfEvent(major, minor, subEvNo);
-  //return 1;
-  //  cout<<fIndexBuilt<<endl<<surfNEvents<<endl;;
   fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(major, minor));
-  //  cout<<txDist<<" "<<txAng<<endl;
+
   txPos.setRThetaPhi(txDist, txAng*pi/180., pi);
   
   for(int i=0;i<12;i++){
     surf->pos[i].setRThetaPhi(surf->dist[i], surf->ang[i]*pi/180., pi);
   }
   if(major<1)return 0;
-  //  fIndexTree->GetEntry(0);
-  //  cout<<major<<" "<<minor<<endl;
+
   TString thisSurfFilename=surfFilename->Data();
   //open the file
-  //cout<<thisSurfFilename<<endl<<" "<<fSurfFilename<<endl;
+
   if(thisSurfFilename!=fSurfFilename){
     //load the event file
     TString openf=directory+thisSurfFilename;
-    //cout<<"one"<<endl<<openf.Data()<<endl;;
-    //  cnpy::npz_t dataset = cnpy::npz_load(openf.Data());
+
     fDataset = cnpy::npz_load(openf.Data());
-    //cout<<"two"<<endl;
+
     //load the data. it is stored as an array of shorts of length (N events) x (12 channels ) x (1024 samples)
-    //cnpy::NpyArray data_arr = dataset["data"];
+
     fSurfDataArray = fDataset["data"];
-    //cout<<"three"<<endl;
+
     fSurfData=fSurfDataArray.data<short>();
-    //cout<<"four"<<endl<<fSurfData[1]<<" "<<fSurfData[10000]<<endl;
-    //cout<<dat[1]<<" "<<dat[10000]<<endl;
-    //load the times, stored as double
-    //fNEntriesSurf=data_arr.shape[0]/(12*1024);
+
     cnpy::NpyArray times_arr = fDataset["times"];
     fSurfTimes = times_arr.data<double>();
-    //cout<<fSurfTimes[0]<<endl;
+
     fSurfFilename=thisSurfFilename;
 }
 
-  //  cout<<fSurfData[1]<<endl;
+
   if(event>=fNEntriesSurf){
     cout<<"event number too high!"<<endl;
     return 0;
   }
-  //cout<<surfNEvents<<endl;
 
   subEvNo=event-surfEvNo;
-  //cout<<event<<" "<<surfEvNo<<" "<<subEvNo<<endl;
+
   surfTime=fSurfTimes[subEvNo];
-  //cout<<fSurfTimes[subEvNo]<<endl<<surfTime<<endl;
-  //cout<<"five"<<endl;
-  //cout<<fSurfData[1000000]<<endl;
-  //cout<<"six"<<endl;
+
   //increment and index variables for event number and channel number
   int ev=12*1024;
   int len=1024;
   int index1=subEvNo*ev;
 
-  
+  //cast the shorts to doubles for plotting and mathing  
   double data[1024];
-  //cast the shorts to doubles for plotting and mathing
 
-  //    int olen=sizeof(fSurfData)/sizeof(*fSurfData);
-  //cout<<olen<<endl;
   for(int i=0;i<12;i++){
     int index2=i*len;//i is channel number
-    //cout<<index1<<" "<<index2<<" "<<fSurfData[index1+index2]<<endl;
     copy(fSurfData+index1+index2, fSurfData+index1+index2+len, surf->ch[i]);
-    //   cout<<i<<endl;
-    TGraph * graph=new TGraph(len, surf->time, surf->ch[i]);
+    surf->delays[i]=surf->cableLengths[i]*surf->velocityFactor;
 
+    TGraph * graph=new TGraph(len, TUtil::makeIndices(len, 1./3.2, surf->delays[i]), surf->ch[i]);
+
+    TGraph *grChunk=TUtil::getChunkOfGraphFine(graph, 0, 250);
     if(fInterpGsNs>0.){
-      getInterpolatedGraph(graph, surf->gr[i]);
+      getInterpolatedGraph(grChunk, surf->gr[i]);
     }
     else{
-      *surf->gr[i]=*graph;
+      *surf->gr[i]=*grChunk;
     }
-   delete(graph);
+    delete(grChunk);
+    delete(graph);
   }
   
-  //  if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
-  //delete(file);
-  //  getCharge(surf->gr[3]);
-  
-  //  delete (files);
-  
-  
+  //getCharge();  
   return 1;
 }
 

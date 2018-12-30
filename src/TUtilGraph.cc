@@ -1,3 +1,8 @@
+/*
+copyright s. prohira and the T576 collaboration 2018
+released under the GNU General Public License version 3
+*/
+
 #include "TUtilGraph.hh"
 #include "TROOT.h"
 

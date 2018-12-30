@@ -1,3 +1,8 @@
+/*
+copyright s. prohira and the T576 collaboration 2018
+released under the GNU General Public License version 3
+*/
+
 #include "TUtil.hh"
 
 int TUtil::fN=1;
@@ -219,4 +224,24 @@ int TUtil::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double inter
 			 
 
   return 1;
+}
+
+TGraph * TUtil::getChunkOfGraphFine(TGraph *ingr, double start, double end){
+  double *xx=ingr->GetX();
+  double *yy=ingr->GetY();
+  vector<double> outx, outy;
+  double xincr=xx[10]-xx[9];
+  for(int i=0;i<ingr->GetN();i++){
+    //if(xx[i]>=start&&xx[i]<=end){
+      //    }
+      //else{
+      double time=start+((double)i*xincr);
+      if(time<end){
+      outx.push_back(time);
+      //      outx.push_back(xx[i]);
+      outy.push_back(ingr->Eval(time));
+      }
+  }
+  TGraph * outg=new TGraph(outx.size(), &outx[0], &outy[0]);
+  return outg;
 }

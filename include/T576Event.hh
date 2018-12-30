@@ -1,3 +1,8 @@
+/*
+copyright s. prohira and the T576 collaboration 2018
+released under the GNU General Public License version 3
+*/
+
 #ifndef T576EVENT_BASE_H
 #define T576EVENT_BASE_H
 
@@ -28,7 +33,7 @@
 #include "CLHEP/Units/PhysicalConstants.h"
 #include "CLHEP/Vector/LorentzVector.h"
 #include "CLHEP/Vector/ThreeVector.h"
-
+#include "TUtil.hh"
 
 using namespace CLHEP;
 using namespace std;
@@ -93,7 +98,8 @@ public:
   //run on construction to make sure the indexing is valid and useable.
   TString getSurfFilename(int inMaj, int inMin);
   int checkStatus();
-  //set the interpolation level
+  //set the interpolation level. this is used in the graphs, but the
+  //channel arrays are always the raw values.
   void setInterpGsNs(double value){fInterpGsNs=value;};
 
   /**************utility and analysis functions**************/
@@ -155,8 +161,12 @@ public:
 	time[i]=i*incr;
       }
     }
+    double cableLengths[12]={50., 20., 20., 10., 0., 0., 0., 0., 0., 0., 10., 20.};
+    double velocityFactor=-.82;//from Krijn and Kian, negative for math reasons
+    
     Hep3Vector pos[12];
     double dist[12], ang[12];
+    double delays[12];
     double  ch[12][1024];
     TGraph * gr[12]={new TGraph(), new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph()};
     double  time[1024];
