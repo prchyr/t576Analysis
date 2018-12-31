@@ -146,41 +146,51 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
   
   }
   
-  if(event>fEventTree->GetEntries()){
-    cout<<"event number too high! this major/minor combination only contains "<<fEventTree->GetEntries()<<" events."<<endl<<"select another event number, or call loadScopeEvent(event) or loadSurfEvent(event) without major/minor to use overall event index"<<endl;
-    return (-1);
+  if(major!=run_major&&minor!=run_minor){
+    cout<<"major/minor combination doesn't exist"<<endl;
+    return 0;
   }
-
-  fEventTree->GetEntry(event);
-
-   //check the length of the record.
-  auto length=sizeof(scope->time)/sizeof(*scope->time);
-
-  //fill the event graphs for the scope->
-  //fix the first and last values, which were recorded incorrectly
-  scope->time[0]=0.;
-  scope->time[19999]=scope->time[19998]+.05;
-  for(int i=0;i<4;i++){
-    TGraph * graph=new TGraph(length, scope->time, scope->ch[i]);
-
-    if(fInterpGsNs>0.){
-      getInterpolatedGraph(graph, scope->gr[i]);
-    }
-    else{
-      *scope->gr[i]=*graph;
-    }
-    delete(graph);
+  if(loadScopeEvent(scopeEvNo+event)==1){
+    getCharge(scope->gr[3]);
+    return 1;
   }
+  else return 0;
   
-  //delete(tree);
-  fEventFile->Close();
-  //delete(file);
-  getCharge(scope->gr[3]);
+  // if(event>fEventTree->GetEntries()){
+  //   cout<<"event number too high! this major/minor combination only contains "<<fEventTree->GetEntries()<<" events."<<endl<<"select another event number, or call loadScopeEvent(event) or loadSurfEvent(event) without major/minor to use overall event index"<<endl;
+  //   return (-1);
+  // }
+
+  // fEventTree->GetEntry(event);
+
+  //  //check the length of the record.
+  // auto length=sizeof(scope->time)/sizeof(*scope->time);
+
+  // //fill the event graphs for the scope->
+  // //fix the first and last values, which were recorded incorrectly
+  // scope->time[0]=0.;
+  // scope->time[19999]=scope->time[19998]+.05;
+  // for(int i=0;i<4;i++){
+  //   TGraph * graph=new TGraph(length, scope->time, scope->ch[i]);
+
+  //   if(fInterpGsNs>0.){
+  //     getInterpolatedGraph(graph, scope->gr[i]);
+  //   }
+  //   else{
+  //     *scope->gr[i]=*graph;
+  //   }
+  //   delete(graph);
+  // }
   
-  //  delete (files);
+  // //delete(tree);
+  // fEventFile->Close();
+  // //delete(file);
+  // getCharge(scope->gr[3]);
+  
+  // //  delete (files);
   
   
-  return 1;
+  // return 1;
   }
 
 
@@ -202,16 +212,16 @@ int T576Event::loadScopeEvent(int event){
   TString directory=top_dir+"/root/";
 
   
-  //  cout<<"asdf"<<endl;
+  //cout<<"asdf"<<endl;
   //  fIndexTree->SetBranchAddress("scopeFilename", &scopeFilename);
   fIndexTree->SetTreeIndex(fScopeEvNoIndex);
   fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(event, event));
 
   //loadScopeEvent(major, minor, subEvNo);
   //return 1;
-  //  cout<<fIndexBuilt<<endl;
+  //cout<<fIndexBuilt<<endl;
   fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(major, minor));
-  //  cout<<txDist<<" "<<txAng<<endl;
+  //cout<<txDist<<" "<<txAng<<endl;
   txPos.setRThetaPhi(txDist, txAng*pi/180., pi);
   
   for(int i=0;i<4;i++){
@@ -219,7 +229,7 @@ int T576Event::loadScopeEvent(int event){
   }
   if(major<1)return 0;
   //  fIndexTree->GetEntry(0);
-  //  cout<<major<<" "<<minor<<endl;
+  //cout<<major<<" "<<minor<<endl;
   TString thisScopeFilename=scopeFilename->Data();
   //open the file
   //cout<<thisScopeFilename<<endl<<" "<<fScopeFilename<<endl;
@@ -273,7 +283,7 @@ int T576Event::loadScopeEvent(int event){
    delete(graph);
   }
   
-  if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
+  // if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
   //delete(file);
   getCharge(scope->gr[3]);
   
@@ -322,7 +332,7 @@ int T576Event::loadSurfEvent(int run_major, int run_minor, int event){
     return 0;
   }
 
-  if(loadSurfEvent(surfEvNo)==1)return 1;
+  if(loadSurfEvent(surfEvNo+event)==1)return 1;
   else return 0;
 //   TString thisSurfFilename=surfFilename->Data();
 //   //open the file

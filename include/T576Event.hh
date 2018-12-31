@@ -17,6 +17,7 @@ released under the GNU General Public License version 3
 #include "cnpy.h"
 //#include "TIter.h"
 #include "TSystemFile.h"
+#include "TCanvas.h"
 #include "TH1F.h"
 #include "TString.h"
 #include "TTree.h"
@@ -24,6 +25,8 @@ released under the GNU General Public License version 3
 #include "TGraph.h"
 #include "TGraph2D.h"
 #include "TMath.h"
+#include "TColor.h"
+#include "TStyle.h"
 #include "Math/Interpolator.h"
 #include "Math/InterpolationTypes.h"
 #include <iostream>
@@ -97,6 +100,7 @@ public:
   int buildEventIndex(int force=0);
   //run on construction to make sure the indexing is valid and useable.
   TString getSurfFilename(int inMaj, int inMin);
+  //called on construction, checks that things are where they should be.
   int checkStatus();
   //set the interpolation level. this is used in the graphs, but the
   //channel arrays are always the raw values.

@@ -158,6 +158,234 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
   return fXfrmGr;
 }
 
+/*******************SVD things**********************
+
+
+ */
+
+TVectorD TUtil::SVD::normalize(TVectorD vec){
+  auto a=TVectorD(vec);
+  auto b=TVectorD(vec);
+  int len=vec.GetNrows();
+  double norm=0;
+  a.Sqr();
+  norm=sqrt(a.Sum());
+  b*=(1./norm);
+  return b;
+}
+
+
+double TUtil::SVD::norm(TVectorD vec){
+  auto a=TVectorD(vec);
+  int len=vec.GetNrows();
+  double norm=0;
+  a.Sqr();
+  norm=sqrt(a.Sum());
+  return norm;
+}
+
+TMatrixD TUtil::SVD::eventMatrix(vector<TGraph*> vecs){
+  int x=vecs.size();
+  int y=vecs[0]->GetN();
+  TMatrixD M(x,y);
+  M.Zero();
+  for(int i=0;i<x;i++){
+    for(int j=0;j<y;j++){
+    M[i][j]=vecs[i]->GetY()[j];
+    }
+  }
+  return M;
+}
+
+//make a density matrix partitioned along D
+TMatrixD TUtil::SVD::densityMatrix(TGraph *vec, int D, int xlim){
+  int N=xlim==0?vec->GetN():xlim;
+  int d=(int) (N/D);
+  TVectorD V(vec->GetN(), vec->GetY());
+  TMatrixD A(D, D);
+  A.Zero();
+  for(int i=0;i<d;i++){
+    auto vv=V.GetSub(i*D, (i*D)+D, "");
+    A.Rank1Update(vv, 1.);
+  }
+  return A;
+}
+
+TMatrixD TUtil::SVD::truncateSVD(TDecompSVD svd, int below, int above){
+  auto V=svd.GetV();
+  auto S=svd.GetSig();
+  auto U=svd.GetU();
+  auto temp=TMatrixD(U.GetNcols(), V.GetNcols());
+  //cout<<U.GetNcols()<<" "<<V.GetNcols()<<endl;
+  //cout<<temp.GetNrows()<<" "<<temp.GetNcols()<<endl;
+
+  temp.Zero();
+  for(int i=above;i<below;i++){
+    temp[i][i]=S[i];
+  }
+  //cout<<"here"<<endl;
+  auto SV=temp*V.T();
+  //cout<<"no here"<<endl;
+  //cout<<temp.GetNrows()<<" "<<temp.GetNcols()<<endl;
+  auto USV=U*temp;
+  //  cout<<"no no here"<<endl;
+  return USV;
+}
+
+
+TMatrixD TUtil::SVD::reconstructSingle(TDecompSVD svd, int val){
+  auto M = truncateSVD(svd, val+1, val);
+  return M;
+}
+
+TVectorD TUtil::SVD::toVector(TGraph *vec){
+  auto v=TVectorD(vec->GetN(), vec->GetY());
+  return v;
+}
+
+//TVectorD subtract(
+
+//TVectorD hilbertTransform(TVectorD vec){
+  
+
+TVectorD TUtil::SVD::avgVector(TMatrixD m){
+  int sizex=m.GetNcols();
+  int sizey=m.GetNrows();
+  auto vec=TVectorD(sizex);
+  //vector<double>vec;
+  for(int i=0;i<sizey;i++){
+    vec+=m[i];
+  }
+  return vec;
+}  
+
+
+TMatrixD TUtil::SVD::buildBasis(TMatrixD m, int num){
+  auto rows=m.GetNrows();
+  auto cols=m.GetNcols();
+  //cout<<rows<<" "<<cols<<endl;
+  num=num>cols?cols:num;
+  auto M=TMatrixD(num, cols);
+
+  auto mm=rows>=cols?m:m.T();
+  //  cout<<mm.GetNrows()<<" "<<mm.GetNcols()<<endl;
+  auto svd=TDecompSVD(mm);
+  rows=M.GetNrows();
+  cols=M.GetNcols();
+  //cout<<rows<<" "<<cols<<endl;
+  for(int i=0;i<rows;i++){
+    auto recon=reconstructSingle(svd,i).T();
+    //cout<<recon.GetNrows()<<" "<<recon.GetNcols()<<endl;
+    auto avg=avgVector(recon);
+    //cout<<avg.GetNrows()<<endl;//" "<<avg.GetNcols()<<endl;
+    auto vec=normalize(avg);
+    //cout<<vec.GetNrows()<<endl;
+    for(int j=0;j<cols;j++){
+      M[i][j]=vec[j];
+    }
+  }
+  return rows>cols?M.T():M;
+}
+
+TVectorD TUtil::SVD::getCoefficients(TVectorD V, TMatrixD B){
+  int y=B.GetNrows();
+  int x=B.GetNcols();
+  auto vec=TVectorD(y);
+  vec.Zero();
+  for (int i=0;i<y;i++){
+    auto vnorm=normalize(V);
+    for( int j=0;j<x;j++){
+      vnorm[j]*=B[i][j];
+    }
+    vec[i]=vnorm.Sum();
+  }
+  return vec;
+}
+
+TVectorD TUtil::SVD::expandInBasis(TVectorD V, TMatrixD B, int num){
+
+  int y=B.GetNrows();
+  int x=B.GetNcols();
+  auto vec=getCoefficients(V, B);
+  auto outvec=TVectorD(V.GetNrows());
+  outvec.Zero();
+  num=num>=y?y:num;
+  for (int i=0;i<num;i++){
+    //    auto aligned=
+    for (int j=0;j<x;j++){
+      outvec[j]+=(vec[i]*B[i][j]);
+    }
+  }
+  outvec*=norm(V);
+  return outvec;
+}
+
+TVectorD TUtil::SVD::expandInBasis(TGraph * G, TMatrixD B, int num){
+  TVectorD V = toVector(G);
+  int y=B.GetNrows();
+  int x=B.GetNcols();
+  auto vec=getCoefficients(V, B);
+  auto outvec=TVectorD(V.GetNrows());
+  outvec.Zero();
+  num=num>=y?y:num;
+  for (int i=0;i<num;i++){
+    //    auto aligned=
+    for (int j=0;j<x;j++){
+      outvec[j]+=(vec[i]*B[i][j]);
+    }
+  }
+  outvec*=norm(V);
+  return outvec;
+}
+
+
+//must be for square matrix
+TMatrixD TUtil::SVD::makeFilter(TDecompSVD svd, int below, int above){
+  auto M = truncateSVD(svd, below, above);
+  auto D = M.GetNrows();
+  auto I = TMatrixD(D, D);
+  I.UnitMatrix();
+  auto filter=I-(M*(1./M.NormInf()));
+  //  auto filter=(M*(1./M.E2Norm()));
+  return filter;
+}
+
+
+TGraph * TUtil::SVD::toGraph(TVectorD v, double samplerate, double delay,TString name){
+  double tdiv=1./samplerate;
+  auto  gg=new TGraph(v.GetNrows(), makeIndices(v.GetNrows(), tdiv, delay), &v[0]);
+  gg->SetTitle("");
+  gg->SetName(name);
+  gg->GetXaxis()->SetRangeUser(0,gg->GetX()[gg->GetN()-1]);
+  return gg;
+}
+
+TVectorD TUtil::SVD::flatten(TMatrixD m){
+  int sizex=m.GetNcols();
+  int sizey=m.GetNrows();
+    auto vec=TVectorD(sizex*sizey);
+  //vector<double>vec;
+  for(int i=0;i<sizey;i++){
+    vec.SetSub(i*sizex, m[i]);
+  }
+  return vec;
+}  
+
+TH2F * TUtil::SVD::matrixMap(TMatrixD M, TString name){
+  int sizex=M.GetNcols();
+  int sizey=M.GetNrows();
+  //  cout<<sizey<<" "<<sizex<<endl;
+  TH2F * map=new TH2F(name, name, sizex, 0.,sizex, sizey, 0,sizey);
+  for(int i=0;i<sizex;i++){
+    for(int j=0;j<sizey;j++){
+      map->SetBinContent(i+1,j+1, M[i][sizey-j-1]);
+    }
+  }
+  
+  return map;
+}
+
+
 
 
 
@@ -245,3 +473,80 @@ TGraph * TUtil::getChunkOfGraphFine(TGraph *ingr, double start, double end){
   TGraph * outg=new TGraph(outx.size(), &outx[0], &outy[0]);
   return outg;
 }
+
+
+
+TGraph * TUtil::delayGraph(TGraph *ingr, double delay){
+  double*xx=ingr->GetX();
+  double xxout[ingr->GetN()];
+  double*yy=ingr->GetY();
+  for(int i=0;i<ingr->GetN();i++){
+    xxout[i]=(double)xx[i]+delay;
+  }
+  TGraph *dg=new TGraph(ingr->GetN(), xxout, yy);
+  return dg;
+}
+
+int TUtil::delayGraph(TGraph *ingr, TGraph *outgr, double delay){
+  double*xx=ingr->GetX();
+  double xxout[ingr->GetN()];
+  double*yy=ingr->GetY();
+  for(int i=0;i<ingr->GetN();i++){
+    xxout[i]=(double)xx[i]+delay;
+  }
+  TGraph *dg=new TGraph(ingr->GetN(), xxout, yy);
+  *outgr=*dg;
+  delete dg;
+  return 1;
+}
+
+
+TH1F * TUtil::plotResiduals(TGraph *gr1, TGraph *gr2, int nbins, double min, double max){
+  TH1F *hist =new TH1F("", "", nbins,min, max);
+  for(int i=0;i<gr1->GetN();i++)hist->Fill(gr1->GetY()[i]-gr2->GetY()[i]);
+  return hist;
+}
+
+
+
+
+
+
+
+
+
+
+/*************some plotting things****************/
+
+
+
+
+void TUtil::setWarmPalette(){
+
+  const Int_t rgb = 3;
+  const Int_t N = 255;
+
+  Double_t stops[rgb] = {0.34, 0.61, 0.84};
+  Double_t red[rgb]   = {0.00, 1., 0.90};
+  Double_t green[rgb] = {0., 0.0, 1.0};
+  Double_t blue[rgb]  = {0.00, 0.0, 0.00};
+  TColor::CreateGradientColorTable(rgb, stops, red, green, blue, N);
+  gStyle->SetNumberContours(N);
+
+}
+
+void TUtil::setCoolPalette(){
+
+  const Int_t rgb = 3;
+  const Int_t N = 255;
+
+
+  Double_t red[]    = {0., .0, .0, 1., 1.0};
+  Double_t green[]  = {0., .1, .9, .0, 1.0};
+  Double_t blue[]   = {0., .80, .90, 0.20, 1.0};
+  Double_t stops[] = {0., .25, .50, .75, 1.0};
+  TColor::CreateGradientColorTable(rgb, stops, red, green, blue, N);
+  gStyle->SetNumberContours(N);
+
+}
+
