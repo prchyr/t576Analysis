@@ -6,7 +6,7 @@
 #ifndef TUTIL_BASE_H
 #define TUTIL_BASE_H
 
-#include "T576Event.hh"
+
 #include "TROOT.h"
 #include "TRint.h"
 #include "TSystem.h"
@@ -20,6 +20,8 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TString.h"
+#include "TStyle.h"
+#include "TCanvas.h"
 #include "TTree.h"
 #include "TTreeIndex.h"
 #include "TGraph.h"

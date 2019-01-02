@@ -29,9 +29,9 @@ include(${ROOT_USE_FILE})
 #add_definitions(${ROOT_CXX_FLAGS})
 
 if(DEFINED ENV{T576_SOURCE_DIR})
-  set(T576_INCLUDE_DIR $ENV{T576_SOURCE_DIR}/include)
+  set(T576_INCLUDE_DIR $ENV{T576_SOURCE_DIR}/include/t576)
 else()
-  set(T576_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+  set(T576_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/t576)
 endif()
 
 if(DEFINED ENV{T576_INSTALL_DIR})
@@ -45,7 +45,7 @@ endif()
 
 
 
-include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include ${ZLIB_INCLUDE_DIRS} ${ROOT_INCLUDE_DIRS} ${T576_INCLUDE_DIR} ${T576_INCLUDE_DIR}/../)
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/include/t576 ${ZLIB_INCLUDE_DIRS} ${ROOT_INCLUDE_DIRS} ${T576_INCLUDE_DIR} ${T576_INCLUDE_DIR}/../)
 
 #----------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ file(GLOB HEADER_FILES ${T576_INCLUDE_DIR}/*.h ${T576_INCLUDE_DIR}/*.hh)# ${GSL_
 
 #make the ROOT dictionaries and shared object library for reading the event tree
 
-ROOT_GENERATE_DICTIONARY(G__t576 ${HEADER_FILES} LINKDEF ${T576_INCLUDE_DIR}/../LinkDef.h)
+ROOT_GENERATE_DICTIONARY(G__t576 ${HEADER_FILES} LINKDEF ${PROJECT_SOURCE_DIR}/LinkDef.h)
 
 
 add_library(t576 SHARED ${SOURCE_FILES} G__t576.cxx)
@@ -70,7 +70,7 @@ target_link_libraries(svdExample ${ROOT_LIBRARIES} t576)
 #----------------------------------------------------------------------------
 
 
-install (FILES ${T576_INCLUDE_DIR}/T576Event.hh ${T576_INCLUDE_DIR}/TUtil.hh ${T576_INCLUDE_DIR}/cnpy.h ${T576_INCLUDE_DIR}/TUtilGraph.hh DESTINATION ${T576_INSTALL_DIR}/include/t576)
+install (FILES ${T576_INCLUDE_DIR}/T576Event.hh ${T576_INCLUDE_DIR}/TUtil.hh ${PROJECT_SOURCE_DIR}/include/cnpy.h ${T576_INCLUDE_DIR}/TUtilGraph.hh DESTINATION ${T576_INSTALL_DIR}/include/t576)
 install (FILES ${PROJECT_SOURCE_DIR}/src/T576Event.cc DESTINATION ${T576_INSTALL_DIR}/src/t576)
 
 install (FILES ${PROJECT_SOURCE_DIR}/share/runLog.root DESTINATION ${T576_INSTALL_DIR}/share/t576)
