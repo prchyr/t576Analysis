@@ -66,7 +66,7 @@ add_library(t576 SHARED ${SOURCE_FILES} G__t576.cxx)
 
 target_link_libraries(t576 ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})# cnpy)
 add_executable(svdExample ${PROJECT_SOURCE_DIR}/example/svdExample.cc)
-target_link_libraries(svdExample t576)
+target_link_libraries(svdExample ${ROOT_LIBRARIES} t576)
 #----------------------------------------------------------------------------
 
 
