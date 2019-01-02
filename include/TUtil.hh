@@ -61,17 +61,20 @@ namespace TUtil{
   TGraph * normalize(TGraph *inGr);
   //return a chunk of a graph, specified by x-axis values. 
   TGraph * getChunkOfGraphFine(TGraph *ingr, double start, double end);
-  //cross correlation of two graphs. by default, returns the graph yy
-  //delayed to point of peak correlation with xx. if xcorr_graph=1,
-  //the cross correlation graph is returned instead.
-  //maxDelay is the maximum starting offset between xx and yy. defaults
-  //to the full length of the graphs. 
-  TGraph * crossCorrelate(TGraph * xx, TGraph * yy, int max_delay=100000, int xcorr_graph=0);
+  //cross correlation of two graphs. returns the cross-correlation graph
+  //maxDelay is the maximum starting offset between gr1 and gr2. defaults
+  //to the full length of the graphs.
+  //t_low(high) are the lowest(highest) times over which to
+  //calculate the correlation. defaults to the full length of the graphs.
+  TGraph * crossCorrelate(TGraph * gr1, TGraph * gr2, double max_delay=999999., double t_low=0., double t_high=999999.);
   //same as above but allows you to supply a window function, to only
   //correlate parts of the graph that you want.
-  TGraph * crossCorrelateWindowed(TGraph * xx, TGraph * yy, TGraph *wingraph, int max_delay=100000);
+  TGraph * crossCorrelateWindowed(TGraph * gr1, TGraph * gr2, TGraph *wingraph, double max_delay=999999., double t_low=0., double t_high=999999.);
+  //the same as the crossCorrelate() function, but returns gr2 shifted in time
+  //to the point of peak cross correlation with gr1.
+  TGraph * align(TGraph * gr1, TGraph * gr2, double max_delay=999999., double t_low=0., double t_high=999999.);
   //align a large number of graphs to the first graph in the set.
-  TGraph * alignGraphs(vector<TGraph*> inGr);
+  vector<TGraph*> alignMultiple(vector<TGraph*> inGr, double max_delay, double t_low, double t_high);
   //delay a graph
   TGraph *delayGraph(TGraph *ingr, double delay);
   //same but with no mem usage.

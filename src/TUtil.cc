@@ -598,46 +598,168 @@ TH1F * TUtil::plotResiduals(TGraph *gr1, TGraph *gr2, int nbins, double min, dou
 }
 
 
-TGraph * TUtil::crossCorrelate(TGraph * xx, TGraph * yy, int max_delay, int xcorr_graph){
-  double *x = xx->GetY();
-  double *time=xx->GetX();
-  double *y = yy->GetY();
-  int yn=yy->GetN();
-  int xn=xx->GetN();
+TGraph * TUtil::crossCorrelate(TGraph * gr1, TGraph * gr2, double max_delay, double t_low, double t_high){
+  double *x = gr1->GetY();
+  double *time=gr1->GetX();
+  double *y = gr2->GetY();
+  int yn=gr1->GetN();
+  int xn=gr2->GetN();
+
   int lengthx=xn;
   int lengthy=yn;
-  int length=0, d, i, n=0;
+  int length=0;
   vector<double> out, outx, outy;
   double num, ynum, xdenom, ydenom, denom;
   double timescale = time[1]-time[0];
 
   length=lengthx<=lengthy?xn:yn;
   length=lengthx<=lengthy?xn:yn;
-  int throwaway=length/10;//throw away highest delays, they are unstable
-  max_delay=max_delay>length?length-throwaway:max_delay;
+  double throwaway=time[xn-1]/10.;//throw away highest delays, they are unstable
+  max_delay=max_delay>time[xn-1]?time[xn-1]-throwaway:max_delay;
+
+  t_high=t_high>=time[xn-1]?time[xn-1]:t_high;
+  t_low=t_low<0.?0.:t_low;
 
 
 
   double mx=0;
   double my=0;
 
-	
-  for(d=-max_delay;d<max_delay;d++){
+  int n=0;
+  double t=-max_delay;
+  while(time[n]<max_delay){
+    //  for(int d=-max_delay;d<max_delay;d++){
     num=0.;
     xdenom=0.;
     ydenom=0.;
-    for(i=0;i<length;i++){
-      if((i+d)<0 | (i+d)>=length){
-	continue;
-      }
-      else{
-	num+=(x[i]-mx)*(y[i+d]-my);
+
+    for(int i=0;i<length;i++){
+      if((i+n)>0 && (i+n)<length && time[i]>=t_low && time[i]<=t_high){
+    
+	num+=(x[i]-mx)*(y[i+n]-my);
 	xdenom+=pow(x[i]-mx, 2);
-	ydenom+=pow(y[i+d]-my, 2);
+	ydenom+=pow(y[i+n]-my, 2);
+    
       }
     }
     out.push_back(num/sqrt(xdenom*ydenom));
-    outx.push_back(time[(length/2)+d]);
+    outx.push_back(time[(length/2)+n]);
+    n++;
+
+		
+  }
+
+  
+  TGraph *outt = new TGraph(outx.size(), &outx[0], &out[0]);
+
+  return outt;
+}
+
+
+TGraph * TUtil::crossCorrelateWindowed(TGraph * gr1, TGraph * gr2, TGraph *grWindow, double max_delay, double t_low, double t_high){
+  double *x = gr1->GetY();
+  double *time=gr1->GetX();
+  double *y = gr2->GetY();
+  double *window = grWindow->GetY();
+  int yn=gr1->GetN();
+  int xn=gr2->GetN();
+
+  int lengthx=xn;
+  int lengthy=yn;
+  int length=0;
+  vector<double> out, outx, outy;
+  double num, ynum, xdenom, ydenom, denom;
+  double timescale = time[1]-time[0];
+
+  length=lengthx<=lengthy?xn:yn;
+  length=lengthx<=lengthy?xn:yn;
+  double throwaway=time[xn-1]/10.;//throw away highest delays, they are unstable
+  max_delay=max_delay>time[xn-1]?time[xn-1]-throwaway:max_delay;
+
+  t_high=t_high>=time[xn-1]?time[xn-1]:t_high;
+  t_low=t_low<0.?0.:t_low;
+
+
+  double mx=0;
+  double my=0;
+
+  int n=0;
+  double t=-max_delay;
+  while(time[n]<max_delay){
+    //  for(int d=-max_delay;d<max_delay;d++){
+    num=0.;
+    xdenom=0.;
+    ydenom=0.;
+
+    for(int i=0;i<length;i++){
+      if((i+n)>0 && (i+n)<length && time[i]>=t_low && time[i]<=t_high){
+    
+	num+=(x[i]-mx)*(y[i+n]-my)*window[i];
+	xdenom+=pow(x[i]-mx, 2)*window[i];
+	ydenom+=pow(y[i+n]-my, 2)*window[i];
+    
+      }
+    }
+    out.push_back(num/sqrt(xdenom*ydenom));
+    outx.push_back(time[(length/2)+n]);
+    n++;
+
+		
+  }
+
+  
+  TGraph *outt = new TGraph(outx.size(), &outx[0], &out[0]);
+
+  return outt;
+}
+
+
+TGraph * TUtil::align(TGraph * gr1, TGraph * gr2, double max_delay, double t_low, double t_high){
+  double *x = gr1->GetY();
+  double *time=gr1->GetX();
+  double *y = gr2->GetY();
+  int yn=gr1->GetN();
+  int xn=gr2->GetN();
+  int lengthx=xn;
+  int lengthy=yn;
+  int length=0;
+  vector<double> out, outx, outy;
+  double num, ynum, xdenom, ydenom, denom;
+  double timescale = time[1]-time[0];
+
+  length=lengthx<=lengthy?xn:yn;
+  length=lengthx<=lengthy?xn:yn;
+
+  double throwaway=time[xn-1]/10.;//throw away highest delays, they are unstable
+  max_delay=max_delay>time[xn-1]?time[xn-1]-throwaway:max_delay;
+
+  t_high=t_high>=time[xn-1]?time[xn-1]:t_high;
+  t_low=t_low<0.?0.:t_low;
+
+
+  double mx=0;
+  double my=0;
+
+
+  int n=0;
+  double t=-max_delay;
+  while(time[n]<max_delay){
+    //  for(int d=-max_delay;d<max_delay;d++){
+    num=0.;
+    xdenom=0.;
+    ydenom=0.;
+
+    for(int i=0;i<length;i++){
+      if((i+n)>0 && (i+n)<length && time[i]>=t_low && time[i]<=t_high){
+	
+	num+=(x[i]-mx)*(y[i+n]-my);
+	xdenom+=pow(x[i]-mx, 2);
+	ydenom+=pow(y[i+n]-my, 2);
+	
+      }
+    }
+    out.push_back(num/sqrt(xdenom*ydenom));
+    outx.push_back(time[(length/2)+n]);
     n++;
 
 		
@@ -646,72 +768,32 @@ TGraph * TUtil::crossCorrelate(TGraph * xx, TGraph * yy, int max_delay, int xcor
   double maxIndex=TMath::LocMax(out.size(), &out[0]);
   double offset=(maxIndex-(double)max_delay)*timescale;
 
-  if(xcorr_graph==1){
-    TGraph *outt = new TGraph(outx.size(), &outx[0], &out[0]);
-    return outt;
-  }
-
   outx.clear();
   for(int i=0;i<xn;i++){
     outx.push_back(time[i]-offset);
     outy.push_back(y[i]);
   }
+
   TGraph *outt = new TGraph(outx.size(), &outx[0], &outy[0]);
+  
   return outt;
 }
 
-TGraph * TUtil::crossCorrelateWindowed(TGraph * xx, TGraph * yy, TGraph *wingraph, int max_delay){
-  double *window=wingraph->GetY();
-  double *x = xx->GetY();
-  double *time=xx->GetX();
-  double *y = yy->GetY();
-  int yn=yy->GetN();
-  int xn=xx->GetN();
- 
-  int lengthx=xn;
-  int lengthy=yn;
-  int length=0, d, i, n=0;
-  vector<double> out, outx, outy;
-  double num, ynum, xdenom, ydenom, denom;
-  double timescale = time[1]-time[0];
 
-  length=lengthx<=lengthy?xn:yn;
-  int throwaway=length/10;//throw away highest delays, they are unstable
-  max_delay=max_delay>length?length-throwaway:max_delay;
 
-  double mx=0;
-  double my=0;
-
-  for(d=-max_delay;d<max_delay;d++){
-    num=0.;
-    xdenom=1.;
-    ydenom=1.;
-    for(i=0;i<length;i++){
-      if((i+d)<0 | (i+d)>=length){
-	continue;
-      }
-      else{
-
-	double val=(x[i]-mx)*(y[i+d]-my)*window[i];
-	num+=val;
-	xdenom+=pow(x[i]-mx, 2)*window[i]; 
-	ydenom+=pow(y[i+d]-my, 2)*window[i]; 
-
-      }
-	       
-    }
-
-    out.push_back(num/sqrt(xdenom*ydenom));
-    outx.push_back((d)*timescale);
-    n++;
+vector<TGraph*> TUtil::alignMultiple(vector<TGraph*> inGr, double max_delay, double t_low, double t_high){   
+  vector<TGraph*>outgraphs;
+  TGraph *g1=inGr[0];
+  //  g1->Draw("al PLC");
+  outgraphs.push_back(g1);
+  for(int i=1;i<inGr.size();i++){
+    outgraphs.push_back(align(g1, inGr[i], max_delay, t_low, t_high));
+    //    cout<<i<<endl;
+    //    outgraphs[i]->Draw("l same PLC");
   }
-
-  double maxIndex=TMath::LocMax(out.size(), &out[0]);
-  double offset=(maxIndex-(double)max_delay)*timescale;
-
-  TGraph *outt = new TGraph(outx.size(), &outx[0], &out[0]);
-  return outt;
+  return outgraphs;
 }
+
 
 
 

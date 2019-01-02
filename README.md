@@ -1,7 +1,6 @@
 the basic analysis framework for t576.
 
-TODO:  fix the positions for some remaining events (run 4 mostly). expand the TUtil class to include the SVD.
-
+TODO:  fix the positions for some remaining events (run 4 mostly). 
 
 # Dependencies:
 
