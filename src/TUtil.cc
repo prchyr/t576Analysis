@@ -5,12 +5,12 @@ released under the GNU General Public License version 3
 
 #include "TUtil.hh"
 
-int TUtil::fN=1;
-int TUtil::fNi=1;
-TVirtualFFT * TUtil::fftr2c=TVirtualFFT::FFT(1, &fN, "R2C ES");
-TVirtualFFT * TUtil::fftc2r=TVirtualFFT::FFT(1, &fN, "C2R ES");
-TGraph2D *TUtil::fXfrmGr2D = new TGraph2D();
-TGraph *TUtil::fXfrmGr = new TGraph();
+static int fN=1;
+static int fNi=1;
+static TVirtualFFT * fftr2c=TVirtualFFT::FFT(1, &fN, "R2C ES");
+static TVirtualFFT * fftc2r=TVirtualFFT::FFT(1, &fN, "C2R ES");
+static TGraph2D *fXfrmGr2D = new TGraph2D();
+static TGraph *fXfrmGr = new TGraph();
 
 
 /***************FFT things************************
@@ -26,6 +26,10 @@ in the tgraphs above, so DO NOT delete the returned graph.
 
 
 **************************************************/
+
+// static void init(){
+
+// }
 
 /*
 
@@ -404,22 +408,24 @@ TVectorD TUtil::SVD::expandInBasis(TVectorD V, TMatrixD B, int num){
   return outvec;
 }
 
-TVectorD TUtil::SVD::expandInBasis(TGraph * G, TMatrixD B, int num){
+TGraph * TUtil::SVD::expandInBasis(TGraph * G, TMatrixD B, int num){
   TVectorD V = toVector(G);
-  int y=B.GetNrows();
-  int x=B.GetNcols();
-  auto vec=getCoefficients(V, B);
-  auto outvec=TVectorD(V.GetNrows());
-  outvec.Zero();
-  num=num>=y?y:num;
-  for (int i=0;i<num;i++){
-    //    auto aligned=
-    for (int j=0;j<x;j++){
-      outvec[j]+=(vec[i]*B[i][j]);
-    }
-  }
-  outvec*=norm(V);
-  return outvec;
+  double dt = G->GetX()[10]-G->GetX()[9];
+  return toGraph(expandInBasis(V, B, num), 1./dt, G->GetX()[0]);
+}
+
+TGraph * TUtil::SVD::filter(TGraph *G, TMatrixD B, int num){
+  TVectorD V = toVector(G);
+  auto filter=expandInBasis(V, B, num);
+  auto oV=V-filter;
+  double dt = G->GetX()[10]-G->GetX()[9];
+  return toGraph(oV, 1./dt, G->GetX()[0]);
+  
+}
+
+TVectorD TUtil::SVD::filter(TVectorD V, TMatrixD B, int num){
+  auto filter=expandInBasis(V, B, num);
+  return V-filter;
 }
 
 
@@ -592,7 +598,7 @@ TH1F * TUtil::plotResiduals(TGraph *gr1, TGraph *gr2, int nbins, double min, dou
 }
 
 
-TGraph * crossCorrelate(TGraph * xx, TGraph * yy, int max_delay=100000, int xcorr_graph=0){
+TGraph * TUtil::crossCorrelate(TGraph * xx, TGraph * yy, int max_delay, int xcorr_graph){
   double *x = xx->GetY();
   double *time=xx->GetX();
   double *y = yy->GetY();
@@ -606,18 +612,20 @@ TGraph * crossCorrelate(TGraph * xx, TGraph * yy, int max_delay=100000, int xcor
   double timescale = time[1]-time[0];
 
   length=lengthx<=lengthy?xn:yn;
+  length=lengthx<=lengthy?xn:yn;
+  int throwaway=length/10;//throw away highest delays, they are unstable
+  max_delay=max_delay>length?length-throwaway:max_delay;
 
-  max_delay=max_delay>length?length:max_delay;
+
 
   double mx=0;
   double my=0;
-  int throwaway=.1*max_delay;
+
 	
   for(d=-max_delay;d<max_delay;d++){
     num=0.;
     xdenom=0.;
     ydenom=0.;
-    //    for(i=windowlow;i<windowhigh;i++){
     for(i=0;i<length;i++){
       if((i+d)<0 | (i+d)>=length){
 	continue;
@@ -628,12 +636,10 @@ TGraph * crossCorrelate(TGraph * xx, TGraph * yy, int max_delay=100000, int xcor
 	ydenom+=pow(y[i+d]-my, 2);
       }
     }
-    //square the output. finds strongest correlation/anticorrelation.
-    //out.push_back(pow(num/sqrt(xdenom*ydenom), 2));
     out.push_back(num/sqrt(xdenom*ydenom));
     outx.push_back(time[(length/2)+d]);
     n++;
-    //out.push_back(pow(num/10000, 2));
+
 		
   }
 
@@ -644,9 +650,7 @@ TGraph * crossCorrelate(TGraph * xx, TGraph * yy, int max_delay=100000, int xcor
     TGraph *outt = new TGraph(outx.size(), &outx[0], &out[0]);
     return outt;
   }
-  //	if(xcorr_graph==2){
-  // return 
-  //else
+
   outx.clear();
   for(int i=0;i<xn;i++){
     outx.push_back(time[i]-offset);
@@ -656,7 +660,7 @@ TGraph * crossCorrelate(TGraph * xx, TGraph * yy, int max_delay=100000, int xcor
   return outt;
 }
 
-TGraph * crossCorrelateWindowed(TGraph * xx, TGraph * yy, TGraph *wingraph, int max_delay=100000){
+TGraph * TUtil::crossCorrelateWindowed(TGraph * xx, TGraph * yy, TGraph *wingraph, int max_delay){
   double *window=wingraph->GetY();
   double *x = xx->GetY();
   double *time=xx->GetX();
@@ -672,7 +676,7 @@ TGraph * crossCorrelateWindowed(TGraph * xx, TGraph * yy, TGraph *wingraph, int 
   double timescale = time[1]-time[0];
 
   length=lengthx<=lengthy?xn:yn;
-  int throwaway=length/10;//throw away highest delays
+  int throwaway=length/10;//throw away highest delays, they are unstable
   max_delay=max_delay>length?length-throwaway:max_delay;
 
   double mx=0;

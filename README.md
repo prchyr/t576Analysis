@@ -5,9 +5,7 @@ TODO:  fix the positions for some remaining events (run 4 mostly). expand the TU
 
 # Dependencies:
 
-there are 2 dependencies for this software:
-
-1) ROOT:
+The only dependency for this software is ROOT:
 
 https://root.cern.ch/downloading-root
 
@@ -15,13 +13,6 @@ and i recommend installing the latest version. (6.14.06 at time of writing). ins
 
  #### be sure, once installed, that you do the "source /path/to/root/bin/thisroot.sh" so that your environment variables are set correctly.
 
-2) CLHEP:
-
-clhep is a really great library for doing physics things with code. it has datatypes like 3-vectors, 4-vectors, and a bunch of physical constants and a nice system of units that makes coordinate transformations and relativistic things like boosts a breeze.
-
-https://proj-clhep.web.cern.ch/proj-clhep/clhep23.html
-
-and again i recommend installing the latest version (2.4.1 at time of writing). installation is pretty straightforward for this too.
 
 
 additionally, this software uses the very nice, lightweight code for reading python .npz and .npy files into c++ ```cnpy```, which can be found at
@@ -40,8 +31,7 @@ to install:
 
 first, add these to your bashrc:
 ```bash
-#point to the build directory for CLHEP, which conatains CLHEPConfig.cmake
-export CLHEP_DIR=/path/to/CLHEP/build/dir
+
 #point to where you want the tools installed. default is /usr/local
 export T576_INSTALL_DIR=/path/to/your/fav/install/dir
 #point to the t576 data. 
@@ -64,8 +54,6 @@ details about the above:
 
 
 Firstly for anything to work you need to tell it where to find ROOT. this is usually done already when you run the "source thisroot.sh" script from root. I'll assume you know what this is already. to know if things are sourced correctly, type "echo $ROOTSYS", and you should get the correct directory to ROOT.
-
-next, tell it where CMAKE can find CLHEP. you can do that in 2 ways. you can either add the installation path for CLHEP to your CMAKE_PREFIX_PATH, or you can point CMAKE to the CLHEP build directory by setting CLHEP_DIR=/path/to/chlep/build. this is the build directory you made when you installed CLHEP. it can be inside of the CLHEP directory, or somewhere else.
 
 
 then, (optional) tell it where you'd like to install the software, as above. if you don't do this, it will install to /usr/local/.
@@ -132,7 +120,7 @@ ev->scope->pos[2];
 //would give you an Hep3Vector of the position of the channel 3 antenna,
 //such that you can acces the z dimension like
 
-double z = ev->scope->pos[2].z();
+double z = ev->scope->pos[2].Z();
 
 //these event-by-event variables are all loaded up when you call
 //ev->loadScopeEvent(event number). 
@@ -168,7 +156,15 @@ export T576_DATA_DIR=/path/to/t576/run2
 ```
 in your .bashrc. this will let the program find the data.
 
-FILENAMES: all of the filenames are stored with a timestamp then the run major and the run minor, e.g. 20181031122345run1_999.root where 1 is the major, 999 is the minor. the timestamp just helps to sort the files. the major and minor are used to index in root. 
+#### filenames:
+
+all of the filenames are stored with a timestamp then the run major and the run minor, e.g. 20181031122345run1_999.root where 1 is the major, 999 is the minor. the timestamp just helps to sort the files. the major and minor are used to index in root. 
+
+#### missing data:
+
+there is a data flag, isGood(), which says whether an event is good. it is good if all of the event info is present, and if there wasn't a note in the run log for the event being corrupted in some way.
+
+if data was missing, like we don't have a distance in place or something, the value is 999. so if event->surf{scope}->pos.Mag()=999, the position is not known. 
 
 # Problems:
 

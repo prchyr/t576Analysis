@@ -5,7 +5,7 @@ released under the GNU General Public License version 3
 
 #include "T576Event.hh"
 
-using namespace CLHEP;
+//using namespace CLHEP;
 using namespace std;
 
 
@@ -107,7 +107,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
   TString top_dir = getenv("T576_DATA_DIR");
 
   if(top_dir==""){
-    cout<<"T576_DATA_DIR not set. please set this flag so that the data can be found. this should be the top directory inside of which is py/ and root/."<<endl;
+   cout<<"T576_DATA_DIR not set. please set this flag so that the data can be found. this should be the top directory inside of which is py/ and root/."<<endl;
     return (0);
   }
   
@@ -117,10 +117,10 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
   fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(run_major, run_minor));
   fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(run_major, run_minor));
 
-  txPos.setRThetaPhi(txDist, txAng*pi/180., pi);
+  txPos.SetMagThetaPhi(txDist, txAng*pi/180., pi);
 
   for(int i=0;i<4;i++){
-    scope->pos[i].setRThetaPhi(scope->dist[i], scope->ang[i]*pi/180., pi);
+    scope->pos[i].SetMagThetaPhi(scope->dist[i], scope->ang[i]*pi/180., pi);
   }
 
   TString thisScopeFilename=scopeFilename->Data();
@@ -222,10 +222,10 @@ int T576Event::loadScopeEvent(int event){
   //cout<<fIndexBuilt<<endl;
   fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(major, minor));
   //cout<<txDist<<" "<<txAng<<endl;
-  txPos.setRThetaPhi(txDist, txAng*pi/180., pi);
+  txPos.SetMagThetaPhi(txDist, txAng*pi/180., pi);
   
   for(int i=0;i<4;i++){
-    scope->pos[i].setRThetaPhi(scope->dist[i], scope->ang[i]*pi/180., pi);
+    scope->pos[i].SetMagThetaPhi(scope->dist[i], scope->ang[i]*pi/180., pi);
   }
   if(major<1)return 0;
   //  fIndexTree->GetEntry(0);
@@ -317,10 +317,10 @@ int T576Event::loadSurfEvent(int run_major, int run_minor, int event){
 
   fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(major, minor));
 
-  txPos.setRThetaPhi(txDist, txAng*pi/180., pi);
+  txPos.SetMagThetaPhi(txDist, txAng*pi/180., pi);
   
   for(int i=0;i<12;i++){
-    surf->pos[i].setRThetaPhi(surf->dist[i], surf->ang[i]*pi/180., pi);
+    surf->pos[i].SetMagThetaPhi(surf->dist[i], surf->ang[i]*pi/180., pi);
   }
   if(run_major!=major &&run_minor!=minor){
     cout<<"no surf file for requested major/minor combination."<<endl;
@@ -418,10 +418,10 @@ int T576Event::loadSurfEvent(int event){
 
   fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(major, minor));
 
-  txPos.setRThetaPhi(txDist, txAng*pi/180., pi);
+  txPos.SetMagThetaPhi(txDist, txAng*pi/180., pi);
   
   for(int i=0;i<12;i++){
-    surf->pos[i].setRThetaPhi(surf->dist[i], surf->ang[i]*pi/180., pi);
+    surf->pos[i].SetMagThetaPhi(surf->dist[i], surf->ang[i]*pi/180., pi);
   }
   if(major<1)return 0;
 
@@ -467,7 +467,8 @@ int T576Event::loadSurfEvent(int event){
   for(int i=0;i<12;i++){
     int index2=i*len;//i is channel number
     copy(fSurfData+index1+index2, fSurfData+index1+index2+len, surf->ch[i]);
-    surf->delays[i]=surf->cableLengths[i]*surf->velocityFactor;
+    //feet to meter conversion
+    surf->delays[i]=(surf->cableLengths[i]/3.2808)/(c_light*surf->velocityFactor);
 
     TGraph * graph=new TGraph(len, TUtil::makeIndices(len, 1./3.2, surf->delays[i]), surf->ch[i]);
 
@@ -700,113 +701,3 @@ TString T576Event::getSurfFilename(int inMaj, int inMin){
   }
   return "null";
 }
-
-// int T576Event::buildEventIndex(int force){
-//   TString install_dir=getenv("T576_INSTALL_DIR");
-//   if(install_dir==""){
-//     install_dir="/usr/local";
-//   }
-  
-
-//   ifstream indexFile;
-//   indexFile.open(install_dir+"/share/t576/eventIndex.root");
-//   if(indexFile&&force==0){
-//     cout<<"event index already built."<<endl;
-//     return 1;
-//   }
-//   else if(indexFile&&force==1){
-//     cout<<"event index already built, forcing rebuild.."<<endl;
-//   }
-
-//   //cout<<"asdf"<<endl;
-//   TFile * index= new TFile(install_dir+"/share/t576/eventIndex.root", "recreate");
-//   TTree *indexTree = new TTree("indexTree", "index of events");
-//   TString scopeFilename;
-//   int maj=0, min=0, subEvNo=0, scopeEvNo=0, surfEvNo=0;
-//   ULong64_t tstamp;
-//   indexTree->Branch("scopeFilename", &scopeFilename);
-//   indexTree->Branch("surfFilename", &surfFilename);
-//   indexTree->Branch("major", &maj);
-//   indexTree->Branch("minor", &min);
-//   indexTree->Branch("subEvNo", &subEvNo);
-//   indexTree->Branch("scopeEvNo", &scopeEvNo);
-//   indexTree->Branch("surfEvNo", &surfEvNo);
-//   indexTree->Branch("tstamp", &tstamp);
-
-//   TString top_dir = getenv("T576_DATA_DIR");
-//   TString directory=top_dir+"/root/";
-  
-//   TSystemDirectory dir(directory, directory);
-//   TList *files = dir.GetListOfFiles();
-//   //    cout<<files->GetEntries()<<endl;
-//   //find the scopeFilename
-  
-//   if(files){
-//     files->Sort();
-//     int nfiles=files->GetEntries();
-//     TString fname;
-//     TString ext = ".root";
-//     //TObject *obj;
-//     //    TIter next(files);
-//     for(int i=0;i<nfiles;i++){
-//       TSystemFile *file=(TSystemFile*)files->At(i);
-//       //delete(filen);
-//       fname = file->GetName();
-
-//       if(!file->IsDirectory()&&!file->IsZombie()){//is the file there
-// 	TString majorstr=fname(17);//get the run major
-// 	maj=majorstr.Atoi(); 
-// 	//cout<<majorstr<<" ";
-// 	TString substr1=fname(19, 999);
-// 	TString minorstr=substr1(0, substr1.First("."));//get run minor
-// 	//cout<<minorstr<<endl;
-// 	if(minorstr.IsDec()){//check that it isn't 'test' or something
-// 	  min=minorstr.Atoi();
-// 	  //cout<<min<<endl;
-// 	  auto inFile=TFile::Open(directory+fname);//open the file
-// 	  if(inFile){
-// 	    TTree *tree = (TTree*)inFile->Get("tree");
-// 	    if(tree){
-// 	      tree->SetBranchAddress("timestamp", &tstamp);
-// 	      int nentries=tree->GetEntries();
-// 	      cout.flush()<<fname<<"                  \r";	      
-// 	      for(int j=0;j<nentries;j++){
-// 		//cout<<scopeFilename<<" "<<major<<" "<<minor<<" "<<subEvNo<<" "<<scopeEvNo<<endl;
-// 		tree->GetEntry(j);
-// 		subEvNo=j;
-// 		//	      scopeFilename=const_cast<char*>(fname.Data());
-// 		scopeFilename=fname;
-// 		indexTree->Fill();
-// 		scopeEvNo++;
-// 	      }
-// 	    }
-// 	  }
-// 	  //inFile->Close();
-	    
-// 	  delete(inFile);
-// 	  //delete(tree);
-// 	}
-
-//       }
-//       delete(file);
-//     }
-    
-//   }
-//     //delete (file);
-//   //}
-//   else{
-//     cout<<"no files! check directory."<<endl;
-//     return 0;
-//   }
-  
-//   index->Write();
-//   index->Close();
-// //delete(indexTree);
-//   delete(index);
-//   cout.flush();
-//   cout<<endl<<"index built."<<endl;
-  
-//   fIndexBuilt=1;
-  
-//   return 1;
-// }

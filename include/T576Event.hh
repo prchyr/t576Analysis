@@ -24,6 +24,7 @@ released under the GNU General Public License version 3
 #include "TTreeIndex.h"
 #include "TGraph.h"
 #include "TGraph2D.h"
+#include "TVector3.h"
 #include "TMath.h"
 #include "TColor.h"
 #include "TStyle.h"
@@ -33,12 +34,14 @@ released under the GNU General Public License version 3
 #include <fstream>
 #include <vector>
 
-#include "CLHEP/Units/PhysicalConstants.h"
-#include "CLHEP/Vector/LorentzVector.h"
-#include "CLHEP/Vector/ThreeVector.h"
-#include "TUtil.hh"
 
-using namespace CLHEP;
+
+// #include "CLHEP/Units/PhysicalConstants.h"
+// #include "CLHEP/Vector/LorentzVector.h"
+// #include "CLHEP/Vector/ThreeVector.h"
+ #include "TUtil.hh"
+
+//using namespace CLHEP;
 using namespace std;
 
 
@@ -60,7 +63,7 @@ public:
   class Surf;
 
   //useful variables, gathered from the run log for each event.
-  Hep3Vector txPos;
+  TVector3 txPos;
   double txAng, txDist;
   double charge;
   ULong64_t timestamp, scopeTime, surfTime;
@@ -140,7 +143,7 @@ public:
   class Scope {
   public:
     //receiver positions
-    Hep3Vector pos[4];
+    TVector3 pos[4];
     double dist[4], ang[4];
     //double arrays for the individual traces
     double  ch[4][20000];
@@ -165,10 +168,11 @@ public:
 	time[i]=i*incr;
       }
     }
+    //these are measured in feet.
     double cableLengths[12]={50., 20., 20., 10., 0., 0., 0., 0., 0., 0., 10., 20.};
     double velocityFactor=-.82;//from Krijn and Kian, negative for math reasons
     
-    Hep3Vector pos[12];
+    TVector3 pos[12];
     double dist[12], ang[12];
     double delays[12];
     double  ch[12][1024];

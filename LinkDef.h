@@ -9,9 +9,9 @@
 //#pragma link C++ class RadioScatter+;
 
 
-#pragma link C++ namespace CLHEP;
-#pragma link C++ class Hep3Vector+;
-#pragma link C++ class HepLorentzVector+;
+//#pragma link C++ namespace CLHEP;
+//#pragma link C++ class Hep3Vector+;
+//#pragma link C++ class HepLorentzVector+;
 
 //#pragma link C++ class 
 
