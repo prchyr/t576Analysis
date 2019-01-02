@@ -1,6 +1,13 @@
 #include "t576/T576Event.hh"
 
+/*
+in this example, we take a selection of events from a run and make
+a basis out of them. we then take a different event form the same 
+run and expand it in the basis, using diffferent numbers of patterns.
 
+we then plot the result, and histogram the difference between the 
+reconstucted values and the actual values. 
+ */
 
 int thing(){
   auto ev=new T576Event();
@@ -51,7 +58,7 @@ int thing(){
   gOut1->Draw("l same PLC");
   gOut3->Draw("l same PLC");
   gOut10->Draw("l same PLC");
-  can->cd(1)->BuildLegend(.7, .7, .88, .88, "number of patterns", "l");
+  can->cd(1)->BuildLegend(.6, .7, .88, .88, "number of patterns", "l");
   gStyle->SetOptStat(0);
   can->cd(2)->SetGrid();
   TUtil::plotResiduals(gOut1, delayGrOut, 100, -.4, .4)->Draw("l  PLC");

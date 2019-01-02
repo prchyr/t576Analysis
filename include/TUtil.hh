@@ -51,13 +51,32 @@ public:
 
   static double setN(double val){fN=val;return fN;};
   static double getN(){return fN;}
+  //volts to dbm/hz
   static double vToDbmHz(double bandwidthGsNs, double re, double im=0);
+  //make an axis with linearly increasing values.
   static double * makeIndices(int n, double step, double offset=0);
+  //interpolate a tgraph using the ROOT interpolation functions
   static int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGsNs);
+  //normalize a graph
   static TGraph * normalize(TGraph *inGr);
+  //return a chunk of a graph, specified by x-axis values. 
   static TGraph * getChunkOfGraphFine(TGraph *ingr, double start, double end);
+  //cross correlation of two graphs. by default, returns the graph yy
+  //delayed to point of peak correlation with xx. if xcorr_graph=1,
+  //the cross correlation graph is returned instead.
+  //maxDelay is the maximum starting offset between xx and yy. defaults
+  //to the full length of the graphs. 
+  static  TGraph * crossCorrelate(TGraph * xx, TGraph * yy, int max_delay=100000, int xcorr_graph=0);
+  //same as above but allows you to supply a window function, to only
+  //correlate parts of the graph that you want.
+  static  TGraph * crossCorrelateWindowed(TGraph * xx, TGraph * yy, TGraph *wingraph, int max_delay=100000);
+  //align a large number of graphs to the first graph in the set.
+  static TGraph * alignGraphs(vector<TGraph*> inGr);
+  //delay a graph
   static TGraph *delayGraph(TGraph *ingr, double delay);
+  //same but with no mem usage.
   static int delayGraph(TGraph * ingr, TGraph *outgr, double delay);
+  //plot \Delta(gr1[i], gr2[i]) for each graph point i
   static TH1F * plotResiduals(TGraph *gr1, TGraph *gr2, int nbins=40, double min=1, double max=-1);
 
   static void setWarmPalette();
@@ -85,6 +104,7 @@ public:
 
   class SVD{
   public:
+    //normmalize a tvector
     static TVectorD normalize(TVectorD vec);
     static double norm(TVectorD vec);
     //build a matrix out of events, with each event a row in the matrix.

@@ -158,7 +158,91 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
   return fXfrmGr;
 }
 
+// TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128, int log=1, int draw=1){
+
+//   Int_t size = gr->GetN();
+//   double samprate=1./gr->GetX()[1]-gr->GetX()[0]);
+//   double xmax = size/samprate;
+//   double xmin = 0;
+
+//   Int_t num_zeros=(zero_pad_length-binsize)/2.;
+//   Int_t nbins = size/overlap;
+//   char*timebuff;
+//   double samplerate = size/(xmax-xmin);
+//   double bandwidth = 1e9*samplerate;
+//   TH1F *in = new TH1F("inhi", "inhi", zero_pad_length, 0, zero_pad_length);  
+//   TH1*outt=0;
+//   //TH2F *outhist=new TH2F("outhist", "spectrogram", nbins, xmin, xmax, (binsize), 0, samplerate);
+//   //  cout<<binsize<<" "<<samplerate<<endl;
+// TH2D *spectrogramHist=new TH2D("outhist", "spectrogram", nbins, xmin, xmax, (zero_pad_length), 0, samplerate);
+
+//   Int_t start = 0;
+//   //  Int_t j=0;
+// TGraph *fGr=new TGraph(binsize+num_zeros+num_zeros);
+//   for(int i=0;i<=nbins;i++){
+//     for(int j=0;j<num_zeros;j++){
+//     //    for(int j = 0;j<=zero_pad_length;j++){
+//       in->SetPoint(j, 0);
+//     }
+//     for(int j=num_zeros;j<binsize+num_zeros;j++){
+//       if((j+start)>=size)break;
+//       in->SetBinContent(j, data[j+start]*FFTtools::bartlettWindow(j-num_zeros, binsize));
+//     }
+//     for(int j=binsize+num_zeros;j<zero_pad_length;j++){
+//       in->SetBinContent(j, 0);
+//     }
+
+//     outt=in->FFT(outt, "mag");
+//     outt->Scale(1./sqrt(zero_pad_length));
+//     for(int j = 0;j<=(zero_pad_length);j++){
+//       Double_t y = outt->GetBinContent(j);
+//       if(log==1){
+// 	y = (10.*log10(pow(y, 2.)/50.));//mv->dbm
+// 	//y=10.*log10(y)+30;
+// 	spectrogramHist->SetBinContent(i,j,(y-(10.*log10(bandwidth/2.))));//dmb/hz
+//       }
+//       else{
+//       spectrogramHist->SetBinContent(i,j,y);//dmb
+//       }
+//     }
+//     start+=overlap-1;
+//   }
+//   //cout<<"here"<<endl;
+//   //  ->SetRightMargin(.15);
+//   if(draw==1){
+//   spectrogramHist->GetYaxis()->SetRangeUser(0, spectrogramHist->GetYaxis()->GetXmax()/2);
+  
+//   spectrogramHist->GetXaxis()->SetTitle("Time (ns)");
+
+//   spectrogramHist->GetYaxis()->SetTitle("Frequency (GHz)");
+
+//   spectrogramHist->GetZaxis()->SetTitle("dBm/Hz");
+//   spectrogramHist->GetZaxis()->SetTitleOffset(1.5);
+//   spectrogramHist->SetStats(0);
+//   spectrogramHist->Draw("colz");
+//   //maxbins->Draw("same");
+//   //maxvals->SetLineColor(kRed);
+//   //maxvals->Draw("same");
+//   }
+//   outt->Delete();
+//   in->Delete();
+
+//   // spectrogramHist->Delete();
+//   return spectrogramHist;
+//   //return outdat;
+// }
+
+
+
+
+
+
 /*******************SVD things**********************
+
+these functions use the root linear algebra routines, which are 
+quite extensive. they are built on the usual GSL routines. 
+
+memory management is not done here.
 
 
  */
@@ -508,10 +592,122 @@ TH1F * TUtil::plotResiduals(TGraph *gr1, TGraph *gr2, int nbins, double min, dou
 }
 
 
+TGraph * crossCorrelate(TGraph * xx, TGraph * yy, int max_delay=100000, int xcorr_graph=0){
+  double *x = xx->GetY();
+  double *time=xx->GetX();
+  double *y = yy->GetY();
+  int yn=yy->GetN();
+  int xn=xx->GetN();
+  int lengthx=xn;
+  int lengthy=yn;
+  int length=0, d, i, n=0;
+  vector<double> out, outx, outy;
+  double num, ynum, xdenom, ydenom, denom;
+  double timescale = time[1]-time[0];
 
+  length=lengthx<=lengthy?xn:yn;
 
+  max_delay=max_delay>length?length:max_delay;
 
+  double mx=0;
+  double my=0;
+  int throwaway=.1*max_delay;
+	
+  for(d=-max_delay;d<max_delay;d++){
+    num=0.;
+    xdenom=0.;
+    ydenom=0.;
+    //    for(i=windowlow;i<windowhigh;i++){
+    for(i=0;i<length;i++){
+      if((i+d)<0 | (i+d)>=length){
+	continue;
+      }
+      else{
+	num+=(x[i]-mx)*(y[i+d]-my);
+	xdenom+=pow(x[i]-mx, 2);
+	ydenom+=pow(y[i+d]-my, 2);
+      }
+    }
+    //square the output. finds strongest correlation/anticorrelation.
+    //out.push_back(pow(num/sqrt(xdenom*ydenom), 2));
+    out.push_back(num/sqrt(xdenom*ydenom));
+    outx.push_back(time[(length/2)+d]);
+    n++;
+    //out.push_back(pow(num/10000, 2));
+		
+  }
 
+  double maxIndex=TMath::LocMax(out.size(), &out[0]);
+  double offset=(maxIndex-(double)max_delay)*timescale;
+
+  if(xcorr_graph==1){
+    TGraph *outt = new TGraph(outx.size(), &outx[0], &out[0]);
+    return outt;
+  }
+  //	if(xcorr_graph==2){
+  // return 
+  //else
+  outx.clear();
+  for(int i=0;i<xn;i++){
+    outx.push_back(time[i]-offset);
+    outy.push_back(y[i]);
+  }
+  TGraph *outt = new TGraph(outx.size(), &outx[0], &outy[0]);
+  return outt;
+}
+
+TGraph * crossCorrelateWindowed(TGraph * xx, TGraph * yy, TGraph *wingraph, int max_delay=100000){
+  double *window=wingraph->GetY();
+  double *x = xx->GetY();
+  double *time=xx->GetX();
+  double *y = yy->GetY();
+  int yn=yy->GetN();
+  int xn=xx->GetN();
+ 
+  int lengthx=xn;
+  int lengthy=yn;
+  int length=0, d, i, n=0;
+  vector<double> out, outx, outy;
+  double num, ynum, xdenom, ydenom, denom;
+  double timescale = time[1]-time[0];
+
+  length=lengthx<=lengthy?xn:yn;
+  int throwaway=length/10;//throw away highest delays
+  max_delay=max_delay>length?length-throwaway:max_delay;
+
+  double mx=0;
+  double my=0;
+
+  for(d=-max_delay;d<max_delay;d++){
+    num=0.;
+    xdenom=1.;
+    ydenom=1.;
+    for(i=0;i<length;i++){
+      if((i+d)<0 | (i+d)>=length){
+	continue;
+      }
+      else{
+
+	double val=(x[i]-mx)*(y[i+d]-my)*window[i];
+	num+=val;
+	xdenom+=pow(x[i]-mx, 2)*window[i]; 
+	ydenom+=pow(y[i+d]-my, 2)*window[i]; 
+
+      }
+	       
+    }
+
+    out.push_back(num/sqrt(xdenom*ydenom));
+    outx.push_back((d)*timescale);
+    n++;
+  }
+
+  double maxIndex=TMath::LocMax(out.size(), &out[0]);
+  double offset=(maxIndex-(double)max_delay)*timescale;
+
+  TGraph *outt = new TGraph(outx.size(), &outx[0], &out[0]);
+  return outt;
+}
 
 
 
