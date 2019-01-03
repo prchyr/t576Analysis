@@ -617,37 +617,36 @@ TGraph * TUtil::crossCorrelate(TGraph * gr1, TGraph * gr2, double max_delay, dou
   double throwaway=time[xn-1]/10.;//throw away highest delays, they are unstable
   max_delay=max_delay>time[xn-1]?time[xn-1]-throwaway:max_delay;
 
+
   t_high=t_high>=time[xn-1]?time[xn-1]:t_high;
-  t_low=t_low<0.?0.:t_low;
+  t_low=t_low<time[0]?time[0]:t_low;
 
-
-
+  int max_delay_index=(1./timescale)*max_delay;
   double mx=0;
   double my=0;
 
   int n=0;
   double t=-max_delay;
-  while(time[n]<max_delay){
-    //  for(int d=-max_delay;d<max_delay;d++){
-    num=0.;
-    xdenom=0.;
-    ydenom=0.;
-
-    for(int i=0;i<length;i++){
-      if((i+n)>0 && (i+n)<length && time[i]>=t_low && time[i]<=t_high){
-    
-	num+=(x[i]-mx)*(y[i+n]-my);
-	xdenom+=pow(x[i]-mx, 2);
-	ydenom+=pow(y[i+n]-my, 2);
-    
+  for(int n=-max_delay_index;n<max_delay_index;n++){
+    //if(time[d]>=-max_delay&&time[d]<=max_delay){
+      num=0.;
+      xdenom=0.;
+      ydenom=0.;
+      for(int i=0;i<length;i++){
+	if((i+n)>0 && (i+n)<length && time[i]>=t_low && time[i]<=t_high){
+	  
+	  num+=(x[i]-mx)*(y[i+n]-my);
+	  xdenom+=pow(x[i]-mx, 2);
+	  ydenom+=pow(y[i+n]-my, 2);
+	  
+	}
       }
+      out.push_back(num/sqrt(xdenom*ydenom));
+      outx.push_back(time[(length/2)+n]);
+      //    n++;    
     }
-    out.push_back(num/sqrt(xdenom*ydenom));
-    outx.push_back(time[(length/2)+n]);
-    n++;
 
-		
-  }
+
 
   
   TGraph *outt = new TGraph(outx.size(), &outx[0], &out[0]);
@@ -679,33 +678,31 @@ TGraph * TUtil::crossCorrelateWindowed(TGraph * gr1, TGraph * gr2, TGraph *grWin
   t_high=t_high>=time[xn-1]?time[xn-1]:t_high;
   t_low=t_low<0.?0.:t_low;
 
-
+  int max_delay_index=(1./timescale)*max_delay;
   double mx=0;
   double my=0;
 
   int n=0;
   double t=-max_delay;
-  while(time[n]<max_delay){
-    //  for(int d=-max_delay;d<max_delay;d++){
-    num=0.;
-    xdenom=0.;
-    ydenom=0.;
-
-    for(int i=0;i<length;i++){
-      if((i+n)>0 && (i+n)<length && time[i]>=t_low && time[i]<=t_high){
-    
-	num+=(x[i]-mx)*(y[i+n]-my)*window[i];
-	xdenom+=pow(x[i]-mx, 2)*window[i];
-	ydenom+=pow(y[i+n]-my, 2)*window[i];
-    
+  for(int n=-max_delay_index;n<max_delay_index;n++){
+    //if(time[d]>=-max_delay&&time[d]<=max_delay){
+      num=0.;
+      xdenom=0.;
+      ydenom=0.;
+      for(int i=0;i<length;i++){
+	if((i+n)>0 && (i+n)<length && time[i]>=t_low && time[i]<=t_high){
+	  
+	  num+=(x[i]-mx)*(y[i+n]-my);
+	  xdenom+=pow(x[i]-mx, 2);
+	  ydenom+=pow(y[i+n]-my, 2);
+	  
+	}
       }
+      out.push_back(num/sqrt(xdenom*ydenom));
+      outx.push_back(time[(length/2)+n]);
+      //    n++;    
     }
-    out.push_back(num/sqrt(xdenom*ydenom));
-    outx.push_back(time[(length/2)+n]);
-    n++;
 
-		
-  }
 
   
   TGraph *outt = new TGraph(outx.size(), &outx[0], &out[0]);
@@ -734,39 +731,35 @@ TGraph * TUtil::align(TGraph * gr1, TGraph * gr2, double max_delay, double t_low
   max_delay=max_delay>time[xn-1]?time[xn-1]-throwaway:max_delay;
 
   t_high=t_high>=time[xn-1]?time[xn-1]:t_high;
-  t_low=t_low<0.?0.:t_low;
+  t_low=t_low<time[0]?time[0]:t_low;
 
-
+  int max_delay_index=(1./timescale)*max_delay;
   double mx=0;
   double my=0;
 
-
   int n=0;
   double t=-max_delay;
-  while(time[n]<max_delay){
-    //  for(int d=-max_delay;d<max_delay;d++){
-    num=0.;
-    xdenom=0.;
-    ydenom=0.;
-
-    for(int i=0;i<length;i++){
-      if((i+n)>0 && (i+n)<length && time[i]>=t_low && time[i]<=t_high){
-	
-	num+=(x[i]-mx)*(y[i+n]-my);
-	xdenom+=pow(x[i]-mx, 2);
-	ydenom+=pow(y[i+n]-my, 2);
-	
+  for(int n=-max_delay_index;n<max_delay_index;n++){
+    //if(time[d]>=-max_delay&&time[d]<=max_delay){
+      num=0.;
+      xdenom=0.;
+      ydenom=0.;
+      for(int i=0;i<length;i++){
+	if((i+n)>0 && (i+n)<length && time[i]>=t_low && time[i]<=t_high){
+	  
+	  num+=(x[i]-mx)*(y[i+n]-my);
+	  xdenom+=pow(x[i]-mx, 2);
+	  ydenom+=pow(y[i+n]-my, 2);
+	  
+	}
       }
+      out.push_back(num/sqrt(xdenom*ydenom));
+      outx.push_back(time[(length/2)+n]);
+      //    n++;    
     }
-    out.push_back(num/sqrt(xdenom*ydenom));
-    outx.push_back(time[(length/2)+n]);
-    n++;
-
-		
-  }
 
   double maxIndex=TMath::LocMax(out.size(), &out[0]);
-  double offset=(maxIndex-(double)max_delay)*timescale;
+  double offset=(maxIndex-(double)max_delay_index)*timescale;
 
   outx.clear();
   for(int i=0;i<xn;i++){

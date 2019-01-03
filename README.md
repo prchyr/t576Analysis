@@ -18,7 +18,7 @@ additionally, this software uses the very nice, lightweight code for reading pyt
 
 https://github.com/rogersce/cnpy
 
-we have used the relevant source from cnpy in this project, and lisence info can be found in LICENSE. 
+we have included the relevant source from cnpy in this project (so you don't need to install it separately), and license info can be found in LICENSE. 
 
 # Install:
 
@@ -116,7 +116,7 @@ cout<<ev->scopeFilename->Data()<<endl;
 ev->charge;
 //which gives you the charge from the ICT. also
 ev->scope->pos[2];
-//would give you an Hep3Vector of the position of the channel 3 antenna,
+//would give you an 3 vector of the position of the channel 3 antenna,
 //such that you can acces the z dimension like
 
 double z = ev->scope->pos[2].Z();

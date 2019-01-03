@@ -66,7 +66,9 @@ add_library(t576 SHARED ${SOURCE_FILES} G__t576.cxx)
 
 target_link_libraries(t576 ${ROOT_LIBRARIES} ${ZLIB_LIBRARIES})# cnpy)
 add_executable(svdExample ${PROJECT_SOURCE_DIR}/example/svdExample.cc)
+add_executable(alignExample ${PROJECT_SOURCE_DIR}/example/alignExample.cc)
 target_link_libraries(svdExample ${ROOT_LIBRARIES} t576)
+target_link_libraries(alignExample ${ROOT_LIBRARIES} t576)
 #----------------------------------------------------------------------------
 
 
@@ -78,6 +80,7 @@ install (FILES ${PROJECT_SOURCE_DIR}/share/runLog.root DESTINATION ${T576_INSTAL
 install (FILES ${PROJECT_BINARY_DIR}/libt576_rdict.pcm DESTINATION ${LIB_INSTALL_DIR})
 install (TARGETS t576 LIBRARY DESTINATION ${LIB_INSTALL_DIR})
 install(TARGETS svdExample DESTINATION ${T576_INSTALL_DIR}/share/t576/example)
+install(TARGETS alignExample DESTINATION ${T576_INSTALL_DIR}/share/t576/example)
 
 
 

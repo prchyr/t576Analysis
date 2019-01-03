@@ -39,6 +39,10 @@ int thing(){
   TGraph * gOut10= TUtil::SVD::expandInBasis(testGr, basis, 10);
 
 
+  gOut1->SetName("1");
+  gOut3->SetName("3");
+  gOut10->SetName("10");
+
   //all plotting things now. 
 
   TCanvas * can=new TCanvas("canvas", "canvas", 1200, 600);
@@ -52,6 +56,8 @@ int thing(){
   testGr->GetXaxis()->SetRangeUser(tmin, tmax);
   testGr->SetLineColor(kRed);
   testGr->Draw("al");
+
+
   gOut1->Draw("l same PLC");
   gOut3->Draw("l same PLC");
   gOut10->Draw("l same PLC");
