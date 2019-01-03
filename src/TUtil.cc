@@ -544,7 +544,7 @@ int TUtil::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double inter
   return 1;
 }
 
-TGraph * TUtil::getChunkOfGraphFine(TGraph *ingr, double start, double end){
+TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end){
   double *xx=ingr->GetX();
   double *yy=ingr->GetY();
   vector<double> outx, outy;

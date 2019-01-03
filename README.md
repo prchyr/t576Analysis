@@ -14,7 +14,7 @@ and i recommend installing the latest version. (6.14.06 at time of writing). ins
 
 
 
-additionally, this software uses the very nice, lightweight code for reading python .npz and .npy files into c++ ```cnpy```, which can be found at
+additionally, this software uses the very nice, lightweight code for reading python .npz and .npy files into c++, ```cnpy```, which can be found at
 
 https://github.com/rogersce/cnpy
 

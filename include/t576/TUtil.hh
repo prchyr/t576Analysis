@@ -62,7 +62,7 @@ namespace TUtil{
   //normalize a graph
   TGraph * normalize(TGraph *inGr);
   //return a chunk of a graph, specified by x-axis values. 
-  TGraph * getChunkOfGraphFine(TGraph *ingr, double start, double end);
+  TGraph * getChunkOfGraph(TGraph *ingr, double start, double end);
   //cross correlation of two graphs. returns the cross-correlation graph
   //maxDelay is the maximum starting offset between gr1 and gr2. defaults
   //to the full length of the graphs.
