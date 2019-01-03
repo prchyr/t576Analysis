@@ -472,7 +472,7 @@ int T576Event::loadSurfEvent(int event){
 
     TGraph * graph=new TGraph(len, TUtil::makeIndices(len, 1./3.2, surf->delays[i]), surf->ch[i]);
 
-    TGraph *grChunk=TUtil::getChunkOfGraphFine(graph, 0, 250);
+    TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);
     if(fInterpGsNs>0.){
       getInterpolatedGraph(grChunk, surf->gr[i]);
     }
