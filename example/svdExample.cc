@@ -18,7 +18,7 @@ int thing(){
     ev->loadScopeEvent(3, 10, i);
     //get a small chunk of the graph to perform SVD on.
     //too long a trace and it'll eat all the memory on your machine (trust me)
-    graphs.push_back(TUtil::getChunkOfGraphFine(ev->scope->gr[0], 460, 520));
+    graphs.push_back(TUtil::getChunkOfGraph(ev->scope->gr[0], 460, 520));
 
   }
 
@@ -31,7 +31,7 @@ int thing(){
   ev->loadScopeEvent(3, 10, 15);
   double tmin=460.;
   double tmax=520.;
-  TGraph * testGr=TUtil::getChunkOfGraphFine(ev->scope->gr[0], tmin, tmax);
+  TGraph * testGr=TUtil::getChunkOfGraph(ev->scope->gr[0], tmin, tmax);
 
   //expand the event in the basis, using different numbers of patterns.
   TGraph * gOut1= TUtil::SVD::expandInBasis(testGr, basis, 1);
