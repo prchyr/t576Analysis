@@ -15,12 +15,10 @@ static TGraph *fXfrmGr = new TGraph();
 
 /***************FFT things************************
 
-the functions here utilise the above static members, meaning that
-this class is very lightweight, and takes care of its own memory 
-management. FFTW calculates the fastest and most optimal way to do
+the functions here utilise the above static members for the FFT.
+FFTW calculates the fastest and most optimal way to do
 an FFT the first time it is initialized with new parameters. after that,
-each subsequent fft of the same size is very fast. the outputs are stored
-in the tgraphs above, so DO NOT delete the returned graph. 
+each subsequent fft of the same size is very fast. 
 
 
 
@@ -63,8 +61,8 @@ TGraph2D * TUtil::FFT::fft(TGraph * inGr){
     outGr->GetZ()[i] *= norm;
   }
   *fXfrmGr2D=*outGr;
-  delete outGr;
-  return fXfrmGr2D;
+  //  delete outGr;
+  return outGr;//fXfrmGr2D;
 }
 
 
@@ -101,8 +99,8 @@ TGraph * TUtil::FFT::ifft(TGraph2D * inGr){
 
   for (int i=0;i<outGr->GetN();i++) outGr->GetY()[i] *= norm;
   *fXfrmGr=*outGr;
-  delete outGr;
-  return fXfrmGr;
+  //  delete outGr;
+  return outGr;//fXfrmGr;
 }
 
 /*
@@ -132,8 +130,8 @@ TGraph * TUtil::FFT::psd(TGraph * inGr){
   TGraph * outGr=new TGraph((n/2), xx, yy);
 
   *fXfrmGr=*outGr;
-  delete outGr;
-  return fXfrmGr;
+  //  delete outGr;
+  return outGr;//fXfrmGr;
 }
 
 
@@ -158,8 +156,8 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
     out->SetPoint(i, inGr->GetX()[i], sqrt((inGr->GetY()[i]*inGr->GetY()[i])+(hilb->GetY()[i]*hilb->GetY()[i])));
   }
   *fXfrmGr=*out;
-  delete out;
-  return fXfrmGr;
+  //  delete out;
+  return out;//fXfrmGr;
 }
 
 // TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128, int log=1, int draw=1){
@@ -344,7 +342,7 @@ TVectorD TUtil::SVD::avgVector(TMatrixD m){
   for(int i=0;i<sizey;i++){
     vec+=m[i];
   }
-  return vec;
+  return vec*=1./((double)sizey);
 }  
 
 
@@ -394,6 +392,7 @@ TVectorD TUtil::SVD::expandInBasis(TVectorD V, TMatrixD B, int num){
 
   int y=B.GetNrows();
   int x=B.GetNcols();
+  //  x=x>V.GetNrows()?V.GetNrows():x;
   auto vec=getCoefficients(V, B);
   auto outvec=TVectorD(V.GetNrows());
   outvec.Zero();
@@ -417,6 +416,7 @@ TGraph * TUtil::SVD::expandInBasis(TGraph * G, TMatrixD B, int num){
 TGraph * TUtil::SVD::filter(TGraph *G, TMatrixD B, int num){
   TVectorD V = toVector(G);
   auto filter=expandInBasis(V, B, num);
+  //  cout<<V.GetNrows()<<" "<<B.GetNcols()<<endl;
   auto oV=V-filter;
   double dt = G->GetX()[10]-G->GetX()[9];
   return toGraph(oV, 1./dt, G->GetX()[0]);
@@ -563,6 +563,22 @@ TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end){
   TGraph * outg=new TGraph(outx.size(), &outx[0], &outy[0]);
   return outg;
 }
+
+// TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end){
+//   double *xx=ingr->GetX();
+//   double *yy=ingr->GetY();
+//   vector<double> outx, outy;
+//   double xincr=xx[10]-xx[9];
+//   double time=start;
+//   while(time<end){
+//     outx.push_back(time);
+//     outy.push_back(ingr->Eval(time));
+//     time+=xincr;
+//   }
+  
+//   TGraph * outg=new TGraph(outx.size(), &outx[0], &outy[0]);
+//   return outg;
+// }
 
 
 
