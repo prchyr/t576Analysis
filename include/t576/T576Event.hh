@@ -69,6 +69,21 @@ public:
   ULong64_t timestamp, scopeTime, surfTime;
   double frequency;
   double power;
+  /*the type of antenna for:
+    antennaType[0] = TX, 
+    antennaType[1] = scope ch1
+    antennaType[2] = scope ch2
+    antennaType[3] = scope ch3
+    antennaType[4] = scope ch4 (always ICT see below)
+    antennaType[5] = surf (always =lpda, see below)
+
+    the key is:
+    1=vivaldi
+    2=wifi
+    3=lpda
+    4=Jiwoo (lpda with a dish)
+    5=ICT
+  */
   double antennaType[6]={0.,0.,0.,0.,0.,0.};
   //various event numbering indices.
   int subEvNo, scopeEvNo, surfEvNo, evNo, surfNEvents, scopeNEvents;
@@ -146,11 +161,11 @@ public:
     TVector3 pos[4];
     double dist[4], ang[4];
     //double arrays for the individual traces
-    double  ch[4][20000];
+    double  dat[4][20000];
     //and the x axis time of the recorded traces
     double  time[20000];
     //tgraphs of each event channel
-    TGraph * gr[4]={new TGraph(), new TGraph(),new TGraph(),new TGraph()};
+    TGraph * ch[4]={new TGraph(), new TGraph(),new TGraph(),new TGraph()};
 
 
 
@@ -175,8 +190,8 @@ public:
     TVector3 pos[12];
     double dist[12], ang[12];
     double delays[12];
-    double  ch[12][1024];
-    TGraph * gr[12]={new TGraph(), new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph()};
+    double  dat[12][1024];
+    TGraph * ch[12]={new TGraph(), new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph(),new TGraph()};
     double  time[1024];
 
     TGraph2D * map=0;

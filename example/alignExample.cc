@@ -8,7 +8,7 @@ int thing(){
   for(int i=0;i<20;i++){
     ev->loadScopeEvent(3, 14, i);
     
-    graphs.push_back((TGraph*)ev->scope->gr[0]->Clone());
+    graphs.push_back((TGraph*)ev->scope->ch[0]->Clone());
 
   }
 

@@ -136,10 +136,10 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
   
     //set addresses
   
-    fEventTree->SetBranchAddress("ch1", scope->ch[0]);
-    fEventTree->SetBranchAddress("ch2", scope->ch[1]);
-    fEventTree->SetBranchAddress("ch3", scope->ch[2]);
-    fEventTree->SetBranchAddress("ch4", scope->ch[3]);
+    fEventTree->SetBranchAddress("ch1", scope->dat[0]);
+    fEventTree->SetBranchAddress("ch2", scope->dat[1]);
+    fEventTree->SetBranchAddress("ch3", scope->dat[2]);
+    fEventTree->SetBranchAddress("ch4", scope->dat[3]);
     fEventTree->SetBranchAddress("time", scope->time);
     fEventTree->SetBranchAddress("timestamp", &timestamp);
 
@@ -151,7 +151,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
     return 0;
   }
   if(loadScopeEvent(scopeEvNo+event)==1){
-    getCharge(scope->gr[3]);
+    getCharge(scope->ch[3]);
     return 1;
   }
   else return 0;
@@ -171,13 +171,13 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
   // scope->time[0]=0.;
   // scope->time[19999]=scope->time[19998]+.05;
   // for(int i=0;i<4;i++){
-  //   TGraph * graph=new TGraph(length, scope->time, scope->ch[i]);
+  //   TGraph * graph=new TGraph(length, scope->time, scope->dat[i]);
 
   //   if(fInterpGsNs>0.){
-  //     getInterpolatedGraph(graph, scope->gr[i]);
+  //     getInterpolatedGraph(graph, scope->ch[i]);
   //   }
   //   else{
-  //     *scope->gr[i]=*graph;
+  //     *scope->ch[i]=*graph;
   //   }
   //   delete(graph);
   // }
@@ -185,7 +185,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
   // //delete(tree);
   // fEventFile->Close();
   // //delete(file);
-  // getCharge(scope->gr[3]);
+  // getCharge(scope->ch[3]);
   
   // //  delete (files);
   
@@ -243,10 +243,10 @@ int T576Event::loadScopeEvent(int event){
     //  memset(scope->ch, 0, sizeof(scope->ch));
     //memset(scope->gr, 0, sizeof(scope->gr));
 
-    fEventTree->SetBranchAddress("ch1", scope->ch[0]);
-    fEventTree->SetBranchAddress("ch2", scope->ch[1]);
-    fEventTree->SetBranchAddress("ch3", scope->ch[2]);
-    fEventTree->SetBranchAddress("ch4", scope->ch[3]);
+    fEventTree->SetBranchAddress("ch1", scope->dat[0]);
+    fEventTree->SetBranchAddress("ch2", scope->dat[1]);
+    fEventTree->SetBranchAddress("ch3", scope->dat[2]);
+    fEventTree->SetBranchAddress("ch4", scope->dat[3]);
     fEventTree->SetBranchAddress("time", scope->time);
     fEventTree->SetBranchAddress("timestamp", &timestamp);
 
@@ -272,20 +272,20 @@ int T576Event::loadScopeEvent(int event){
   scope->time[0]=0.;
   scope->time[19999]=scope->time[19998]+.05;
   for(int i=0;i<4;i++){
-    TGraph * graph=new TGraph(length, scope->time, scope->ch[i]);
+    TGraph * graph=new TGraph(length, scope->time, scope->dat[i]);
 
     if(fInterpGsNs>0.){
-      getInterpolatedGraph(graph, scope->gr[i]);
+      getInterpolatedGraph(graph, scope->ch[i]);
     }
     else{
-      *scope->gr[i]=*graph;
+      *scope->ch[i]=*graph;
     }
    delete(graph);
   }
   
   // if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
   //delete(file);
-  getCharge(scope->gr[3]);
+  getCharge(scope->ch[3]);
   
   //  delete (files);
   
@@ -376,15 +376,15 @@ int T576Event::loadSurfEvent(int run_major, int run_minor, int event){
 
 //   for(int i=0;i<12;i++){
 //     int index2=i*len;//i is channel number
-//     copy(fSurfData+index1+index2, fSurfData+index1+index2+len, surf->ch[i]);
+//     copy(fSurfData+index1+index2, fSurfData+index1+index2+len, surf->dat[i]);
 
-//     TGraph * graph=new TGraph(len, surf->time, surf->ch[i]);
+//     TGraph * graph=new TGraph(len, surf->time, surf->dat[i]);
 
 //     if(fInterpGsNs>0.){
-//       getInterpolatedGraph(graph, surf->gr[i]);
+//       getInterpolatedGraph(graph, surf->ch[i]);
 //     }
 //     else{
-//       *surf->gr[i]=*graph;
+//       *surf->ch[i]=*graph;
 //     }
 //    delete(graph);
 //   }
@@ -466,18 +466,18 @@ int T576Event::loadSurfEvent(int event){
 
   for(int i=0;i<12;i++){
     int index2=i*len;//i is channel number
-    copy(fSurfData+index1+index2, fSurfData+index1+index2+len, surf->ch[i]);
+    copy(fSurfData+index1+index2, fSurfData+index1+index2+len, surf->dat[i]);
     //feet to meter conversion
     surf->delays[i]=(surf->cableLengths[i]/3.2808)/(c_light*surf->velocityFactor);
 
-    TGraph * graph=new TGraph(len, TUtil::makeIndices(len, 1./3.2, surf->delays[i]), surf->ch[i]);
+    TGraph * graph=new TGraph(len, TUtil::makeIndices(len, 1./3.2, surf->delays[i]), surf->dat[i]);
 
     TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);
     if(fInterpGsNs>0.){
-      getInterpolatedGraph(grChunk, surf->gr[i]);
+      getInterpolatedGraph(grChunk, surf->ch[i]);
     }
     else{
-      *surf->gr[i]=*grChunk;
+      *surf->ch[i]=*grChunk;
     }
     delete(grChunk);
     delete(graph);
