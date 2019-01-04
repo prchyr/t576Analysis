@@ -81,11 +81,7 @@ TUtilGraph * TUtilGraph::operator+(const TUtilGraph *b){
 
 
 TUtilGraph * TUtilGraph::operator-(const TUtilGraph *b){
-  auto thing=(TUtilGraph*)this->Clone();
-  for(int i=0;i<thing->GetN();i++){
-    thing->GetY()[i]=this->GetY()[i]-b->GetY()[i];
-  }
-  return thing;
+  for(int i=0;i<this->GetN();i++)this->GetY()[i]-=b->GetY()[i];
 }
 
 

@@ -83,7 +83,9 @@ namespace TUtil{
   int delayGraph(TGraph * ingr, TGraph *outgr, double delay);
   //plot \Delta(gr1[i], gr2[i]) for each graph point i
   TH1F * plotResiduals(TGraph *gr1, TGraph *gr2, int nbins=40, double min=1, double max=-1);
-
+  //add 2 TGraphs. if constant is -1, they are subtracted.
+  TGraph * add(TGraph * g1, TGraph * g2, double constant=1.);
+  
   void setWarmPalette();
   void setCoolPalette();
   

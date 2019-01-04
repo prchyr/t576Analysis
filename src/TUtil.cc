@@ -803,6 +803,15 @@ vector<TGraph*> TUtil::alignMultiple(vector<TGraph*> inGr, double max_delay, dou
   return outgraphs;
 }
 
+TGraph * TUtil::add(TGraph *g1, TGraph *g2, double constant){
+
+  int len=g1->GetN()<g2->GetN()?g1->GetN():g2->GetN();
+  TGraph *outGr=new TGraph(len);  
+  for(int i=0;i<len;i++){
+    outGr->SetPoint(outGr->GetN(), g1->GetX()[i], g1->GetY()[i]+(constant*g2->Eval(g1->GetX()[i])));
+  }
+  return outGr;
+}
 
 
 
