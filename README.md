@@ -98,7 +98,7 @@ T576Event * ev = new T576Event();
 
 ev->loadScopeEvent(4, 6, 1);
 
-ev->scope->gr[3]->Draw("al");
+ev->scope->ch[3]->Draw("al");
 
 //will draw channel 4 on ths scope (ICT) as a graph.
 
@@ -130,7 +130,7 @@ ev->surf->loadSurfEvent(9000);
 //which will put all the things in the proper place, e.g. to draw a graph
 //for channel 9 in the surf for this event, do
 
-ev->surf->gr[9]->Draw("al");
+ev->surf->ch[9]->Draw("al");
 
 //furthermore, you can set the level of interpolation for all events
 
