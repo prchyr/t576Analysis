@@ -76,11 +76,10 @@ TUtilGraph * TUtilGraph::operator*(const TUtilGraph *b){
 
 TUtilGraph * TUtilGraph::operator+(const TUtilGraph *b){
   for(int i=0;i<this->GetN();i++)this->GetY()[i]+=b->GetY()[i];
-  return new TUtilGraph(this->GetN(), this->GetX(), this->GetY());
 }
 
 
-TUtilGraph * TUtilGraph::operator-(const TUtilGraph *b){
+TUtilGraph * TUtilGraph::operator- (TUtilGraph *b){
   for(int i=0;i<this->GetN();i++)this->GetY()[i]-=b->GetY()[i];
 }
 

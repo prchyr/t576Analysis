@@ -31,7 +31,7 @@ class TUtilGraph: public TGraph{
 
   TUtilGraph * operator*(const TUtilGraph *b);
   TUtilGraph * operator+(const TUtilGraph *b);
-  TUtilGraph * operator-(const TUtilGraph *b);
+  TUtilGraph * operator-(TUtilGraph *b);
   TUtilGraph * operator*(const double b);
   TUtilGraph * operator+(const double b);
   TUtilGraph * operator-(const double b);
