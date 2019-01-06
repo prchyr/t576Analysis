@@ -173,7 +173,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
   // for(int i=0;i<4;i++){
   //   TGraph * graph=new TGraph(length, scope->time, scope->dat[i]);
 
-  //   if(fInterpGsNs>0.){
+  //   if(fInterpGSs>0.){
   //     getInterpolatedGraph(graph, scope->ch[i]);
   //   }
   //   else{
@@ -279,7 +279,7 @@ int T576Event::loadScopeEvent(int event){
     graph->GetYaxis()->SetTitle("Volts (V)");
     graph->GetYaxis()->SetTitleOffset(1.15);
     graph->GetHistogram()->SetName("");
-    if(fInterpGsNs>0.){
+    if(fInterpGSs>0.){
       getInterpolatedGraph(graph, scope->ch[i]);
     }
     else{
@@ -385,7 +385,7 @@ int T576Event::loadSurfEvent(int run_major, int run_minor, int event){
 
 //     TGraph * graph=new TGraph(len, surf->time, surf->dat[i]);
 
-//     if(fInterpGsNs>0.){
+//     if(fInterpGSs>0.){
 //       getInterpolatedGraph(graph, surf->ch[i]);
 //     }
 //     else{
@@ -484,7 +484,7 @@ int T576Event::loadSurfEvent(int event){
     graph->GetYaxis()->SetTitle("Volts (V)");
     graph->GetYaxis()->SetTitleOffset(1.15);
     graph->GetHistogram()->SetName("");
-    if(fInterpGsNs>0.){
+    if(fInterpGSs>0.){
       getInterpolatedGraph(grChunk, surf->ch[i]);
     }
     else{
@@ -517,11 +517,11 @@ int T576Event::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph){
 
   //get dt, assuming even sampling.
   double inDt=inGraph->GetX()[50]-inGraph->GetX()[49];
-  double inGsPerNs=1./inDt;
+  double inGsPerS=1./inDt;
 
-  double outDt=1./fInterpGsNs;
+  double outDt=1./fInterpGSs;
 
-  int samps=(int) (inGraph->GetN()*(fInterpGsNs/inGsPerNs));
+  int samps=(int) (inGraph->GetN()*(fInterpGSs/inGsPerS));
 
   vector<double> xx, yy;
   for(int i=0;i<samps;i++){

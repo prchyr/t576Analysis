@@ -671,6 +671,7 @@ TGraph * TUtil::crossCorrelate(TGraph * gr1, TGraph * gr2, double max_delay, dou
   outt->GetYaxis()->SetTitle("CC coefficient");
   outt->GetYaxis()->SetTitleOffset(1.15);
   outt->SetTitle("");
+  outt->GetXaxis()->SetRangeUser(-max_delay, max_delay);
   return outt;
 }
 

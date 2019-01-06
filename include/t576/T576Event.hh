@@ -122,7 +122,7 @@ public:
   int checkStatus();
   //set the interpolation level. this is used in the graphs, but the
   //channel arrays are always the raw values.
-  void setInterpGsNs(double value){fInterpGsNs=value;};
+  void setInterpGSs(double value){fInterpGSs=value;};
 
   /**************utility and analysis functions**************/
 
@@ -133,7 +133,7 @@ public:
   
 private:
   int fNEntriesSurf=0, fNEntriesScope=0;
-  double fInterpGsNs=0.;
+  double fInterpGSs=0.;
   TString fScopeFilename="20181025191401run0_4.root", fInstallDir="20181025191401run0_4.root";
   TString fSurfFilename="20181025191401run0_4.py";
   int fIndexBuilt=0;
