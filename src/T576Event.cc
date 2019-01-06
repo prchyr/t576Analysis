@@ -478,12 +478,12 @@ int T576Event::loadSurfEvent(int event){
     TGraph * graph=new TGraph(len, TUtil::makeIndices(len, 1./3.2, surf->delays[i]), surf->dat[i]);
 
     TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);
-    graph->SetTitle("");
-    graph->SetName("ch"+TString::Itoa(i, 10));
-    graph->GetXaxis()->SetTitle("Time (ns)");
-    graph->GetYaxis()->SetTitle("Volts (V)");
-    graph->GetYaxis()->SetTitleOffset(1.15);
-    graph->GetHistogram()->SetName("");
+    grChunk->SetTitle("");
+    grChunk->SetName("ch"+TString::Itoa(i, 10));
+    grChunk->GetXaxis()->SetTitle("Time (ns)");
+    grChunk->GetYaxis()->SetTitle("Volts (V)");
+    grChunk->GetYaxis()->SetTitleOffset(1.15);
+    grChunk->GetHistogram()->SetName("");
     if(fInterpGSs>0.){
       getInterpolatedGraph(grChunk, surf->ch[i]);
     }
