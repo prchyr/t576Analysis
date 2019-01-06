@@ -658,7 +658,8 @@ TGraph * TUtil::crossCorrelate(TGraph * gr1, TGraph * gr2, double max_delay, dou
 	}
       }
       out.push_back(num/sqrt(xdenom*ydenom));
-      outx.push_back(time[(length/2)+n]);
+      //      outx.push_back(time[(length/2)+n]);
+      outx.push_back((double)n *timescale);
       //    n++;    
     }
 
@@ -666,7 +667,7 @@ TGraph * TUtil::crossCorrelate(TGraph * gr1, TGraph * gr2, double max_delay, dou
 
   
   TGraph *outt = new TGraph(outx.size(), &outx[0], &out[0]);
-
+  outt->GetXaxis()->SetTitle("offset (ns)");
   return outt;
 }
 
