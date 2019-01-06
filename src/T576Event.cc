@@ -277,6 +277,8 @@ int T576Event::loadScopeEvent(int event){
     graph->SetName("ch"+TString::Itoa(i, 10));
     graph->GetXaxis()->SetTitle("Time (ns)");
     graph->GetYaxis()->SetTitle("Volts (V)");
+    graph->GetYaxis()->SetTitleOffset(1.15);
+    graph->GetHistogram()->SetName("");
     if(fInterpGsNs>0.){
       getInterpolatedGraph(graph, scope->ch[i]);
     }
@@ -480,6 +482,8 @@ int T576Event::loadSurfEvent(int event){
     graph->SetName("ch"+TString::Itoa(i, 10));
     graph->GetXaxis()->SetTitle("Time (ns)");
     graph->GetYaxis()->SetTitle("Volts (V)");
+    graph->GetYaxis()->SetTitleOffset(1.15);
+    graph->GetHistogram()->SetName("");
     if(fInterpGsNs>0.){
       getInterpolatedGraph(grChunk, surf->ch[i]);
     }
