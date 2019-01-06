@@ -273,7 +273,8 @@ int T576Event::loadScopeEvent(int event){
   scope->time[19999]=scope->time[19998]+.05;
   for(int i=0;i<4;i++){
     TGraph * graph=new TGraph(length, scope->time, scope->dat[i]);
-
+    graph->SetTitle("");
+    graph->SetName("ch"+TString::Itoa(i, 10));
     if(fInterpGsNs>0.){
       getInterpolatedGraph(graph, scope->ch[i]);
     }
@@ -473,6 +474,8 @@ int T576Event::loadSurfEvent(int event){
     TGraph * graph=new TGraph(len, TUtil::makeIndices(len, 1./3.2, surf->delays[i]), surf->dat[i]);
 
     TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);
+    graph->SetTitle("");
+    graph->SetName("ch"+TString::Itoa(i, 10));
     if(fInterpGsNs>0.){
       getInterpolatedGraph(grChunk, surf->ch[i]);
     }
