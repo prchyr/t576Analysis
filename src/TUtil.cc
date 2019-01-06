@@ -668,6 +668,9 @@ TGraph * TUtil::crossCorrelate(TGraph * gr1, TGraph * gr2, double max_delay, dou
   
   TGraph *outt = new TGraph(outx.size(), &outx[0], &out[0]);
   outt->GetXaxis()->SetTitle("offset (ns)");
+  outt->GetYaxis()->SetTitle("CC coefficient");
+  outt->GetYaxis()->SetTitleOffset(1.15);
+  outt->SetTitle("");
   return outt;
 }
 
