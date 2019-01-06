@@ -85,7 +85,9 @@ namespace TUtil{
   TH1F * plotResiduals(TGraph *gr1, TGraph *gr2, int nbins=40, double min=1, double max=-1);
   //add 2 TGraphs. if constant is -1, they are subtracted.
   TGraph * add(TGraph * g1, TGraph * g2, double constant=1.);
-  
+
+  double deg2Rad(double deg);
+  double rad2Deg(double rad);
   void setWarmPalette();
   void setCoolPalette();
   

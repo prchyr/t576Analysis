@@ -814,7 +814,13 @@ TGraph * TUtil::add(TGraph *g1, TGraph *g2, double constant){
 }
 
 
+double TUtil::deg2Rad(double deg) {
+  return (deg * pi / 180.);
+}
 
+double TUtil::rad2Deg(double rad) {
+  return (rad * 180. / pi);
+}
 
 /*************some plotting things****************/
 
