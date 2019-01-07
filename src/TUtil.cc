@@ -499,9 +499,9 @@ double * TUtil::makeIndices(int n, double step, double offset){
 }
 
 
-double TUtil::vToDbmHz(double bandwidthGsNs, double re, double im){
+double TUtil::vToDbmHz(double bandwidthGSs, double re, double im){
   double val=re*re+im*im;
-  return (10.*log10(val/50.))+30-(10.*log10(bandwidthGsNs*1.e9));
+  return (10.*log10(val/50.))+30-(10.*log10(bandwidthGSs*1.e9));
 }
 
 TGraph * TUtil::normalize(TGraph * inGr){
@@ -514,19 +514,90 @@ TGraph * TUtil::normalize(TGraph * inGr){
     for(int i=0;i<length;i++)og->GetY()[i]*=norm;
     return og;
   }
-  
 
-int TUtil::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGsNs){
+
+double TUtil::integrate(TGraph * gr, double t_low, double t_high){
+  t_low=t_low>0.?t_low:0.;
+  t_high>gr->GetX()[gr->GetN()-1]?gr->GetX()[gr->GetN()-1]:t_high;
+  double dt = gr->GetX()[1]-gr->GetX()[0];
+  double integral=0.;
+  for(int i=0;i<gr->GetN();i++){
+    if(gr->GetX()[i]<t_low||gr->GetX()[i]>t_high)continue;
+    integral+=gr->GetY()[i]*dt;
+  }
+  return integral;
+}
+
+double TUtil::sinc(double x){
+  if(x==0.){
+    return 1.;
+  }
+  return sin(pi* x)/(pi*x);
+}
+
+
+TGraph * TUtil::sincInterpolateGraph(TGraph *inGr, double interpGSs){
+  double T = inGr->GetX()[1]-inGr->GetX()[0];
+  double dt = 1./interpGSs;
+  vector<double> xx, yy;
+  double t=0;
+  double num=0.;
+  
+  t=0;    
+  while(t<inGr->GetX()[inGr->GetN()-1]){
+    xx.push_back(t);
+    double temp=0;
+    for(int i=0;i<inGr->GetN();i++){
+      temp+=inGr->GetY()[i]*TUtil::sinc((t-((double)i*T))/T);
+
+    }
+  
+    yy.push_back(temp);
+    t+=dt;
+  }
+  TGraph *outGr = new TGraph(xx.size(), &xx[0], &yy[0]);
+  return outGr;
+}
+
+
+// TGraph * TUtil::sincInterpolateGraphSimple(TGraph *inGr, double interpGSs){
+//   double T = inGr->GetX()[1]-inGr->GetX()[0];
+//   double dt = 1./interpGSs;
+//   vector<double> xx, yy;
+//   double t=0;
+//   double num=0.;
+//   double t_ex = inGr->GetX()[inGr->GetN()/2];
+//   double ex=0.;
+//   for(int i=0;i<inGr->GetN();i++){
+//     ex+=inGr->GetY()[i]*TUtil::sinc((t_ex-((double)i*T))/T);
+//   }
+  
+//   t=0;
+//   int i=0;
+//   while(t<inGr->GetX()[inGr->GetN()-1]){
+//     xx.push_back(t);
+//     i=fmod(t, inGr->GetY()[i])>(T/2)?i+1:i;
+//     double temp=inGr->GetY()[i]*TUtil::sinc(fmod(t, T)/T);
+//     cout<<t<<" "<<i<<" "<<inGr->GetY()[i]<<endl;
+//     yy.push_back(temp);
+//     t+=dt;
+//   }
+//   TGraph *outGr = new TGraph(xx.size(), &xx[0], &yy[0]);
+//   return outGr;
+// }
+
+
+int TUtil::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs){
   ROOT::Math::Interpolator interp(inGraph->GetN(), ROOT::Math::Interpolation::kAKIMA);
   interp.SetData(inGraph->GetN(), inGraph->GetX(), inGraph->GetY());
 
   //get dt, assuming even sampling.
   double inDt=inGraph->GetX()[50]-inGraph->GetX()[49];
-  double inGsPerNs=1./inDt;
+  double inGSs=1./inDt;
 
-  double outDt=1./interpGsNs;
+  double outDt=1./interpGSs;
 
-  int samps=(int) (inGraph->GetN()*(interpGsNs/inGsPerNs));
+  int samps=(int) (inGraph->GetN()*(interpGSs/inGSs));
 
   vector<double> xx, yy;
   for(int i=0;i<samps;i++){

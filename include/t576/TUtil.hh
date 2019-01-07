@@ -54,11 +54,17 @@ class TUtilGraph;
 namespace TUtil{
 
   //volts to dbm/hz
-  double vToDbmHz(double bandwidthGsNs, double re, double im=0);
+  double vToDbmHz(double bandwidthGSs, double re, double im=0);
   //make an axis with linearly increasing values.
   double * makeIndices(int n, double step, double offset=0);
+  //the normalized sinc function: sin(pi x)/(pi x)
+  double sinc(double x);
+  //return a TGraph interpoltaed using simple sinc interpolation.
+  TGraph * sincInterpolateGraph(TGraph *inGr, double interpGSs);
+  TGraph * sincInterpolateGraphSimple(TGraph *inGr, double interpGSs);
   //interpolate a tgraph using the ROOT interpolation functions
-  int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGsNs);
+  int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs);
+
   //normalize a graph
   TGraph * normalize(TGraph *inGr);
   //return a chunk of a graph, specified by x-axis values. 
@@ -85,7 +91,7 @@ namespace TUtil{
   TH1F * plotResiduals(TGraph *gr1, TGraph *gr2, int nbins=40, double min=1, double max=-1);
   //add 2 TGraphs. if constant is -1, they are subtracted.
   TGraph * add(TGraph * g1, TGraph * g2, double constant=1.);
-
+  double integrate(TGraph * gr, double t_low=0, double t_high=999999.);
   double deg2Rad(double deg);
   double rad2Deg(double rad);
   void setWarmPalette();
