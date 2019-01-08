@@ -81,8 +81,12 @@ namespace TUtil{
   //the same as the crossCorrelate() function, but returns gr2 shifted in time
   //to the point of peak cross correlation with gr1.
   TGraph * align(TGraph * gr1, TGraph * gr2, double max_delay=999999., double t_low=0., double t_high=999999.);
+  //align gr2 to gr1, but returning othGr, delayed correctly. 
+  TGraph * alignToOther(TGraph * gr1, TGraph * gr2, TGraph* othGr, double max_delay=999999., double t_low=0., double t_high=999999.);
   //align a large number of graphs to the first graph in the set.
   vector<TGraph*> alignMultiple(vector<TGraph*> inGr, double max_delay=999999., double t_low=0., double t_high=999999.);
+  //align a large set to a reference set.
+  vector<TGraph*> alignMultipleToOther(vector<TGraph*> inGr, vector<TGraph*> othGr, double max_delay=999999., double t_low=0., double t_high=999999.);
   //delay a graph
   TGraph *delayGraph(TGraph *ingr, double delay);
   //same but with no mem usage.

@@ -865,6 +865,68 @@ TGraph * TUtil::align(TGraph * gr1, TGraph * gr2, double max_delay, double t_low
 }
 
 
+TGraph * TUtil::alignToOther(TGraph * gr1, TGraph * gr2, TGraph *othGr, double max_delay, double t_low, double t_high){
+  double *x = gr1->GetY();
+  double *time=gr1->GetX();
+  double *y = gr2->GetY();
+  double *yOth=othGr->GetY();
+  int yn=gr1->GetN();
+  int xn=gr2->GetN();
+  int lengthx=xn;
+  int lengthy=yn;
+  int length=0;
+  vector<double> out, outx, outy;
+  double num, ynum, xdenom, ydenom, denom;
+  double timescale = time[1]-time[0];
+
+  length=lengthx<=lengthy?xn:yn;
+  length=lengthx<=lengthy?xn:yn;
+
+  double throwaway=time[xn-1]/10.;//throw away highest delays, they are unstable
+  max_delay=max_delay>time[xn-1]?time[xn-1]-throwaway:max_delay;
+
+  t_high=t_high>=time[xn-1]?time[xn-1]:t_high;
+  t_low=t_low<time[0]?time[0]:t_low;
+
+  int max_delay_index=(1./timescale)*max_delay;
+  double mx=0;
+  double my=0;
+
+  int n=0;
+  double t=-max_delay;
+  for(int n=-max_delay_index;n<max_delay_index;n++){
+    //if(time[d]>=-max_delay&&time[d]<=max_delay){
+      num=0.;
+      xdenom=0.;
+      ydenom=0.;
+      for(int i=0;i<length;i++){
+	if((i+n)>0 && (i+n)<length && time[i]>=t_low && time[i]<=t_high){
+	  
+	  num+=(x[i]-mx)*(y[i+n]-my);
+	  xdenom+=pow(x[i]-mx, 2);
+	  ydenom+=pow(y[i+n]-my, 2);
+	  
+	}
+      }
+      out.push_back(num/sqrt(xdenom*ydenom));
+      outx.push_back(time[(length/2)+n]);
+      //    n++;    
+    }
+
+  double maxIndex=TMath::LocMax(out.size(), &out[0]);
+  double offset=(maxIndex-(double)max_delay_index)*timescale;
+
+  outx.clear();
+  for(int i=0;i<othGr->GetN();i++){
+    outx.push_back(othGr->GetX()[i]-offset);
+    //    outy.push_back(y[i]);
+  }
+
+  TGraph *outt = new TGraph(outx.size(), &outx[0], yOth);
+  
+  return outt;
+}
+
 
 vector<TGraph*> TUtil::alignMultiple(vector<TGraph*> inGr, double max_delay, double t_low, double t_high){   
   vector<TGraph*>outgraphs;
@@ -873,6 +935,19 @@ vector<TGraph*> TUtil::alignMultiple(vector<TGraph*> inGr, double max_delay, dou
   outgraphs.push_back(g1);
   for(int i=1;i<inGr.size();i++){
     outgraphs.push_back(align(g1, inGr[i], max_delay, t_low, t_high));
+    //    cout<<i<<endl;
+    //    outgraphs[i]->Draw("l same PLC");
+  }
+  return outgraphs;
+}
+
+vector<TGraph*> TUtil::alignMultipleToOther(vector<TGraph*> inGr, vector<TGraph*> othGr, double max_delay, double t_low, double t_high){   
+  vector<TGraph*>outgraphs;
+  TGraph *g1=inGr[0];
+  //  g1->Draw("al PLC");
+  outgraphs.push_back(othGr[0]);
+  for(int i=1;i<inGr.size();i++){
+    outgraphs.push_back(alignToOther(g1, inGr[i], othGr[i], max_delay, t_low, t_high));
     //    cout<<i<<endl;
     //    outgraphs[i]->Draw("l same PLC");
   }
