@@ -956,13 +956,14 @@ vector<TGraph*> TUtil::alignMultipleToOther(vector<TGraph*> inGr, vector<TGraph*
 
 
 TGraph * TUtil::makeCW(double freq,  double amp, double t_min, double t_max, double GSs, double phase){
-  TGraph * oG=new TGraph();
+
   int n=(t_max-t_min)*GSs;
+  TGraph * oG=new TGraph(n);
   int dt=1./GSs;
   for(int i=0;i<n;i++){
     double t = (double)i*dt;
     double temp=amp*sin(2.*pi*freq*t + phase);
-    oG->SetPoint(oG->GetN(), t, temp);
+    oG->SetPoint(i, t, temp);
   }
   return oG;
 }
