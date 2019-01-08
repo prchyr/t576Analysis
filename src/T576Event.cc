@@ -236,7 +236,7 @@ int T576Event::loadScopeEvent(int event){
   if(thisScopeFilename!=fScopeFilename){
 
     fEventFile->Close();
-    //cout<<thisScopeFilename<<endl;
+    // cout<<thisScopeFilename<<endl;
     fEventFile=TFile::Open(directory+thisScopeFilename);
     fEventTree=(TTree*)fEventFile->Get("tree");
 
@@ -266,7 +266,7 @@ int T576Event::loadScopeEvent(int event){
   //check the length of the record.
   auto length=sizeof(scope->time)/sizeof(*scope->time);
   if(length!=20000)cout<<length;
-  //  if(minor==4)  cout<<major<<" "<<minor<<" "<<subEvNo<<" "<<length<<" "<<fEventTree->GetEntries()<<endl;
+  //cout<<major<<" "<<minor<<" "<<subEvNo<<" "<<length<<" "<<fEventTree->GetEntries()<<" "<<scope->dat[1][18]<<endl;
   //fill the event graphs for the scope->
   //fix the first and last values, which were recorded incorrectly
   scope->time[0]=0.;
@@ -287,8 +287,8 @@ int T576Event::loadScopeEvent(int event){
     }
    delete(graph);
   }
-  
-  // if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
+  //  cout<<"here"<<endl;
+  if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
   //delete(file);
   getCharge(scope->ch[3]);
   
@@ -432,7 +432,7 @@ int T576Event::loadSurfEvent(int event){
 
   TString thisSurfFilename=surfFilename->Data();
   //open the file
-
+  cout<<thisSurfFilename<<endl<<" "<<event<<endl;
   if(thisSurfFilename!=fSurfFilename){
     //load the event file
     TString openf=directory+thisSurfFilename;
