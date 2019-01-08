@@ -65,8 +65,8 @@ if you didn't install to the default /usr/local, then you'll need to add the ins
 
 ```bash
 export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$T576_INSTALL_DIR/include
-export LIBRARY_PATH:$LIBRARY_PATH:$T576_INSTALL_DIR/lib
-export LD_LIBRARY_PATH:$LD_LIBRARY_PATH:$T576_INSTALL_DIR/lib
+export LIBRARY_PATH=$LIBRARY_PATH:$T576_INSTALL_DIR/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$T576_INSTALL_DIR/lib
 ```
 
 # Using:
