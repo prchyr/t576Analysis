@@ -61,6 +61,7 @@ namespace TUtil{
   double sinc(double x);
   //return a TGraph interpoltaed using simple sinc interpolation.
   TGraph * sincInterpolateGraph(TGraph *inGr, double interpGSs);
+  //approximated (fast) sinc interpolation.
   TGraph * sincInterpolateGraphSimple(TGraph *inGr, double interpGSs);
   //interpolate a tgraph using the ROOT interpolation functions
   int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs);
@@ -81,7 +82,12 @@ namespace TUtil{
   //the same as the crossCorrelate() function, but returns gr2 shifted in time
   //to the point of peak cross correlation with gr1.
   TGraph * align(TGraph * gr1, TGraph * gr2, double max_delay=999999., double t_low=0., double t_high=999999.);
-  //align gr2 to gr1, but returning othGr, delayed correctly. 
+  /*align gr2 to gr1, but returning othGr, delayed by the amount needed to
+  align gr2 to gr1 at the point of peak correlation. 
+  for example, gr1 and gr2 are events which are causal, and othGr
+  is some other graph which you'd like to align with these, but can't for
+  whatever reason (contaminated with CW, etc.). 
+  */
   TGraph * alignToOther(TGraph * gr1, TGraph * gr2, TGraph* othGr, double max_delay=999999., double t_low=0., double t_high=999999.);
   //align a large number of graphs to the first graph in the set.
   vector<TGraph*> alignMultiple(vector<TGraph*> inGr, double max_delay=999999., double t_low=0., double t_high=999999.);

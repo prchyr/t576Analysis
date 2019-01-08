@@ -36,7 +36,7 @@ cmake $top_dir &&
     make -B -j4 &&
     make install &&
     printf "\n\n\n\na test script is being compiled...\n\n" &&
-    g++ -std=c++11  loadEvents.cc -o loadEvents -L$T576_INSTALL_DIR/include/t576 `root-config --cflags --glibs --libs` -lt576 &&
+    g++ -std=c++11  loadEvents.cc -o loadEvents -I$T576_INSTALL_DIR/include `root-config --cflags --glibs --libs` -lt576 &&
     mv loadEvents $T576_INSTALL_DIR/share/t576/example/ &&
     printf "done. make sure that T576_INSTALL_DIR/include is in your include path, then try running:\n\n" &&
     printf " $T576_INSTALL_DIR/share/t576/example/loadEvents\n\n" &&
