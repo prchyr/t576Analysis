@@ -59,6 +59,16 @@ then, (optional) tell it where you'd like to install the software, as above. if 
 
 finally, tell it where the t576 data lives. the data directory structure must be /path/to/t576/data/(root/ py/) meaning root/ and py/ live under some common directory. and under py/, lives dat/ and ped/. contact me if there are questions on this.
 
+## setting your paths
+
+if you didn't install to the default /usr/local, then you'll need to add the installation directories to the correct paths. to do so, add these to your .bashrc
+
+```bash
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$T576_INSTALL_DIR/include
+export LIBRARY_PATH:$LIBRARY_PATH:$T576_INSTALL_DIR/lib
+export LD_LIBRARY_PATH:$LD_LIBRARY_PATH:$T576_INSTALL_DIR/lib
+```
+
 # Using:
 
 to use inside of root is simple, just point ROOT to the t576 library that you just made on installation. i recommend doing this in your rootlogon.C file by adding this line like so:
