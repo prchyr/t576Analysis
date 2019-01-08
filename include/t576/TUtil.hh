@@ -95,6 +95,7 @@ namespace TUtil{
   TH1F * plotResiduals(TGraph *gr1, TGraph *gr2, int nbins=40, double min=1, double max=-1);
   //add 2 TGraphs. if constant is -1, they are subtracted.
   TGraph * add(TGraph * g1, TGraph * g2, double constant=1.);
+  TGraph * makeCW(double freq,  double amp, double t_min=0., double t_max=1000., double GSs=20., double phase=0.);
   double integrate(TGraph * gr, double t_low=0, double t_high=999999.);
   double deg2Rad(double deg);
   double rad2Deg(double rad);
