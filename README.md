@@ -31,7 +31,7 @@ we have included the relevant source from cnpy in this project (so you don't nee
 
 the software uses CMAKE, and you need to set a couple environment variables. ```T576_INSTALL_DIR``` is the top directory for the install. headers will install to ```T576_INSTALL_DIR/include/t576```, sources to  ```T576_INSTALL_DIR/src/t576```,  run logs and index files to ```T576_INSTALL_DIR/share/t576``` and the t576 library to ```T576_INSTALL_DIR/lib```. any directories below ```T576_INSTALL_DIR/``` which don't exist will be automatically created.
 
-T576_DATA_DIR is where the data is. set it to yhe directory just above root/ and py/ if you have a full copy of the source. e.g. if the data is ```/path/to/t576/run2``` (below which are ```root/``` and ```py/```, do:
+```T576_DATA_DIR``` is where the data is. set it to yhe directory just above root/ and py/ if you have a full copy of the source. e.g. if the data is ```/path/to/t576/run2``` (below which are ```root/``` and ```py/```, do:
 
 ```bash
 export T576_DATA_DIR=/path/to/t576/run2
@@ -66,16 +66,16 @@ and it will compile, install, and then compile a little test macro that you can 
 details about the above:
 
 
-Firstly for anything to work you need to tell it where to find ROOT. this is usually done already when you run the "source thisroot.sh" script from root. I'll assume you know what this is already. to know if things are sourced correctly, type "echo $ROOTSYS", and you should get the correct directory to ROOT.
+Firstly for anything to work you need to tell it where to find ROOT. this is usually done already when you run the "source thisroot.sh" script from root. I'll assume you know what this is already. to know if things are sourced correctly, type ```echo $ROOTSYS```, and you should get the correct directory to ROOT.
 
 
-then, (optional) tell it where you'd like to install the software, as above. if you don't do this, it will install to /usr/local/.
+then, (optional) tell it where you'd like to install the software, as above. if you don't do this, it will install to ```/usr/local/```.
 
-finally, tell it where the t576 data lives. the data directory structure must be /path/to/t576/data/(root/ py/) meaning root/ and py/ live under some common directory. and under py/, lives dat/ and ped/. contact me if there are questions on this.
+finally, tell it where the t576 data lives. the data directory structure must be ```/path/to/t576/data/(root/ py/)``` meaning ```root/``` and ```py/``` live under some common directory. and under ```py/```, lives ```dat/``` and ```ped/```. contact me if there are questions on this.
 
 ## setting your paths
 
-if you didn't install to the default /usr/local, then you'll need to add the installation directories to the correct paths. to do so, add these to your .bashrc
+if you didn't install to the default ```/usr/local```, then you'll need to add the installation directories to the correct paths. to do so, add these to your .bashrc
 
 ```bash
 export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$T576_INSTALL_DIR/include
@@ -102,9 +102,9 @@ to use the software in your own standalone programs, just include the header and
 ```
 and compile with
 ```bash
-g++ -std=c++11 your_script.cc -o your_script `root-config --cflags --glibs --libs` -L$T576_INSTALL_DIR/include/t576 -lt576
+g++ -std=c++11 your_script.cc -o your_script `root-config --cflags --glibs --libs` -I$T576_INSTALL_DIR/include/ -lt576
 ```
-ignore the -L flag if you have $T576_INSTALL_DIR/include in your include path.
+ignore the -I flag if you have ```$T576_INSTALL_DIR/include``` in your include path.
 
 
 # T576Event class
