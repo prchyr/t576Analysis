@@ -22,6 +22,13 @@ we have included the relevant source from cnpy in this project (so you don't nee
 
 # Install:
 
+2 things to note straight away:
+
+1) you need compile these tools with the same compiler version you used to compile ROOT above
+
+2) this compiler must be greater than or equal to gcc 4.9. 
+
+
 the software uses CMAKE, and you need to set a couple environment variables. T576_INSTALL_DIR is the top directory for the install. headers will install to T576_INSTALL_DIR/include/t576, sources to  T576_INSTALL_DIR/src/t576,  run logs and index files to T576_INSTALL_DIR/share/t576 and the t576 library to T576_INSTALL_DIR/lib. any directories below T576_INSTALL_DIR/ which don't exist will be automatically created.
 
 T576_DATA_DIR is where the data is, more on that below.

@@ -4,7 +4,7 @@ int main(){
   time_t time_start, time_end;
 
   auto ev=new T576Event();
-  ev->setInterpGSs(20.);
+  //ev->setInterpGSs(20.);
   int eventCount=0;
   cout<<"running through first several thousand events. skipping run 0 because it was a test run..."<<endl;
   for(int i=0;i<10000;i++){
