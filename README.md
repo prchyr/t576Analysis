@@ -31,7 +31,14 @@ we have included the relevant source from cnpy in this project (so you don't nee
 
 the software uses CMAKE, and you need to set a couple environment variables. T576_INSTALL_DIR is the top directory for the install. headers will install to T576_INSTALL_DIR/include/t576, sources to  T576_INSTALL_DIR/src/t576,  run logs and index files to T576_INSTALL_DIR/share/t576 and the t576 library to T576_INSTALL_DIR/lib. any directories below T576_INSTALL_DIR/ which don't exist will be automatically created.
 
-T576_DATA_DIR is where the data is, more on that below.
+T576_DATA_DIR is where the data is. set it to yhe directory just above root/ and py/ if you have a full copy of the source. e.g. if the data is ```/path/to/t576/run2``` (below which are ```root/``` and ```py/```, do:
+
+```bash
+export T576_DATA_DIR=/path/to/t576/run2
+```
+
+more on the data below. the installation instructions which follow use generic directories, replace them with the correct ones as above.
+
 
 to install: 
 
