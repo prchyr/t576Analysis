@@ -8,6 +8,7 @@ released under the GNU General Public License version 3
 static int fN=1;
 static int fNi=1;
 static TVirtualFFT * fftr2c=TVirtualFFT::FFT(1, &fN, "R2C ES");
+static TVirtualFFT * fftr2cSpec=TVirtualFFT::FFT(1, &fNCpec, "R2C ES");
 static TVirtualFFT * fftc2r=TVirtualFFT::FFT(1, &fN, "C2R ES");
 static TGraph2D *fXfrmGr2D = new TGraph2D();
 static TGraph *fXfrmGr = new TGraph();
@@ -160,79 +161,79 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
   return out;//fXfrmGr;
 }
 
-// TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128, int log=1, int draw=1){
+TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128, int log=1, int draw=1){
 
-//   Int_t size = gr->GetN();
-//   double samprate=1./gr->GetX()[1]-gr->GetX()[0]);
-//   double xmax = size/samprate;
-//   double xmin = 0;
+  Int_t size = gr->GetN();
+  double samprate=1./gr->GetX()[1]-gr->GetX()[0]);
+  double xmax = size/samprate;
+  double xmin = 0;
 
-//   Int_t num_zeros=(zero_pad_length-binsize)/2.;
-//   Int_t nbins = size/overlap;
-//   char*timebuff;
-//   double samplerate = size/(xmax-xmin);
-//   double bandwidth = 1e9*samplerate;
-//   TH1F *in = new TH1F("inhi", "inhi", zero_pad_length, 0, zero_pad_length);  
-//   TH1*outt=0;
-//   //TH2F *outhist=new TH2F("outhist", "spectrogram", nbins, xmin, xmax, (binsize), 0, samplerate);
-//   //  cout<<binsize<<" "<<samplerate<<endl;
-// TH2D *spectrogramHist=new TH2D("outhist", "spectrogram", nbins, xmin, xmax, (zero_pad_length), 0, samplerate);
+  Int_t num_zeros=(zero_pad_length-binsize)/2.;
+  Int_t nbins = size/overlap;
+  char*timebuff;
+  double samplerate = size/(xmax-xmin);
+  double bandwidth = 1e9*samplerate;
+  TH1F *in = new TH1F("inhi", "inhi", zero_pad_length, 0, zero_pad_length);  
+  TH1*outt=0;
+  //TH2F *outhist=new TH2F("outhist", "spectrogram", nbins, xmin, xmax, (binsize), 0, samplerate);
+  //  cout<<binsize<<" "<<samplerate<<endl;
+TH2D *spectrogramHist=new TH2D("outhist", "spectrogram", nbins, xmin, xmax, (zero_pad_length), 0, samplerate);
 
-//   Int_t start = 0;
-//   //  Int_t j=0;
-// TGraph *fGr=new TGraph(binsize+num_zeros+num_zeros);
-//   for(int i=0;i<=nbins;i++){
-//     for(int j=0;j<num_zeros;j++){
-//     //    for(int j = 0;j<=zero_pad_length;j++){
-//       in->SetPoint(j, 0);
-//     }
-//     for(int j=num_zeros;j<binsize+num_zeros;j++){
-//       if((j+start)>=size)break;
-//       in->SetBinContent(j, data[j+start]*FFTtools::bartlettWindow(j-num_zeros, binsize));
-//     }
-//     for(int j=binsize+num_zeros;j<zero_pad_length;j++){
-//       in->SetBinContent(j, 0);
-//     }
+  Int_t start = 0;
+  //  Int_t j=0;
+TGraph *fGr=new TGraph(binsize+num_zeros+num_zeros);
+  for(int i=0;i<=nbins;i++){
+    for(int j=0;j<num_zeros;j++){
+    //    for(int j = 0;j<=zero_pad_length;j++){
+      in->SetPoint(j, 0);
+    }
+    for(int j=num_zeros;j<binsize+num_zeros;j++){
+      if((j+start)>=size)break;
+      in->SetBinContent(j, data[j+start]*FFTtools::bartlettWindow(j-num_zeros, binsize));
+    }
+    for(int j=binsize+num_zeros;j<zero_pad_length;j++){
+      in->SetBinContent(j, 0);
+    }
 
-//     outt=in->FFT(outt, "mag");
-//     outt->Scale(1./sqrt(zero_pad_length));
-//     for(int j = 0;j<=(zero_pad_length);j++){
-//       Double_t y = outt->GetBinContent(j);
-//       if(log==1){
-// 	y = (10.*log10(pow(y, 2.)/50.));//mv->dbm
-// 	//y=10.*log10(y)+30;
-// 	spectrogramHist->SetBinContent(i,j,(y-(10.*log10(bandwidth/2.))));//dmb/hz
-//       }
-//       else{
-//       spectrogramHist->SetBinContent(i,j,y);//dmb
-//       }
-//     }
-//     start+=overlap-1;
-//   }
-//   //cout<<"here"<<endl;
-//   //  ->SetRightMargin(.15);
-//   if(draw==1){
-//   spectrogramHist->GetYaxis()->SetRangeUser(0, spectrogramHist->GetYaxis()->GetXmax()/2);
+    outt=in->FFT(outt, "mag");
+    outt->Scale(1./sqrt(zero_pad_length));
+    for(int j = 0;j<=(zero_pad_length);j++){
+      Double_t y = outt->GetBinContent(j);
+      if(log==1){
+	y = (10.*log10(pow(y, 2.)/50.));//mv->dbm
+	//y=10.*log10(y)+30;
+	spectrogramHist->SetBinContent(i,j,(y-(10.*log10(bandwidth/2.))));//dmb/hz
+      }
+      else{
+      spectrogramHist->SetBinContent(i,j,y);//dmb
+      }
+    }
+    start+=overlap-1;
+  }
+  //cout<<"here"<<endl;
+  //  ->SetRightMargin(.15);
+  if(draw==1){
+  spectrogramHist->GetYaxis()->SetRangeUser(0, spectrogramHist->GetYaxis()->GetXmax()/2);
   
-//   spectrogramHist->GetXaxis()->SetTitle("Time (ns)");
+  spectrogramHist->GetXaxis()->SetTitle("Time (ns)");
 
-//   spectrogramHist->GetYaxis()->SetTitle("Frequency (GHz)");
+  spectrogramHist->GetYaxis()->SetTitle("Frequency (GHz)");
 
-//   spectrogramHist->GetZaxis()->SetTitle("dBm/Hz");
-//   spectrogramHist->GetZaxis()->SetTitleOffset(1.5);
-//   spectrogramHist->SetStats(0);
-//   spectrogramHist->Draw("colz");
-//   //maxbins->Draw("same");
-//   //maxvals->SetLineColor(kRed);
-//   //maxvals->Draw("same");
-//   }
-//   outt->Delete();
-//   in->Delete();
+  spectrogramHist->GetZaxis()->SetTitle("dBm/Hz");
+  spectrogramHist->GetZaxis()->SetTitleOffset(1.5);
+  spectrogramHist->SetStats(0);
+  spectrogramHist->Draw("colz");
+  //maxbins->Draw("same");
+  //maxvals->SetLineColor(kRed);
+  //maxvals->Draw("same");
+  }
+  outt->Delete();
+  in->Delete();
 
-//   // spectrogramHist->Delete();
-//   return spectrogramHist;
-//   //return outdat;
-// }
+  // spectrogramHist->Delete();
+  return spectrogramHist;
+  //return outdat;
+}
 
 
 

@@ -149,7 +149,7 @@ double z = ev->scope->pos[2].Z();
 //ev->loadScopeEvent(event number). 
 
 //the same can be done for the surf, of course
-ev->surf->loadSurfEvent(9000);
+ev->loadSurfEvent(9000);
 
 //which will put all the things in the proper place, e.g. to draw a graph
 //for channel 9 in the surf for this event, do
