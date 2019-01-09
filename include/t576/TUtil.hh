@@ -19,6 +19,7 @@
 #include "TSystemFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TH2D.h"
 #include "TString.h"
 #include "TStyle.h"
 #include "TCanvas.h"
@@ -121,7 +122,7 @@ namespace TUtil{
     //return the power spectral density in dBm/Hz
     TGraph * psd(TGraph *inGr);
     //return the spectrogram, with various options. 
-    TGraph2D * spectrogram(TGraph *inGr, int nfft=256, int noverlap=0);
+    TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128);
 
 
   }
