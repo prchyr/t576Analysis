@@ -123,7 +123,8 @@ namespace TUtil{
     TGraph * psd(TGraph *inGr);
     //return the spectrogram, with various options. 
     TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128);
-
+    //averages a vector of spectrograms. must be the same size.
+    TH2D* avgSpectrograms(vector<TH2D*>  inh);
 
   }
 

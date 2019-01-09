@@ -231,7 +231,14 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
 }
 
 
-
+TH2D * TUtil::FFT::avgSpectrograms(vector<TH2D*> inh){
+  TH2D *out = (TH2D*)inh[0]->Clone();
+  for(int i=1;i<inh.size();i++){
+    out->Add(inh[i]);
+  }
+  out->Scale(1./inh.size());
+  return out;
+}
 
 
 
