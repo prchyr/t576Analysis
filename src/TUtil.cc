@@ -518,6 +518,30 @@ TGraph * TUtil::normalize(TGraph * inGr){
     return og;
   }
 
+double TUtil::mean(TGraph *gr, double t_low, double t_high){
+  auto data=gr->GetY();
+  int N=gr->GetN();
+
+  t_low=t_low<gr->GetX()[0]?gr->GetX()[0]:t_low;
+  t_high=t_high>gr->GetX()[N-1]?gr->GetX()[N-1]:t_high;
+
+  double m=0.;
+
+  double n=0.;
+  for(int i=0;i<N;i++){
+    if(gr->GetX()[i]>t_low&&gr->GetX()[i]<t_high){
+      m+=data[i];
+      n+=1.;
+    }
+  }
+  
+  return m/n;
+}
+
+TGraph * TUtil::removeMean(TGraph *gr, double t_low, double t_high){
+  double m=TUtil::mean(gr, t_low, t_high);
+  return shift(gr, -m);
+}
 
 double TUtil::integrate(TGraph * gr, double t_low, double t_high){
   t_low=t_low>0.?t_low:0.;
@@ -530,6 +554,8 @@ double TUtil::integrate(TGraph * gr, double t_low, double t_high){
   }
   return integral;
 }
+
+
 
 double TUtil::sinc(double x){
   if(x==0.){
@@ -1043,6 +1069,35 @@ TGraph * TUtil::add(TGraph *g1, TGraph *g2, double constant){
   }
   return outGr;
 }
+
+TGraph * TUtil::scale(TGraph *g1, double factor){
+  TGraph *outGr=new TGraph(g1->GetN());
+  for(int i=0;i<g1->GetN();i++){
+    outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i]*factor);
+  }
+  return outGr;
+  
+}
+
+TGraph * TUtil::stretch(TGraph *g1, double factor){
+  TGraph *outGr=new TGraph(g1->GetN());
+  for(int i=0;i<g1->GetN();i++){
+    outGr->SetPoint(i, g1->GetX()[i]*factor, g1->GetY()[i]);
+  }
+  return outGr;
+
+}
+
+
+TGraph * TUtil::shift(TGraph *g1, double factor){
+  TGraph *outGr=new TGraph(g1->GetN());
+  for(int i=0;i<g1->GetN();i++){
+    outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i]+factor);
+  }
+  return outGr;
+  
+}
+
 
 
 double TUtil::deg2Rad(double deg) {

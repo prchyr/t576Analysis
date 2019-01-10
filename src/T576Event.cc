@@ -506,13 +506,7 @@ int T576Event::loadSurfEvent(int event){
 
 
 double T576Event::getCharge(TGraph *ict){
-  double tot=0.;
-  for(int i=0;i<ict->GetN();i++){
-    tot+=ict->GetY()[i];
-  }
-  double xval=ict->GetX()[10]-ict->GetX()[9];
-
-  charge = .4*tot*xval;
+  charge = .4*TUtil::integrate(TUtil::removeMean(ict, 0., 400.), 455, 550);
   return charge;
 }
 

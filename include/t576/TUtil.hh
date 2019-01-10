@@ -106,6 +106,17 @@ namespace TUtil{
   TH1F * plotResiduals(TGraph *gr1, TGraph *gr2, int nbins=40, double min=1, double max=-1);
   //add 2 TGraphs. if constant is -1, they are subtracted.
   TGraph * add(TGraph * g1, TGraph * g2, double constant=1.);
+  //shift a graph along the y axis by the factor
+  TGraph * shift(TGraph *g1, double factor);
+  //scale a TGraph by a constant factor
+  TGraph * scale(TGraph *g1, double factor);
+  //stretch a TGraph in time by a factor
+  TGraph *stretch(TGraph *g1, double factor);
+  //find the mean of a TGraph. range is optional
+  double mean(TGraph *gr, double t_low=0., double t_high=999999.);
+  //remove the mean of a TGraph. range to compute the mean over is optional.
+  //the mean computed within a sub-range will be removed from the full graph.
+  TGraph * removeMean(TGraph *gr, double t_low=0., double t_high=999999.);
   TGraph * makeCW(double freq,  double amp, double t_min=0., double t_max=1000., double GSs=20., double phase=0.);
   double integrate(TGraph * gr, double t_low=0, double t_high=999999.);
   //simple 2 pole lowpass filter
