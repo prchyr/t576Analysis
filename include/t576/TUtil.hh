@@ -117,6 +117,7 @@ namespace TUtil{
   //remove the mean of a TGraph. range to compute the mean over is optional.
   //the mean computed within a sub-range will be removed from the full graph.
   TGraph * removeMean(TGraph *gr, double t_low=0., double t_high=999999.);
+  //make CW with given parameters.
   TGraph * makeCW(double freq,  double amp, double t_min=0., double t_max=1000., double GSs=20., double phase=0.);
   double integrate(TGraph * gr, double t_low=0, double t_high=999999.);
   //simple 2 pole lowpass filter
