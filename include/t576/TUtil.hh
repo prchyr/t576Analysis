@@ -104,6 +104,8 @@ namespace TUtil{
   TGraph * add(TGraph * g1, TGraph * g2, double constant=1.);
   TGraph * makeCW(double freq,  double amp, double t_min=0., double t_max=1000., double GSs=20., double phase=0.);
   double integrate(TGraph * gr, double t_low=0, double t_high=999999.);
+  //simple 2 pole lowpass filter
+  TGraph * lowpassFilter(TGraph *ingr, double cutoff, int order=2);
   double deg2Rad(double deg);
   double rad2Deg(double rad);
   void setWarmPalette();

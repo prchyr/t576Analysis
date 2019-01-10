@@ -972,6 +972,66 @@ TGraph * TUtil::makeCW(double freq,  double amp, double t_min, double t_max, dou
 }
 
 
+TGraph * TUtil::lowpassFilter(TGraph *ingr, double cutoff, int order){
+  double * yy=ingr->GetY();
+  double *xx= ingr->GetX();
+  int n = ingr->GetN();
+  vector<double> outx, outy;
+  
+  double w = cutoff*2.*pi*1.e9;
+  double T = (xx[10]-xx[9])*1.e-9;;
+  double a, b, c, value;
+  
+  //cout<<setprecision(12);
+  //cout<<"filter coefficients"<<endl<<a<<endl<<b<<endl<<c<<endl;
+  //  int size = in.size();
+  if(order==1){
+    //    a = w*T;
+    b = exp(-w*T);
+    a=1.-b;
+    
+    for(int i=0;i<n;i++){
+      if(i>0){
+	
+	value = a*yy[i]+b*outy[i-1];
+	
+	outy.push_back(value);
+      }
+      if(i==0){
+	value = a*yy[i];
+	//value=0.;
+	outy.push_back(value);
+      } 
+    }
+  }
+  
+  else{
+    //a = pow(T, 2.)*pow(w, 2.)*exp(-2.*w*T);
+    b = 2.*exp(-w*T);
+    c = exp(-2.*w*T);
+    a=1.-(b-c);	
+    //	cout<<"filter coefficients"<<endl<<a<<endl<<b<<endl<<c<<endl;
+
+    for(int i=0;i<n;i++){
+      if(i>1){
+	value = a*yy[i-1]+b*outy[i-1]-c*outy[i-2];
+	outy.push_back(value);
+
+      }
+      if(i==1){
+	value = a*yy[i-1]+b*outy[i-1];
+	outy.push_back(value);
+			
+      }
+      if(i==0){
+	outy.push_back(0.);
+      } 
+      // outx.push_back(xx[i]);
+    }
+  }
+  TGraph *outgr = new TGraph(n, ingr->GetX(), &outy[0]);
+  return outgr;
+}
 
 
 TGraph * TUtil::add(TGraph *g1, TGraph *g2, double constant){

@@ -331,6 +331,10 @@ int T576Event::loadSurfEvent(int run_major, int run_minor, int event){
     cout<<"no surf file for requested major/minor combination."<<endl;
     return 0;
   }
+  if(surfFilename->Data()=="null"){
+    cout<<"no surf events for this run."<<endl;
+    return 0;
+  }
   if(major<1)return 0;
   if(event>surfNEvents){
     cout<<"event number too large for this major/minor combination"<<endl;
@@ -423,6 +427,8 @@ int T576Event::loadSurfEvent(int event){
 
   fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(major, minor));
 
+  //  while(surfFilename=="null"){
+  //fIndexTree->GetEntry(
   txPos.SetMagThetaPhi(txDist, txAng*pi/180., pi);
   
   for(int i=0;i<12;i++){
@@ -432,7 +438,7 @@ int T576Event::loadSurfEvent(int event){
 
   TString thisSurfFilename=surfFilename->Data();
   //open the file
-  cout<<thisSurfFilename<<endl<<" "<<event<<endl;
+  //cout<<thisSurfFilename<<endl<<" "<<event<<endl;
   if(thisSurfFilename!=fSurfFilename){
     //load the event file
     TString openf=directory+thisSurfFilename;
