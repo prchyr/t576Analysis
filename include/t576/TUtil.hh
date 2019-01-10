@@ -119,12 +119,17 @@ namespace TUtil{
   TGraph * removeMean(TGraph *gr, double t_low=0., double t_high=999999.);
   //make CW with given parameters.
   TGraph * makeCW(double freq,  double amp, double t_min=0., double t_max=1000., double GSs=20., double phase=0.);
+  //integrate a TGraph. lower and upper bounds are optional.
   double integrate(TGraph * gr, double t_low=0, double t_high=999999.);
   //simple 2 pole lowpass filter
   TGraph * lowpassFilter(TGraph *ingr, double cutoff, int order=2);
+  //degrees to radians
   double deg2Rad(double deg);
+  //radians to degrees
   double rad2Deg(double rad);
+  //a pretty warm palette
   void setWarmPalette();
+  //a pretty cool palette
   void setCoolPalette();
   
   namespace FFT{
@@ -150,6 +155,7 @@ namespace TUtil{
 
     //normmalize a tvector
     TVectorD normalize(TVectorD vec);
+    //return the norm of a vector
     double norm(TVectorD vec);
     //build a matrix out of events, with each event a row in the matrix.
     //must all be the same length.
@@ -174,6 +180,9 @@ namespace TUtil{
     //expands a vector in a basis B
     TVectorD expandInBasis(TVectorD V, TMatrixD B, int num=10);
     TGraph * expandInBasis(TGraph * G, TMatrixD B, int num=10);
+
+    //filter a vector using a basis. the expansion of the vector in the basis B (to
+    //order num) will be removed from the vector.
     TVectorD filter(TVectorD V, TMatrixD B, int num);
     TGraph * filter(TGraph *G, TMatrixD B, int num);
 
