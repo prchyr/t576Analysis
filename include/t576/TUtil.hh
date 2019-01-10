@@ -35,9 +35,12 @@
 #include "TMatrixD.h"
 #include "TVector3.h"
 #include "TDecompSVD.h"
+#include "TGeoSystemOfUnits.h"
+#include "TGeoPhysicalConstants.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
+
 
 // #include "CLHEP/Units/PhysicalConstants.h"
 // #include "CLHEP/Vector/LorentzVector.h"
@@ -45,11 +48,12 @@
 
 #include "TUtilGraph.hh"
 
-#define c_light .29979246 //  m/ns
-#define pi 3.1415927
+//#define c_light .29979246 //  m/ns
+//#define pi 3.1415927
 
 //using namespace CLHEP;
 using namespace std;
+using namespace TGeoUnit;
 
 class TUtilGraph;
 namespace TUtil{
