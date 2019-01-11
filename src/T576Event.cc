@@ -755,18 +755,7 @@ int T576Event::drawGeom(){
     scopey[i]=scope->pos[i].X();
   }
   
-  auto scoperxgraph=new TGraph(3, scopex, scopey);
-  scoperxgraph->SetMarkerColor(kRed);
-  scoperxgraph->SetMarkerStyle(20);
-  scoperxgraph->SetMarkerSize(1.5);
-  scoperxgraph->Draw("p same");
-
-  auto surfrxgraph=new TGraph(12, surfx, surfy);
-  surfrxgraph->SetMarkerColor(kRed);
-  surfrxgraph->SetMarkerStyle(24);
-  surfrxgraph->SetMarkerSize(1.5);
-  surfrxgraph->Draw("p same");
-
+  
 
   auto txgraph=new TGraph();
   txgraph->SetPoint(0, txPos.Z(), txPos.X());
@@ -881,6 +870,19 @@ int T576Event::drawGeom(){
   target->SetFillColor(kGreen);
   target->SetFillStyle(1001);
   target->Draw("l same");
+
+auto scoperxgraph=new TGraph(3, scopex, scopey);
+  scoperxgraph->SetMarkerColor(kRed);
+  scoperxgraph->SetMarkerStyle(20);
+  scoperxgraph->SetMarkerSize(1.5);
+  scoperxgraph->Draw("p same");
+
+  auto surfrxgraph=new TGraph(12, surfx, surfy);
+  surfrxgraph->SetMarkerColor(kRed);
+  surfrxgraph->SetMarkerStyle(24);
+  surfrxgraph->SetMarkerSize(1.5);
+  surfrxgraph->Draw("p same");
+  
 
 
   
