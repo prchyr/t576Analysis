@@ -28,6 +28,7 @@ released under the GNU General Public License version 3
 #include "TMath.h"
 #include "TColor.h"
 #include "TStyle.h"
+#include "TPolyLine.h"
 #include "Math/Interpolator.h"
 #include "Math/InterpolationTypes.h"
 #include <iostream>
@@ -126,8 +127,8 @@ public:
 
   //get the charge in this event from the ict trace.
   double getCharge(TGraph * ict);
-  //provide a graph and a pointer to a graph, and the desired samplerate in GS/s
-  int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph);
+  int drawGeom();
+
   
 private:
   int fNEntriesSurf=0, fNEntriesScope=0;
@@ -153,8 +154,9 @@ private:
 
   
 public:
-  class Scope {
+  class Scope  {
   public:
+    //    Scope(): fTxPos(txPos){};
     //receiver positions
     TVector3 pos[4];
     double dist[4], ang[4];
@@ -165,7 +167,7 @@ public:
     //tgraphs of each event channel
     TGraph * ch[4]={new TGraph(), new TGraph(),new TGraph(),new TGraph()};
 
-
+    
 
   private:
     
@@ -193,8 +195,8 @@ public:
     double  time[1024];
 
     TGraph2D * map=0;
-
-    TGraph2D *buildMap(int mmStep=500);
+    int drawGeom();
+    //int drawMap(int mStep=.5);
 
   private:
 

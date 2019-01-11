@@ -83,6 +83,15 @@ export LIBRARY_PATH=$LIBRARY_PATH:$T576_INSTALL_DIR/lib
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$T576_INSTALL_DIR/lib
 ```
 
+
+#### builds
+
+so far we've had successful builds on:
+
+Ubuntu 16/gcc 5.4
+Red Hat/gcc 7.3
+
+
 # Using:
 
 to use inside of root is simple, just point ROOT to the t576 library that you just made on installation. i recommend doing this in your rootlogon.C file by adding this line like so:
