@@ -152,6 +152,8 @@ private:
   TFile * fRunLog= new TFile();
   TTree * fRunLogTree = new TTree();
 
+  bool fScopeLoaded=false;
+  bool fSurfLoaded=false;
   
 public:
   class Scope  {

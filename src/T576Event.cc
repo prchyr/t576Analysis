@@ -294,7 +294,7 @@ int T576Event::loadScopeEvent(int event){
   
   //  delete (files);
   
-  
+  fScopeLoaded=true;  
   return 1;
 }
 
@@ -499,7 +499,8 @@ int T576Event::loadSurfEvent(int event){
     delete(grChunk);
     delete(graph);
   }
-  
+
+  fSurfLoaded=true;
   //getCharge();  
   return 1;
 }
@@ -875,14 +876,17 @@ auto scoperxgraph=new TGraph(3, scopex, scopey);
   scoperxgraph->SetMarkerColor(kRed);
   scoperxgraph->SetMarkerStyle(20);
   scoperxgraph->SetMarkerSize(1.5);
-  scoperxgraph->Draw("p same");
-
+  if(fScopeLoaded){
+    scoperxgraph->Draw("p same");
+  }
+  
   auto surfrxgraph=new TGraph(12, surfx, surfy);
   surfrxgraph->SetMarkerColor(kRed);
   surfrxgraph->SetMarkerStyle(24);
   surfrxgraph->SetMarkerSize(1.5);
-  surfrxgraph->Draw("p same");
-  
+  if(fSurfLoaded){
+    surfrxgraph->Draw("p same");
+  }
 
 
   
