@@ -111,7 +111,7 @@ psd, returns a tgraph in dbm/hz from an input tgraph
 
 */
 
-TGraph * TUtil::FFT::psd(TGraph * inGr){
+TGraph * TUtil::FFT::psd(TGraph * inGr, double rBW){
   auto xfrm=fft(inGr);
   int n=xfrm->GetN();
   //  double norm=1./(double)sqrt(n);
@@ -120,14 +120,14 @@ TGraph * TUtil::FFT::psd(TGraph * inGr){
   auto im=xfrm->GetZ();
   double yy[n];
 
-  //resolution bandwidth, set to nyquist. should make this changeable. 
-  double rbw=xx[n-1]/2;
-
-  yy[0]=vToDbmHz(rbw,re[0]);
+  //resolution bandwidth defaults to nyquist
+  rBW=rBW==0?xx[n-1]/2.:rBW;
+  
+  yy[0]=vToDbmHz(rBW,re[0]);
   for(int i=1;i<(n+1)/2;i++){
-    yy[i]=vToDbmHz(rbw, re[i], im[i]);
+    yy[i]=vToDbmHz(rBW, re[i], im[i]);
   }
-  yy[n/2]=vToDbmHz(rbw,re[n/2], im[n/2]);
+  yy[n/2]=vToDbmHz(rBW,re[n/2], im[n/2]);
 
   TGraph * outGr=new TGraph((n/2), xx, yy);
 

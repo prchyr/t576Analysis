@@ -36,14 +36,12 @@ released under the GNU General Public License version 3
 
 
 
-// #include "CLHEP/Units/PhysicalConstants.h"
-// #include "CLHEP/Vector/LorentzVector.h"
-// #include "CLHEP/Vector/ThreeVector.h"
+
  #include "TUtil.hh"
 
-//using namespace CLHEP;
-using namespace std;
 
+using namespace std;
+using namespace TUtil;
 
 class T576Event : public TObject{
 public:

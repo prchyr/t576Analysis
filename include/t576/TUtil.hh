@@ -3,6 +3,25 @@
   released under the GNU General Public License version 3
 */
 
+
+/*
+The TUtil namespace provides numerous useful functions which act primarily on TGraphs. 
+
+The FFT namespace has FFT functions built on ROOT's implementation of FFTW3. 
+
+The SVD namespace has SVD functions built on the ROOT implementation of the GSL linear algebra tools.
+
+The global system of units is: 
+
+time: ns
+length: m
+frequency: GHz
+power spectral density: dBm/Hz
+amplitude: V
+charge: nC
+
+ */
+
 #ifndef TUTIL_BASE_H
 #define TUTIL_BASE_H
 
@@ -35,29 +54,68 @@
 #include "TMatrixD.h"
 #include "TVector3.h"
 #include "TDecompSVD.h"
-#include "TGeoSystemOfUnits.h"
-#include "TGeoPhysicalConstants.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
 
 
-// #include "CLHEP/Units/PhysicalConstants.h"
-// #include "CLHEP/Vector/LorentzVector.h"
-// #include "CLHEP/Vector/ThreeVector.h"
 
 #include "TUtilGraph.hh"
 
-//#define c_light .29979246 //  m/ns
-//#define pi 3.1415927
 
-//using namespace CLHEP;
+
 using namespace std;
-using namespace TGeoUnit;
+
+
+
 
 class TUtilGraph;
 namespace TUtil{
 
+  /*some useful units. 
+
+    use these to keep your numbers in the global system of units defined above:
+    ns, GHz, m, nC
+
+    if you want to write something in terms of MHz, for example, just do 
+    
+    freq = 1200*MHz
+
+    and then freq will have units of GHz, as it should.
+  */
+  //constants
+  static constexpr double c_light = .29979246; //  m/ns
+  static constexpr double pi = 3.1415927; //radians
+  static constexpr double z_0=50; //ohms
+  static constexpr double deg=pi/180.; //radians
+  /*lengths
+ 
+    for example, if you wanted to calculate the time it took for a signal 
+    to propagate 75 feet, you'd do:
+    
+    75*ft/c_light
+    
+    and it would return the correct time in nanoseconds. 
+  */
+  static constexpr double m = 1.;
+  static constexpr double mm = .001*m;
+  static constexpr double cm = .01*m;
+  static constexpr double ft = .3047*m;
+
+  //time
+  static constexpr double ns = 1.;
+  static constexpr double us = ns*1e3;
+  static constexpr double ms = ns*1e6;
+  static constexpr double s = ns*1e9;
+
+  //frequency
+  static constexpr double GHz = 1.;
+  static constexpr double MHz = .001*GHz;
+  static constexpr double kHz = 1e-6*GHz;
+  static constexpr double Hz = 1e-9*GHz;
+  
+
+  
   //volts to dbm/hz
   double vToDbmHz(double bandwidthGSs, double re, double im=0);
   //make an axis with linearly increasing values.
@@ -142,8 +200,8 @@ namespace TUtil{
     TGraph * hilbertTransform(TGraph *inGr);
     //return the Hilbert envelope
     TGraph * hilbertEnvelope(TGraph *inGr);
-    //return the power spectral density in dBm/Hz
-    TGraph * psd(TGraph *inGr);
+    //return the power spectral density in dBm/Hz, rBW is the resolution bandwith of the system, used to calculate the density. defaults to Nyquist.
+    TGraph * psd(TGraph *inGr, double rBW=0.);
     //return the spectrogram, with various options. 
     TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128);
     //averages a vector of spectrograms. must be the same size.
