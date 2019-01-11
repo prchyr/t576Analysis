@@ -72,7 +72,7 @@ using namespace std;
 class TUtilGraph;
 namespace TUtil{
 
-  /*some useful units. 
+  /*some useful units. inspired by the CLHEP global system of units. 
 
     use these to keep your numbers in the global system of units defined above:
     ns, GHz, m, nC
@@ -98,9 +98,10 @@ namespace TUtil{
     and it would return the correct time in nanoseconds. 
   */
   static constexpr double m = 1.;
-  static constexpr double mm = .001*m;
-  static constexpr double cm = .01*m;
   static constexpr double ft = .3047*m;
+  static constexpr double cm = .01*m;
+  static constexpr double mm = .001*m;
+
 
   //time
   static constexpr double ns = 1.;
