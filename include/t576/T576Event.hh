@@ -18,6 +18,7 @@ released under the GNU General Public License version 3
 //#include "TIter.h"
 #include "TSystemFile.h"
 #include "TCanvas.h"
+#include "TLegend.h"
 #include "TH1F.h"
 #include "TString.h"
 #include "TTree.h"

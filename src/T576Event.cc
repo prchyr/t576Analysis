@@ -792,6 +792,7 @@ int T576Event::drawGeom(){
 
   auto wall=new TPolyLine(2, wallx, wally);
   wall->SetLineColor(kBlack);
+  wall->SetLineStyle(9);
   wall->Draw("l same");
 
   double bd2x[5], bd2y[5];
@@ -851,6 +852,7 @@ int T576Event::drawGeom(){
   bpy[4]=0;
   auto bp=new TPolyLine(4, bpx, bpy);
   bp->SetLineColor(kBlack);
+  bp->SetLineStyle(2);
   bp->Draw("l same");
 
 
@@ -870,7 +872,8 @@ int T576Event::drawGeom(){
   target->SetLineColor(kGreen);
   target->SetFillColor(kGreen);
   target->SetFillStyle(1001);
-  target->Draw("l same");
+  //  target->SetTitle("target");
+  target->Draw("f same");
 
 auto scoperxgraph=new TGraph(3, scopex, scopey);
   scoperxgraph->SetMarkerColor(kRed);
@@ -888,7 +891,15 @@ auto scoperxgraph=new TGraph(3, scopex, scopey);
     surfrxgraph->Draw("p same");
   }
 
-
+  TLegend *leg = new TLegend(.83, .7, 1, .95);
+  leg->AddEntry(txgraph, "TX", "p");
+  leg->AddEntry(surfrxgraph, "SURF", "p");
+  leg->AddEntry(scoperxgraph, "Scope", "p");
+  leg->AddEntry(target, "target", "l");
+  leg->AddEntry(wall, "wall", "l");
+  leg->AddEntry(support, "blocks", "l");
+  leg->AddEntry(bp, "beam pipe", "l");
+  leg->Draw();
   
   return 1;
 
