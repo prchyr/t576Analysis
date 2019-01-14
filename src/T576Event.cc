@@ -286,9 +286,6 @@ int T576Event::loadScopeEvent(int event){
       *scope->ch[i]=*graph;
     }
 
-    if(i==3&&TMath::MaxElement(scope->ch[i]->GetN(), scope->ch[i]->GetY())<.1){
-      isGood=0;
-    }
     
    delete(graph);
   }
@@ -298,7 +295,11 @@ int T576Event::loadScopeEvent(int event){
   getCharge(scope->ch[3]);
   
   //  delete (files);
-  
+
+  if(charge<.1){
+    isGood=0;
+  }
+
   fScopeLoaded=true;  
   return 1;
 }
