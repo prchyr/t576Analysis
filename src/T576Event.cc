@@ -336,7 +336,7 @@ int T576Event::loadSurfEvent(int run_major, int run_minor, int event){
     cout<<"no surf file for requested major/minor combination."<<endl;
     return 0;
   }
-  if(surfFilename->Data()=="null"){
+  if(strncmp(surfFilename->Data(), "null", 4)==0){
     cout<<"no surf events for this run."<<endl;
     return 0;
   }

@@ -173,6 +173,9 @@ ev->setInterpGsNs(20);
 //subsequent calls to ev->loadSurf[Scope]Event(xx) will have this level
 //of interpolation applied. details are in the source.
 
+//to see the antena geometry of the specified event:
+ev->drawGeom();
+//this will draw the surf or scope geometry (whichever has been loaded) or both, if both have been loaded for this event.
 
 ```
 future releases will have all sorts of things, like pointing maps and correlations etc.

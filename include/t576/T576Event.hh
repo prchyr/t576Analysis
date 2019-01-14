@@ -33,6 +33,8 @@ released under the GNU General Public License version 3
 #include "Math/Interpolator.h"
 #include "Math/InterpolationTypes.h"
 #include <iostream>
+#include <stdio.h>
+#include <string.h>
 #include <fstream>
 #include <vector>
 
