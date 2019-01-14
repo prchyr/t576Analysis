@@ -285,6 +285,11 @@ int T576Event::loadScopeEvent(int event){
     else{
       *scope->ch[i]=*graph;
     }
+
+    if(i==3&&TMath::MaxElement(scope->ch[i]->GetN(), scope->ch[i]->GetY())<.1){
+      txOn=0;
+    }
+    
    delete(graph);
   }
   //  cout<<"here"<<endl;
@@ -792,7 +797,7 @@ int T576Event::drawGeom(){
 
   auto wall=new TPolyLine(2, wallx, wally);
   wall->SetLineColor(kBlack);
-  wall->SetLineStyle(9);
+  wall->SetLineStyle(3);
   wall->Draw("l same");
 
   double bd2x[5], bd2y[5];
