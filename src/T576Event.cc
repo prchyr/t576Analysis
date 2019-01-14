@@ -287,7 +287,7 @@ int T576Event::loadScopeEvent(int event){
     }
 
     if(i==3&&TMath::MaxElement(scope->ch[i]->GetN(), scope->ch[i]->GetY())<.1){
-      txOn=0;
+      isGood=0;
     }
     
    delete(graph);
