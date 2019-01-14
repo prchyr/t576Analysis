@@ -123,17 +123,18 @@ namespace TUtil{
   double * makeIndices(int n, double step, double offset=0);
   //the normalized sinc function: sin(pi x)/(pi x)
   double sinc(double x);
-  //return a TGraph interpoltaed using simple sinc interpolation.
+  //return a TGraph interpoltaed using simple sinc interpolation.(slow)
   TGraph * sincInterpolateGraph(TGraph *inGr, double interpGSs);
-  //approximated (fast) sinc interpolation.
+  //approximated (fast) sinc interpolation.(broken)
   TGraph * sincInterpolateGraphSimple(TGraph *inGr, double interpGSs);
-  //interpolate a tgraph using the ROOT interpolation functions
+  //interpolate a tgraph using the ROOT interpolation functions(works well)
   int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs);
 
   //normalize a graph
   TGraph * normalize(TGraph *inGr);
-  //return a chunk of a graph, specified by x-axis values. 
-  TGraph * getChunkOfGraph(TGraph *ingr, double start, double end);
+  //return a chunk of a graph, specified by x-axis values.
+  //if shift_to_zero==1, the time axis is shifted such that it starts at 0.
+  TGraph * getChunkOfGraph(TGraph *ingr, double start, double end, int delay_to_zero=0);
   //cross correlation of two graphs. returns the cross-correlation graph
   //maxDelay is the maximum starting offset between gr1 and gr2. defaults
   //to the full length of the graphs.
@@ -166,7 +167,9 @@ namespace TUtil{
   //add 2 TGraphs. if constant is -1, they are subtracted.
   TGraph * add(TGraph * g1, TGraph * g2, double constant=1.);
   //shift a graph along the y axis by the factor
-  TGraph * shift(TGraph *g1, double factor);
+  TGraph * shiftY(TGraph *g1, double factor);
+  //shift a graph along the x axis by the factor
+  TGraph * shiftX(TGraph *g1, double factor);
   //scale a TGraph by a constant factor
   TGraph * scale(TGraph *g1, double factor);
   //stretch a TGraph in time by a factor
@@ -244,7 +247,13 @@ namespace TUtil{
     //order num) will be removed from the vector.
     TVectorD filter(TVectorD V, TMatrixD B, int num);
     TGraph * filter(TGraph *G, TMatrixD B, int num);
-
+    //will align a signal matrix and a background matrix to their respective
+    //reference matrices, build a basis out of backs ,
+    //and filter sigs using this basis to order num
+    TGraph * alignAndFilter(vector<TGraph*> sigs, vector<TGraph*> sigsref, vector<TGraph*> backs, vector<TGraph*> backsref, int num);
+    //will take the first chunk of the signal graph (equal to to t_high-t_low)
+    //and add it to the indicated region of the background graph.
+    TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max);
     //must be for square matrix, a Ralston-style filter matrix
     TMatrixD makeFilter(TDecompSVD svd, int below, int above=0);
     //flatten the indices of a matrix in row major.

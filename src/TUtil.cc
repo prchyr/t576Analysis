@@ -431,6 +431,11 @@ TVectorD TUtil::SVD::filter(TVectorD V, TMatrixD B, int num){
   return V-filter;
 }
 
+TGraph * TUtil::SVD::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_max){
+  auto sigchunk=getChunkOfGraph(sig, 0., (t_max-t_min));
+  auto backchunk=getChunkOfGraph(back, t_min, t_max ,1);
+  return add(sigchunk, backchunk);
+}
 
 //must be for square matrix
 TMatrixD TUtil::SVD::makeFilter(TDecompSVD svd, int below, int above){
@@ -540,7 +545,7 @@ double TUtil::mean(TGraph *gr, double t_low, double t_high){
 
 TGraph * TUtil::removeMean(TGraph *gr, double t_low, double t_high){
   double m=TUtil::mean(gr, t_low, t_high);
-  return shift(gr, -m);
+  return shiftY(gr, -m);
 }
 
 double TUtil::integrate(TGraph * gr, double t_low, double t_high){
@@ -644,7 +649,7 @@ int TUtil::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double inter
   return 1;
 }
 
-TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end){
+TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end, int delay_to_zero){
   double *xx=ingr->GetX();
   double *yy=ingr->GetY();
   vector<double> outx, outy;
@@ -660,8 +665,13 @@ TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end){
       outy.push_back(ingr->Eval(time));
       }
   }
+
   TGraph * outg=new TGraph(outx.size(), &outx[0], &outy[0]);
-  return outg;
+  if(delay_to_zero==0){
+    return outg;
+  }
+  return delayGraph(outg, -start);
+
 }
 
 // TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end){
@@ -1089,10 +1099,18 @@ TGraph * TUtil::stretch(TGraph *g1, double factor){
 }
 
 
-TGraph * TUtil::shift(TGraph *g1, double factor){
+TGraph * TUtil::shiftY(TGraph *g1, double factor){
   TGraph *outGr=new TGraph(g1->GetN());
   for(int i=0;i<g1->GetN();i++){
     outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i]+factor);
+  }
+  return outGr;
+  
+}
+TGraph * TUtil::shiftX(TGraph *g1, double factor){
+  TGraph *outGr=new TGraph(g1->GetN());
+  for(int i=0;i<g1->GetN();i++){
+    outGr->SetPoint(i, g1->GetX()[i]+factor, g1->GetY()[i]);
   }
   return outGr;
   
