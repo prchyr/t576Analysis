@@ -431,11 +431,6 @@ TVectorD TUtil::SVD::filter(TVectorD V, TMatrixD B, int num){
   return V-filter;
 }
 
-TGraph * TUtil::SVD::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_max){
-  auto sigchunk=getChunkOfGraph(sig, 0., (t_max-t_min));
-  auto backchunk=getChunkOfGraph(back, t_min, t_max ,1);
-  return add(sigchunk, backchunk);
-}
 
 //must be for square matrix
 TMatrixD TUtil::SVD::makeFilter(TDecompSVD svd, int below, int above){
@@ -1116,6 +1111,11 @@ TGraph * TUtil::shiftX(TGraph *g1, double factor){
   
 }
 
+TGraph * TUtil::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_max){
+  auto sigchunk=getChunkOfGraph(sig, 0., (t_max-t_min));
+  auto backchunk=getChunkOfGraph(back, t_min, t_max ,1);
+  return add(sigchunk, backchunk);
+}
 
 
 double TUtil::deg2Rad(double deg) {

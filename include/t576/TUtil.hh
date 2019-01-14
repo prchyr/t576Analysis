@@ -185,6 +185,9 @@ namespace TUtil{
   double integrate(TGraph * gr, double t_low=0, double t_high=999999.);
   //simple 2 pole lowpass filter
   TGraph * lowpassFilter(TGraph *ingr, double cutoff, int order=2);
+    //will take the first chunk of the signal graph (equal to to t_high-t_low)
+    //and add it to the indicated region of the background graph.
+  TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max);
   //degrees to radians
   double deg2Rad(double deg);
   //radians to degrees
@@ -251,9 +254,7 @@ namespace TUtil{
     //reference matrices, build a basis out of backs ,
     //and filter sigs using this basis to order num
     TGraph * alignAndFilter(vector<TGraph*> sigs, vector<TGraph*> sigsref, vector<TGraph*> backs, vector<TGraph*> backsref, int num);
-    //will take the first chunk of the signal graph (equal to to t_high-t_low)
-    //and add it to the indicated region of the background graph.
-    TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max);
+
     //must be for square matrix, a Ralston-style filter matrix
     TMatrixD makeFilter(TDecompSVD svd, int below, int above=0);
     //flatten the indices of a matrix in row major.
