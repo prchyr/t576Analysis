@@ -273,19 +273,19 @@ int T576Event::loadScopeEvent(int event){
   scope->time[19999]=scope->time[19998]+.05;
   for(int i=0;i<4;i++){
     TGraph * graph=new TGraph(length, scope->time, scope->dat[i]);
-    graph->SetTitle("");
-    graph->SetName("ch"+TString::Itoa(i, 10));
-    graph->GetXaxis()->SetTitle("Time (ns)");
-    graph->GetYaxis()->SetTitle("Volts (V)");
-    graph->GetYaxis()->SetTitleOffset(1.15);
-    graph->GetHistogram()->SetName("");
+    
     if(fInterpGSs>0.){
       getInterpolatedGraph(graph, scope->ch[i], fInterpGSs);
     }
     else{
       *scope->ch[i]=*graph;
     }
-
+    scope->ch[i]->SetTitle("");
+    scope->ch[i]->SetName("ch"+TString::Itoa(i, 10));
+    scope->ch[i]->GetXaxis()->SetTitle("Time (ns)");
+    scope->ch[i]->GetYaxis()->SetTitle("Volts (V)");
+    scope->ch[i]->GetYaxis()->SetTitleOffset(1.15);
+    scope->ch[i]->GetHistogram()->SetName("");
     
    delete(graph);
   }
@@ -490,18 +490,21 @@ int T576Event::loadSurfEvent(int event){
     TGraph * graph=new TGraph(len, TUtil::makeIndices(len, 1./3.2, surf->delays[i]), surf->dat[i]);
 
     TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);
-    grChunk->SetTitle("");
-    grChunk->SetName("ch"+TString::Itoa(i, 10));
-    grChunk->GetXaxis()->SetTitle("Time (ns)");
-    grChunk->GetYaxis()->SetTitle("Volts (V)");
-    grChunk->GetYaxis()->SetTitleOffset(1.15);
-    grChunk->GetHistogram()->SetName("");
+
     if(fInterpGSs>0.){
       getInterpolatedGraph(grChunk, surf->ch[i], fInterpGSs);
     }
     else{
       *surf->ch[i]=*grChunk;
     }
+
+    surf->ch[i]->SetTitle("");
+    surf->ch[i]->SetName("ch"+TString::Itoa(i, 10));
+    surf->ch[i]->GetXaxis()->SetTitle("Time (ns)");
+    surf->ch[i]->GetYaxis()->SetTitle("Volts (V)");
+    surf->ch[i]->GetYaxis()->SetTitleOffset(1.15);
+    surf->ch[i]->GetHistogram()->SetName("");
+    
     delete(grChunk);
     delete(graph);
   }
