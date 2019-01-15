@@ -201,7 +201,7 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
     
     outt=TUtil::FFT::psd(in);
     
-    for(int j = 0;j<=(zero_pad_length);j++){
+    for(int j = 0;j<(zero_pad_length);j++){
       Double_t z = outt->GetY()[j];
       spectrogramHist->SetBinContent(i,j,z);//dbm/hz
       //sX.push_back(i*binsize*dt);
