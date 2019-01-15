@@ -186,6 +186,23 @@ namespace TUtil{
   //simple 2 pole lowpass filter
   TGraph * lowpassFilter(TGraph *ingr, double cutoff, int order=2);
     //will take the first chunk of the signal graph (equal to to t_high-t_low)
+
+  // return the value of a window over sample numbers n. types are:
+  /*
+    0=bartlett (triangle) (default)
+    1=welch (parabolic)
+    2=hann (gaussian ish)
+    3=blackman-nuttall (gaussian ish);
+   */
+  double window(int i, int n, int type=0);
+  //return the value of a bartlett window over sample numbers n
+  double bartlettWindow(int i, int n);
+  //return the value of a welch window over sample numbers n
+  double welchWindow(int i, int n);
+  //return the value of a hann window over sample numbers n
+  double hannWindow(int i, int n);
+  //return the value of a blackman-nuttall window
+  double blackmanNuttallWindow(int i, int n);
     //and add it to the indicated region of the background graph.
   TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max);
   //degrees to radians
@@ -210,7 +227,7 @@ namespace TUtil{
     //return the power spectral density in dBm/Hz, rBW is the resolution bandwith of the system, used to calculate the density. defaults to Nyquist.
     TGraph * psd(TGraph *inGr, double rBW=0.);
     //return the spectrogram, with various options. 
-    TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128);
+    TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128, int win_type=0);
     //averages a vector of spectrograms. must be the same size.
     TH2D* avgSpectrograms(vector<TH2D*>  inh);
 

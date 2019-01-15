@@ -162,7 +162,7 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
   return out;//fXfrmGr;
 }
 
-TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length){
+TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type){
   Int_t size = gr->GetN();
   double dt=(gr->GetX()[1]-gr->GetX()[0]); 
   double samprate=1./dt;
@@ -170,7 +170,8 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   double xmin = 0;
   zero_pad_length=zero_pad_length<=binsize?binsize:zero_pad_length;
   Int_t num_zeros=(zero_pad_length-binsize)/2.;
-  Int_t nbins = size/overlap;
+  //  Int_t nbins = size/overlap;
+  int nbins=size/(binsize-overlap);
   char*timebuff;
   double samplerate = size/(xmax-xmin);
   double bandwidth = 1e9*samplerate;
@@ -188,14 +189,16 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   
   for(int i=0;i<=nbins;i++){
     for(int j=0;j<num_zeros;j++){
+      //if((j+start)>=size)break;
     //    for(int j = 0;j<=zero_pad_length;j++){
       in->SetPoint(j, gr->GetX()[j+start], 0.);
     }
     for(int j=num_zeros;j<binsize+num_zeros;j++){
-      if((j+start)>=size)break;
-      in->SetPoint(j, gr->GetX()[j+start], gr->GetY()[j+start]);//
+      //      if((j+start)>=size)break;
+      in->SetPoint(j, gr->GetX()[j+start], gr->GetY()[j+start]*window(j-num_zeros, binsize, win_type));//
     }
     for(int j=binsize+num_zeros;j<zero_pad_length;j++){
+      //if((j+start)>=size)break;
       in->SetPoint(j, gr->GetX()[j+start], 0);
     }
     
@@ -209,7 +212,7 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
       //sZ.push_back(z);
     }
     //    cout<<sX.size()<<endl;
-    start+=overlap-1;
+    start+=(binsize-overlap);
   }
 
 
@@ -1251,8 +1254,38 @@ TGraph * TUtil::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_m
 //     return outsig
 
 
+//these are all from wikipedia.
+double TUtil::window(int i, int n, int type){
+  switch (type){
+    case 0:
+      return bartlettWindow(i, n);
+    case 1:
+      return welchWindow(i, n);
+    case 2:
+      return hannWindow(i, n);
+    case 3:
+      return blackmanNuttallWindow(i, n);
+    default:
+      return 1.;
+      break;
+    }
+}
 
+double TUtil::bartlettWindow(int i, int n){
+  return 1.-abs((2.*(double)i-(double)n)/((double)n));
+}
 
+double TUtil::welchWindow(int i, int n){
+  return 1.-pow((2.*(double)i-(double)n)/((double)n), 2);
+}
+
+double TUtil::hannWindow(int i, int n){
+  return sin(pi*i/(n))*sin(pi*i/(n));
+}
+//i have no idea why there are increments in the pi coeff...
+double TUtil::blackmanNuttallWindow(int i, int n){
+  return .3635819-.4891775*cos(2.*pi*i/(n)) + .1365995*cos(4.*pi*i/(n)) - .0106411*cos(6.*pi*i/(n));
+}
 
 double TUtil::deg2Rad(double deg) {
   return (deg * pi / 180.);
