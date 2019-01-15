@@ -213,12 +213,9 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   }
 
 
-  spectrogramHist->GetYaxis()->SetRangeUser(0, spectrogramHist->GetYaxis()->GetXmax()/2.1);
-  
+  //  spectrogramHist->GetYaxis()->SetRangeUser(0, spectrogramHist->GetYaxis()->GetXmax()/2.1);
   spectrogramHist->GetXaxis()->SetTitle("Time (ns)");
-
   spectrogramHist->GetYaxis()->SetTitle("Frequency (GHz)");
-
   spectrogramHist->GetZaxis()->SetTitle("dBm/Hz");
   spectrogramHist->GetZaxis()->SetTitleOffset(1.5);
 
@@ -234,7 +231,9 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
 TH2D * TUtil::FFT::avgSpectrograms(vector<TH2D*> inh){
   TH2D *out = (TH2D*)inh[0]->Clone();
   for(int i=1;i<inh.size();i++){
-    out->Add(inh[i]);
+    if(out->GetNbinsX()==inh[i]->GetNbinsX()&&out->GetNbinsY()==inh[i]->GetNbinsY()){
+      out->Add(inh[i]);
+    }
   }
   out->Scale(1./inh.size());
   return out;
@@ -1153,6 +1152,106 @@ TGraph * TUtil::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_m
   auto backchunk=getChunkOfGraph(back, t_min, t_max ,1);
   return add(sigchunk, backchunk);
 }
+
+/*
+ here is the layout for the coordinates used. centermost band is the 
+ signal band. those to either side in both dims are the sidebands. the integrals
+ ix1, iy2 etc are the integrals of those quadrants. ib1-4 are averaged
+ for the overall background. ix1-background and ix2-background are averaged
+ to get the signal band background, same in y. finally, background and both 
+ signal band backgrounds are subtracted from the signal quadrant to get signal. 
+    __________________________
+   |      |   |   |   |       |
+   |______|___|___|___|_______|y4 
+   |      |b13|y34|b33|       | 
+   |______|___|___|___|_______|y3
+   |      |x12|sig|x34|       | 
+   |______|___|___|___|_______|y2
+   |      |b11|y12|b31|       | 
+   |______|___|___|___|_______|y1
+   |      |   |   |   |       | 
+   |      |   |   |   |       | 
+   |______|___|___|___|_______| 
+         x1   x2  x3  x4 
+    
+*/
+
+// double sidebandSubtract(TH2D* M, x2, y2, nbins):
+//     x1=x2-nbins;
+//     y1=y2-nbins;
+//     x3=x2+nbins;
+//     y3=y2+nbins;
+//     x4=x3+nbins;
+//     y4=y3+nbins;
+
+//     x12=0.
+//     x34=0.
+//     y12=0.
+//     y34=0.
+//     b13=0.
+//     b31=0.
+//     b11=0.
+//     b33=0.
+    
+//     sig=0.
+//     #x12
+//     for i in range(x1,x2):
+//         for j in range(y2,y3):
+//             x12+=M[i][j]
+//     #x34
+//     for i in range(x3,x4):
+//         for j in range(y2,y3):
+//             x34+=M[i][j]
+
+//     #y12
+//     for i in range(x2,x3):
+//         for j in range(y1,y2):
+//             y12+=M[i][j]
+
+//     #y34
+//     for i in range(x2,x3):
+//         for j in range(y3,y4):
+//             y34+=M[i][j]
+
+//     #b11
+//     for i in range(x1,x2):
+//         for j in range(y1,y2):
+//             b11+=M[i][j]
+//     #b31
+//     for i in range(x3,x4):
+//         for j in range(y1,y2):
+//             b31+=M[i][j]
+
+//     #b13
+//     for i in range(x1,x2):
+//         for j in range(y3,y4):
+//             b13+=M[i][j]
+
+//     #b33
+//     for i in range(x3,x4):
+//         for j in range(y3,y4):
+//             b33+=M[i][j]
+
+    
+
+            
+//     #sig
+//     for i in range(x2,x3):
+//         for j in range(y2,y3):
+//             sig+=M[i][j]
+
+//     avgy=(y12+y34)/2.
+//     avgx=(x12+x34)/2.
+//     bkgnd=(b11+b13+b31+b33)/4.
+    
+//     #testing
+//     #outsig=sig-avgy-avgx+bkgnd;
+//     outsig=sig-avgy;
+
+//     return outsig
+
+
+
 
 
 double TUtil::deg2Rad(double deg) {
