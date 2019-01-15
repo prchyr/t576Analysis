@@ -662,6 +662,10 @@ TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end, int dela
   }
 
   TGraph * outg=new TGraph(outx.size(), &outx[0], &outy[0]);
+  outg->SetTitle(ingr->GetTitle());
+  outg->SetName(ingr->GetName());
+  outg->GetXaxis()->SetTitle(ingr->GetXaxis()->GetTitle());
+  outg->GetYaxis()->SetTitle(ingr->GetYaxis()->GetTitle());
   if(delay_to_zero==0){
     return outg;
   }
@@ -695,6 +699,11 @@ TGraph * TUtil::delayGraph(TGraph *ingr, double delay){
     xxout[i]=(double)xx[i]+delay;
   }
   TGraph *dg=new TGraph(ingr->GetN(), xxout, yy);
+  dg->SetTitle(ingr->GetTitle());
+  dg->SetName(ingr->GetName());
+  dg->GetXaxis()->SetTitle(ingr->GetXaxis()->GetTitle());
+  dg->GetYaxis()->SetTitle(ingr->GetYaxis()->GetTitle());
+
   return dg;
 }
 
@@ -706,6 +715,11 @@ int TUtil::delayGraph(TGraph *ingr, TGraph *outgr, double delay){
     xxout[i]=(double)xx[i]+delay;
   }
   TGraph *dg=new TGraph(ingr->GetN(), xxout, yy);
+  dg->SetTitle(ingr->GetTitle());
+  dg->SetName(ingr->GetName());
+  dg->GetXaxis()->SetTitle(ingr->GetXaxis()->GetTitle());
+  dg->GetYaxis()->SetTitle(ingr->GetYaxis()->GetTitle());
+
   *outgr=*dg;
   delete dg;
   return 1;
@@ -887,15 +901,15 @@ TGraph * TUtil::align(TGraph * gr1, TGraph * gr2, double max_delay, double t_low
   double maxIndex=TMath::LocMax(out.size(), &out[0]);
   double offset=(maxIndex-(double)max_delay_index)*timescale;
 
-  outx.clear();
-  for(int i=0;i<xn;i++){
-    outx.push_back(time[i]-offset);
-    outy.push_back(y[i]);
-  }
+  // outx.clear();
+  // for(int i=0;i<xn;i++){
+  //   outx.push_back(time[i]-offset);
+  //   outy.push_back(y[i]);
+  // }
 
-  TGraph *outt = new TGraph(outx.size(), &outx[0], &outy[0]);
+  // TGraph *outt = new TGraph(outx.size(), &outx[0], &outy[0]);
   
-  return outt;
+  return delayGraph(gr2, -offset);
 }
 
 
@@ -1072,6 +1086,9 @@ TGraph * TUtil::add(TGraph *g1, TGraph *g2, double constant){
   for(int i=0;i<len;i++){
     outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i]+(constant*g2->Eval(g1->GetX()[i])));
   }
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
   return outGr;
 }
 
@@ -1080,6 +1097,11 @@ TGraph * TUtil::scale(TGraph *g1, double factor){
   for(int i=0;i<g1->GetN();i++){
     outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i]*factor);
   }
+  outGr->SetName(g1->GetName());
+  outGr->SetTitle(g1->GetTitle());
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
   return outGr;
   
 }
@@ -1089,6 +1111,11 @@ TGraph * TUtil::stretch(TGraph *g1, double factor){
   for(int i=0;i<g1->GetN();i++){
     outGr->SetPoint(i, g1->GetX()[i]*factor, g1->GetY()[i]);
   }
+  outGr->SetName(g1->GetName());
+  outGr->SetTitle(g1->GetTitle());
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
   return outGr;
 
 }
@@ -1099,6 +1126,11 @@ TGraph * TUtil::shiftY(TGraph *g1, double factor){
   for(int i=0;i<g1->GetN();i++){
     outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i]+factor);
   }
+  outGr->SetName(g1->GetName());
+  outGr->SetTitle(g1->GetTitle());
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
   return outGr;
   
 }
@@ -1107,6 +1139,11 @@ TGraph * TUtil::shiftX(TGraph *g1, double factor){
   for(int i=0;i<g1->GetN();i++){
     outGr->SetPoint(i, g1->GetX()[i]+factor, g1->GetY()[i]);
   }
+  outGr->SetName(g1->GetName());
+  outGr->SetTitle(g1->GetTitle());
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
   return outGr;
   
 }
