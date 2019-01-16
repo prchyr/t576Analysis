@@ -41,7 +41,7 @@ TGraph2D * TUtil::FFT::fft(TGraph * inGr){
   int n = inGr->GetN();
   if(n!=fN){
     fN=n;
-    fftr2c=TVirtualFFT::FFT(1, &fN, "R2C P K");
+    fftr2c=TVirtualFFT::FFT(1, &fN, "R2C EX K");
     //    fftc2r=TVirtualFFT::FFT(1, &fN, "C2R P");
   }
   
