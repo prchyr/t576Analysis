@@ -226,7 +226,17 @@ namespace TUtil{
     TGraph * hilbertEnvelope(TGraph *inGr);
     //return the power spectral density in dBm/Hz, rBW is the resolution bandwith of the system, used to calculate the density. defaults to Nyquist.
     TGraph * psd(TGraph *inGr, double rBW=0.);
-    //return the spectrogram, with various options. 
+    /*
+      return the spectrogram, with various options:
+
+binsize is what python calls nfft. it's the number of samples in the chunk over which the FFT is calculated. this is one spectrogram 'bin'
+
+overlap is how many samples each bin overlaps with the next. helps somewhat with smoothing.
+
+zero pad length is the length to which the chunk is symmetrically zero-padded.
+
+win_type is an enumeration of window types to be applied to each bin. this helps avoid discontinuities and noise in the spectrogram. see the window function for the window types.
+     */
     TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128, int win_type=0);
     //averages a vector of spectrograms. must be the same size.
     TH2D* avgSpectrograms(vector<TH2D*>  inh);
