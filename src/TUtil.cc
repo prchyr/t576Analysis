@@ -186,7 +186,7 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   vector<double> sX, sY, sZ;
   Int_t start = 0;
   //  Int_t j=0;
-  TH2D *spectrogramHist=new TH2D("outhist", "spectrogram", nbins-1, xmin, xmax, (zero_pad_length), 0, samplerate);
+  TH2D *spectrogramHist=new TH2D("outhist", "spectrogram", nbins, xmin, xmax, (zero_pad_length), 0, samplerate);
   
   for(int i=0;i<nbins;i++){
     if(start+(binsize-overlap)>=size)break;
