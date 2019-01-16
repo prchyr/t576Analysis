@@ -169,56 +169,74 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   double xmax = size/samprate;
   double xmin = 0;
   zero_pad_length=zero_pad_length<=binsize?binsize:zero_pad_length;
-  Int_t num_zeros=(zero_pad_length-binsize)/2.;
+  Int_t num_zeros=(zero_pad_length-binsize)/2;
   //  Int_t nbins = size/overlap;
   int nbins=size/(binsize-overlap);
-  xmax=(double)(nbins*(binsize-overlap))/samprate;
+  xmax=((double)nbins*((double)binsize-(double)overlap))/samprate;
   char*timebuff;
-  double samplerate = size/(xmax-xmin);
-  double bandwidth = 1e9*samplerate;
-  if(zero_pad_length!=fNSpec){
-    fNSpec=zero_pad_length;
-    fftr2cSpec=TVirtualFFT::FFT(1, &fNSpec, "R2C P K");
-  }
+  //double samplerate = size/(xmax-xmin);
+  double bandwidth = 1e9*samprate;
+  // if(zero_pad_length!=fNSpec){
+  //   fNSpec=zero_pad_length;
+  //   fftr2cSpec=TVirtualFFT::FFT(1, &fNSpec, "R2C P K");
+  // }
   TGraph * in=new TGraph(zero_pad_length);
   TGraph * outt=new TGraph(zero_pad_length);
 
   vector<double> sX, sY, sZ;
   Int_t start = 0;
   //  Int_t j=0;
-  TH2D *spectrogramHist=new TH2D("outhist", "spectrogram", nbins, xmin, xmax, (zero_pad_length), 0, samplerate);
+  //cout<<size<<" "<<nbins<<" "<<zero_pad_length<<" "<<binsize<<" "<<overlap<<" "<<num_zeros<<" "<<xmax*samprate<<endl;
+  TH2D *spectrogramHist=new TH2D("outhist", "spectrogram", nbins-1, xmin, xmax, (zero_pad_length), 0, samprate);
   
   for(int i=0;i<nbins;i++){
-    if(start+(binsize-overlap)>=size)break;
-    for(int j=0;j<num_zeros;j++){
-      //if((j+start)>=size)break;
-    //    for(int j = 0;j<=zero_pad_length;j++){
-      in->SetPoint(j, gr->GetX()[j+start], 0.);
+    if(start+binsize-1>0){
+      int sampnum=0;
+      for(int j=0;j<zero_pad_length;j++){
+	if(j<num_zeros||j>=binsize+num_zeros){
+	  in->SetPoint(j, gr->GetX()[j], 0.);
+	}
+	else if(j>=num_zeros&&j<binsize+num_zeros){
+	  if(sampnum+start<size){
+	    in->SetPoint(j, gr->GetX()[j], gr->GetY()[sampnum+start]*window(sampnum, binsize, win_type));
+	  }
+	  else{
+	    in->SetPoint(j, gr->GetX()[j], 0.);
+	  }
+	  sampnum++;
+	}
+      }
+
+	//   for(int j=0;j<num_zeros;j++){
+      // 	//if((j+start)>=size)break;
+      // 	//    for(int j = 0;j<=zero_pad_length;j++){
+      // 	in->SetPoint(j, gr->GetX()[j], 0.);
+      // }
+      // for(int j=num_zeros;j<binsize+num_zeros;j++){
+      // 	//      if((j+start)>=size)break;
+      // 	in->SetPoint(j, gr->GetX()[j], gr->GetY()[j+start]*window(j-num_zeros, binsize, win_type));//
+      // }
+      // for(int j=binsize+num_zeros;j<zero_pad_length;j++){
+      // 	//if((j+start)>=size)break;
+      // 	in->SetPoint(j, gr->GetX()[j], 0);
+      // }
+      
+      outt=TUtil::FFT::psd(in);
+      
+      for(int j = 0;j<(zero_pad_length);j++){
+	Double_t z = outt->GetY()[j];
+	spectrogramHist->SetBinContent(i,j,z);//dbm/hz
+	//sX.push_back(i*binsize*dt);
+	//sY.push_back(outt->GetX()[j]);
+	//sZ.push_back(z);
+      }
+      //    cout<<sX.size()<<endl;
     }
-    for(int j=num_zeros;j<binsize+num_zeros;j++){
-      //      if((j+start)>=size)break;
-      in->SetPoint(j, gr->GetX()[j+start], gr->GetY()[j+start]*window(j-num_zeros, binsize, win_type));//
+      start+=(binsize-overlap);
     }
-    for(int j=binsize+num_zeros;j<zero_pad_length;j++){
-      //if((j+start)>=size)break;
-      in->SetPoint(j, gr->GetX()[j+start], 0);
-    }
-    
-    outt=TUtil::FFT::psd(in);
-    
-    for(int j = 0;j<(zero_pad_length);j++){
-      Double_t z = outt->GetY()[j];
-      spectrogramHist->SetBinContent(i,j,z);//dbm/hz
-      //sX.push_back(i*binsize*dt);
-      //sY.push_back(outt->GetX()[j]);
-      //sZ.push_back(z);
-    }
-    //    cout<<sX.size()<<endl;
-    start+=(binsize-overlap);
-  }
 
 
-  //  spectrogramHist->GetYaxis()->SetRangeUser(0, spectrogramHist->GetYaxis()->GetXmax()/2.1);
+  spectrogramHist->GetYaxis()->SetRangeUser(0, spectrogramHist->GetYaxis()->GetXmax()/2.1);
   spectrogramHist->GetXaxis()->SetTitle("Time (ns)");
   spectrogramHist->GetYaxis()->SetTitle("Frequency (GHz)");
   spectrogramHist->GetZaxis()->SetTitle("dBm/Hz");
