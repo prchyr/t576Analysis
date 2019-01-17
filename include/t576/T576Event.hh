@@ -108,12 +108,12 @@ public:
   /****************operational functions*****************/
   
   //load an event from a particular run file. actual file name not needed, just the major and minor associated with it. so XXXXrun4_6.root event number 15 is loaded by doing loadScopeEvent(4, 6, 15); 
-  int loadScopeEvent(int run_major, int run_minor, int event);
+  int loadScopeEvent(int run_major, int run_minor, int event, bool remove_dc_offset=true);
   //same for surf
   int loadSurfEvent(int run_major, int run_minor, int event);
   //load an event using a running scope event number index. this index is built the first time the T576Event class is used, starting at 0 for the first event in run 0_0 and going upward.
   //when you use this, the correct positions and stuff will be loaded for the correct run etc.
-  int loadScopeEvent(int event);
+  int loadScopeEvent(int event, bool remove_dc_offset=true);
   //same for surf
   int loadSurfEvent(int event);
   //build the event index ROOT file which allows for rapid grabbing of the right data (done once, first time you use the class. you can also force a re-build if you change the data directory [don't.]) 

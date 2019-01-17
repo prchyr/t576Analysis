@@ -99,7 +99,7 @@ int T576Event::checkStatus(){
 
 //load a scope event using a run major/minor combination and event within that file
 
-int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
+int T576Event::loadScopeEvent(int run_major, int run_minor,int event, bool remove_dc_offset){
   if(fIndexBuilt==0){
     cout<<"event index not built yet. building..."<<endl;
     buildEventIndex();
@@ -150,7 +150,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
     cout<<"major/minor combination doesn't exist"<<endl;
     return 0;
   }
-  if(loadScopeEvent(scopeEvNo+event)==1){
+  if(loadScopeEvent(scopeEvNo+event, remove_dc_offset)==1){
     getCharge(scope->ch[3]);
     return 1;
   }
@@ -195,7 +195,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
 
 
 //load an event from the global scope event number index 
-int T576Event::loadScopeEvent(int event){
+int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
 
   if(fIndexBuilt==0){
     cout<<"event index not built yet. building..."<<endl;
@@ -273,6 +273,9 @@ int T576Event::loadScopeEvent(int event){
   scope->time[19999]=scope->time[19998]+.05;
   for(int i=0;i<4;i++){
     TGraph * graph=new TGraph(length, scope->time, scope->dat[i]);
+    if(remove_dc_offset==true){
+      TUtil::removeMeanInPlace(graph, 0., 300.);
+    }
     
     if(fInterpGSs>0.){
       getInterpolatedGraph(graph, scope->ch[i], fInterpGSs);
@@ -288,6 +291,7 @@ int T576Event::loadScopeEvent(int event){
     scope->ch[i]->GetHistogram()->SetName("");
     
    delete(graph);
+
   }
   //  cout<<"here"<<endl;
   //  if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
@@ -516,7 +520,8 @@ int T576Event::loadSurfEvent(int event){
 
 
 double T576Event::getCharge(TGraph *ict){
-  charge = .4*TUtil::integrate(TUtil::removeMean(ict, 0., 400.), 455, 550);
+  //TUtil::removeMeanInPlace(ict, 0., 400.)
+  charge = .4*TUtil::integrate(ict, 455, 550);
   return charge;
 }
 

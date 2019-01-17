@@ -566,6 +566,15 @@ TGraph * TUtil::removeMean(TGraph *gr, double t_low, double t_high){
   return shiftY(gr, -m);
 }
 
+int TUtil::removeMeanInPlace(TGraph *gr, double t_low, double t_high){
+  double m=TUtil::mean(gr, t_low, t_high);
+  for(int i=0;i<gr->GetN();i++){
+    gr->GetY()[i]+=(-m);
+  }
+  return 1;
+}
+
+
 double TUtil::integrate(TGraph * gr, double t_low, double t_high){
   t_low=t_low>0.?t_low:0.;
   t_high>gr->GetX()[gr->GetN()-1]?gr->GetX()[gr->GetN()-1]:t_high;
