@@ -37,6 +37,7 @@ charge: nC
 #include "cnpy.h"
 #include "TSystemFile.h"
 #include "TH1F.h"
+#include "TH1D.h"
 #include "TH2F.h"
 #include "TH2D.h"
 #include "TString.h"
