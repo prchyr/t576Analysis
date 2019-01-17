@@ -602,6 +602,15 @@ TGraph * TUtil::integrateByBin(TGraph *gr, double binNS){
 
 }
 
+TGraph * TUtil::avgGraph(vector<TGraph*> inGr){
+  auto outGr=new TGraph(inGr[0]->GetN());
+  for(int i=0;i<inGr.size();i++){
+    for(int j=0;j<outGr->GetN();j++){
+      outGr->SetPoint(j, inGr[0]->GetX()[j], inGr[i]->GetY()[j]+outGr->GetY()[j]);
+    }
+  }
+    return TUtil::scale(outGr, 1./inGr.size());
+}
 
 TGraph * TUtil::add(TGraph *g1, TGraph *g2, double constant){
 
