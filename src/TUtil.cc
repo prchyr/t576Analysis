@@ -578,6 +578,92 @@ double TUtil::integrate(TGraph * gr, double t_low, double t_high){
 }
 
 
+TGraph * TUtil::integrateByBin(TGraph *gr, double binNS){
+  int nbins=gr->GetX()[gr->GetN()-1]/binNS;
+  auto outGr=new TGraph(nbins);
+
+  double t=binNS;
+  for(int i=0;i<nbins;i++){
+    outGr->SetPoint(i, t, integrate(gr, t-binNS, t));
+    t+=binNS;
+  }
+
+  return outGr;
+
+}
+
+
+TGraph * TUtil::add(TGraph *g1, TGraph *g2, double constant){
+
+  int len=g1->GetN()<g2->GetN()?g1->GetN():g2->GetN();
+  TGraph *outGr=new TGraph(len);  
+  for(int i=0;i<len;i++){
+    outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i]+(constant*g2->Eval(g1->GetX()[i])));
+  }
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
+  return outGr;
+}
+
+TGraph * TUtil::scale(TGraph *g1, double factor){
+  TGraph *outGr=new TGraph(g1->GetN());
+  for(int i=0;i<g1->GetN();i++){
+    outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i]*factor);
+  }
+  outGr->SetName(g1->GetName());
+  outGr->SetTitle(g1->GetTitle());
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
+  return outGr;
+  
+}
+
+TGraph * TUtil::stretch(TGraph *g1, double factor){
+  TGraph *outGr=new TGraph(g1->GetN());
+  for(int i=0;i<g1->GetN();i++){
+    outGr->SetPoint(i, g1->GetX()[i]*factor, g1->GetY()[i]);
+  }
+  outGr->SetName(g1->GetName());
+  outGr->SetTitle(g1->GetTitle());
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
+  return outGr;
+
+}
+
+
+TGraph * TUtil::shiftY(TGraph *g1, double factor){
+  TGraph *outGr=new TGraph(g1->GetN());
+  for(int i=0;i<g1->GetN();i++){
+    outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i]+factor);
+  }
+  outGr->SetName(g1->GetName());
+  outGr->SetTitle(g1->GetTitle());
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
+  return outGr;
+  
+}
+TGraph * TUtil::shiftX(TGraph *g1, double factor){
+  TGraph *outGr=new TGraph(g1->GetN());
+  for(int i=0;i<g1->GetN();i++){
+    outGr->SetPoint(i, g1->GetX()[i]+factor, g1->GetY()[i]);
+  }
+  outGr->SetName(g1->GetName());
+  outGr->SetTitle(g1->GetTitle());
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
+  return outGr;
+  
+}
+
+
+
 
 double TUtil::sinc(double x){
   if(x==0.){
@@ -1101,74 +1187,6 @@ TGraph * TUtil::lowpassFilter(TGraph *ingr, double cutoff, int order){
 }
 
 
-TGraph * TUtil::add(TGraph *g1, TGraph *g2, double constant){
-
-  int len=g1->GetN()<g2->GetN()?g1->GetN():g2->GetN();
-  TGraph *outGr=new TGraph(len);  
-  for(int i=0;i<len;i++){
-    outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i]+(constant*g2->Eval(g1->GetX()[i])));
-  }
-  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
-  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
-
-  return outGr;
-}
-
-TGraph * TUtil::scale(TGraph *g1, double factor){
-  TGraph *outGr=new TGraph(g1->GetN());
-  for(int i=0;i<g1->GetN();i++){
-    outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i]*factor);
-  }
-  outGr->SetName(g1->GetName());
-  outGr->SetTitle(g1->GetTitle());
-  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
-  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
-
-  return outGr;
-  
-}
-
-TGraph * TUtil::stretch(TGraph *g1, double factor){
-  TGraph *outGr=new TGraph(g1->GetN());
-  for(int i=0;i<g1->GetN();i++){
-    outGr->SetPoint(i, g1->GetX()[i]*factor, g1->GetY()[i]);
-  }
-  outGr->SetName(g1->GetName());
-  outGr->SetTitle(g1->GetTitle());
-  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
-  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
-
-  return outGr;
-
-}
-
-
-TGraph * TUtil::shiftY(TGraph *g1, double factor){
-  TGraph *outGr=new TGraph(g1->GetN());
-  for(int i=0;i<g1->GetN();i++){
-    outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i]+factor);
-  }
-  outGr->SetName(g1->GetName());
-  outGr->SetTitle(g1->GetTitle());
-  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
-  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
-
-  return outGr;
-  
-}
-TGraph * TUtil::shiftX(TGraph *g1, double factor){
-  TGraph *outGr=new TGraph(g1->GetN());
-  for(int i=0;i<g1->GetN();i++){
-    outGr->SetPoint(i, g1->GetX()[i]+factor, g1->GetY()[i]);
-  }
-  outGr->SetName(g1->GetName());
-  outGr->SetTitle(g1->GetTitle());
-  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
-  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
-
-  return outGr;
-  
-}
 
 TGraph * TUtil::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_max){
   auto sigchunk=getChunkOfGraph(sig, 0., (t_max-t_min));
