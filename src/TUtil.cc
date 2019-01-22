@@ -241,7 +241,12 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   spectrogramHist->GetYaxis()->SetRangeUser(0, spectrogramHist->GetYaxis()->GetXmax()/2.1);
   spectrogramHist->GetXaxis()->SetTitle("Time (ns)");
   spectrogramHist->GetYaxis()->SetTitle("Frequency (GHz)");
-  spectrogramHist->GetZaxis()->SetTitle("dBm/Hz");
+  if(dbFlag){
+    spectrogramHist->GetZaxis()->SetTitle("dBm/Hz");
+  }
+  else{
+    spectrogramHist->GetZaxis()->SetTitle("W");
+  }
   spectrogramHist->GetZaxis()->SetTitleOffset(1.5);
 
   outt->Delete();
