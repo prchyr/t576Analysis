@@ -111,7 +111,7 @@ psd, returns a tgraph in dbm/hz from an input tgraph
 
 */
 
-TGraph * TUtil::FFT::psd(TGraph * inGr, double rBW){
+TGraph * TUtil::FFT::psd(TGraph * inGr, double rBW, int dbFlag){
   auto xfrm=fft(inGr);
   int n=xfrm->GetN();
   //  double norm=1./(double)sqrt(n);
@@ -123,11 +123,12 @@ TGraph * TUtil::FFT::psd(TGraph * inGr, double rBW){
   //resolution bandwidth defaults to nyquist
   rBW=rBW==0?xx[n-1]/2.:rBW;
   
-  yy[0]=vToDbmHz(rBW,re[0]);
+  yy[0]=dbFlag==1?vToDbmHz(rBW,re[0]):re[0];
   for(int i=1;i<(n+1)/2;i++){
     yy[i]=vToDbmHz(rBW, re[i], im[i]);
+    yy[i]=dbFlag==1?vToDbmHz(rBW,re[i], im[i]):re[i]*re[i]+im[i]*im[i];
   }
-  yy[n/2]=vToDbmHz(rBW,re[n/2], im[n/2]);
+  yy[n/2]=dbFlag==1?vToDbmHz(rBW,re[n/2], im[n/2]):re[n/2]*re[n/2]+im[n/2]*im[n/2];
 
   TGraph * outGr=new TGraph((n/2), xx, yy);
 
@@ -162,7 +163,7 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
   return out;//fXfrmGr;
 }
 
-TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type){
+TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, int dbFlag){
   Int_t size = gr->GetN();
   double dt=(gr->GetX()[1]-gr->GetX()[0]); 
   double samprate=1./dt;
@@ -221,7 +222,7 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
       // 	in->SetPoint(j, gr->GetX()[j], 0);
       // }
       
-      outt=TUtil::FFT::psd(in);
+      outt=TUtil::FFT::psd(in, samprate/2., dbFlag);
       
       for(int j = 0;j<outt->GetN();j++){
 	Double_t z = outt->GetY()[j];
@@ -586,6 +587,8 @@ double TUtil::integrate(TGraph * gr, double t_low, double t_high){
   }
   return integral;
 }
+
+
 
 
 TGraph * TUtil::integrateByBin(TGraph *gr, double binNS){
@@ -1212,6 +1215,143 @@ TGraph * TUtil::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_m
   auto backchunk=getChunkOfGraph(back, t_min, t_max ,1);
   return add(sigchunk, backchunk);
 }
+
+
+double TUtil::integrate2D(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err){
+  Int_t xmin_bin = h->GetXaxis()->FindBin(xmin);
+  Int_t xmax_bin = h->GetXaxis()->FindBin(xmax);
+  Int_t ymin_bin = h->GetYaxis()->FindBin(ymin);
+  Int_t ymax_bin = h->GetYaxis()->FindBin(ymax);
+
+  return  h->IntegralAndError(xmin_bin, xmax_bin, ymin_bin, ymax_bin, err);
+  
+}
+
+
+// double integral_1d(TH1F *h, double xmin, double xmax, double & err){
+//   Int_t xmin_bin = h->GetXaxis()->FindBin(xmin);
+//   Int_t xmax_bin = h->GetXaxis()->FindBin(xmax);
+ 
+
+//   return  h->IntegralAndError(xmin_bin, xmax_bin, err);
+  
+// }
+
+/* 
+here is the layout for the coordinates used. centermost band is the 
+signal band. those to either side in both dims are the sidebands. the integrals
+ix1, iy2 etc are the integrals of those quadrants. ib1-4 are averaged
+for the overall background. ix1-background and ix2-background are averaged
+to get the signal band background, same in y. finally, background and both 
+signal band backgrounds are subtracted from the signal quadrant to get signal. 
+   __________________________
+  |      |   |   |   |       |
+  |______|___|___|___|_______|y4 
+  |      |ib3|iy2|ib4|       | 
+  |______|___|___|___|_______|y3
+  |      |ix1|sig|ix2|       | 
+  |______|___|___|___|_______|y2
+  |      |ib1|iy1|ib2|       | 
+  |______|___|___|___|_______|y1
+  |      |   |   |   |       | 
+  |      |   |   |   |       | 
+  |______|___|___|___|_______| 
+        x1   x2  x3  x4 
+    
+
+
+ */
+
+
+double TUtil::sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw){
+
+  double x1, x2, x3, x4, y1, y2, y3, y4, bandwidth_x, bandwidth_y,ix1, ix2, iy1, iy2, isig, ib1, ib2, ib3, ib4, background, bandy, bandx, avg_x, avg_y, sig;
+  double ix1_err, ix2_err, iy1_err, iy2_err, isig_err, ib1_err, ib2_err, ib3_err, ib4_err, background_err, bandy_err, bandx_err, avg_x_err, avg_y_err, sig_err;
+  //assign the cordinates of the signal and sidebands
+  x2 = sband_x1;
+  x3 = sband_x2;
+  y2 = sband_y1;
+  y3 = sband_y2;
+  bandwidth_x = x3-x2;
+  bandwidth_y = y3-y2;
+  x1 = x2-bandwidth_x;
+  x4 = x3+bandwidth_x;
+  y1 = y2-bandwidth_y;
+  y4 = y3+bandwidth_y;
+  //make the background integrals and average
+  ib1 = integrate2D(h, x1, x2, y1, y2, ib1_err);
+  ib2 = integrate2D(h, x3, x4, y1, y2, ib2_err);
+  ib3 = integrate2D(h, x1, x2, y3, y4, ib3_err);
+  ib4 = integrate2D(h, x3, x4, y3, y4, ib4_err);
+
+  background =(ib1+ib2+ib3+ib4)/4;
+
+  //make the signal band backgrounds
+  ix1 = integrate2D(h, x1, x2, y2, y3, ix1_err);
+  ix2 = integrate2D(h, x3, x4, y2, y3, ix2_err);
+  iy1 = integrate2D(h, x2, x3, y1, y2, iy1_err);
+  iy2 = integrate2D(h, x2, x3, y3, y4, iy2_err);
+
+   bandx = ((ix1-background)+(ix2-background))/2.;
+   bandy = ((iy1-background)+(iy2-background))/2.;
+ 
+ 
+  //make the signal integral
+  isig = integrate2D(h, x2, x3, y2, y3, isig_err);
+  
+
+  //errors. add in quadrature and average.
+  background_err = sqrt(pow(ib1_err, 2)+pow(ib2_err, 2)+pow(ib3_err, 2)+pow(ib4_err, 2))/2;
+  bandx_err = sqrt(pow(ix1_err, 2)+pow(ix2_err, 2))/sqrt(2);
+  bandy_err = sqrt(pow(iy1_err, 2)+pow(iy2_err, 2))/sqrt(2);
+
+  sig_err = sqrt(pow(background_err, 2)+pow(bandx_err, 2)+pow(bandy_err, 2));
+  err=sig_err;
+  //construct signal
+  sig = isig-(background+bandx+bandy);
+  //  sig = isig-((ix1+ix2+iy1+iy2)/4);
+
+  //  cout<<"total events: "<<sig<<"+/-"<<sig_err<<endl;
+  //  TString tit = std::to_string(sig);
+
+  if(draw==1){
+    h->Draw("colz");
+    double ymin = h->GetYaxis()->GetXmin();
+    double ymax = h->GetYaxis()->GetXmax();
+    double xmin = h->GetXaxis()->GetXmin();
+    double xmax = h->GetXaxis()->GetXmax();
+
+    TLine *l1 = new TLine(x2, ymin, x2, ymax);
+    TLine *l2 = new TLine(x3, ymin, x3, ymax);
+    TLine *l3 = new TLine(xmin, y2, xmax, y2);
+    TLine *l4 = new TLine(xmin, y3, xmax, y3);
+    TLine *l5 = new TLine(x1, ymin, x1, ymax);
+    TLine *l6 = new TLine(x4, ymin, x4, ymax);
+    TLine *l7 = new TLine(xmin, y1, xmax, y1);
+    TLine *l8 = new TLine(xmin, y4, xmax, y4);
+    l1->SetLineColor(kRed);
+    l2->SetLineColor(kRed);
+    l3->SetLineColor(kRed);
+    l4->SetLineColor(kRed);
+
+    l1->Draw();
+    l2->Draw();
+    l3->Draw();
+    l4->Draw();
+    l5->Draw();
+    l6->Draw();
+    l7->Draw();
+    l8->Draw();
+    char title[100];
+
+    h->SetStats(0);
+    ((TCanvas*)gROOT->GetListOfCanvases()->At(0))->SetRightMargin(0.15);
+  }
+
+
+  
+  return sig;
+} 
 
 /*
  here is the layout for the coordinates used. centermost band is the 

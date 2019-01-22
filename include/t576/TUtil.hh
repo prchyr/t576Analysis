@@ -31,6 +31,7 @@ charge: nC
 #include "TSystem.h"
 #include "TRandom.h"
 #include "TObject.h"
+#include "TLine.h"
 #include "TFile.h"
 #include "TSystemDirectory.h"
 #include "TList.h"
@@ -190,6 +191,7 @@ namespace TUtil{
   double integrate(TGraph * gr, double t_low=0, double t_high=999999.);
   //integrate a graph bin-by-bin, putting the result in a tgraph
   //binNS is the desired bin width in nanoseconds
+  double integrate2D(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err);
   TGraph * integrateByBin(TGraph *gr, double binNS);
   //simple 2 pole lowpass filter
   TGraph * lowpassFilter(TGraph *ingr, double cutoff, int order=2);
@@ -213,6 +215,7 @@ namespace TUtil{
   double blackmanNuttallWindow(int i, int n);
     //and add it to the indicated region of the background graph.
   TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max);
+  double sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0);
   //degrees to radians
   double deg2Rad(double deg);
   //radians to degrees
@@ -233,7 +236,7 @@ namespace TUtil{
     //return the Hilbert envelope
     TGraph * hilbertEnvelope(TGraph *inGr);
     //return the power spectral density in dBm/Hz, rBW is the resolution bandwith of the system, used to calculate the density. defaults to Nyquist.
-    TGraph * psd(TGraph *inGr, double rBW=0.);
+    TGraph * psd(TGraph *inGr, double rBW=0., int dbFlag=1);
     /*
       return the spectrogram, with various options:
 
@@ -245,7 +248,7 @@ zero pad length is the length to which the chunk is symmetrically zero-padded.
 
 win_type is an enumeration of window types to be applied to each bin. this helps avoid discontinuities and noise in the spectrogram. see the window function for the window types.
      */
-    TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128, int win_type=0);
+    TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128, int win_type=0, int dbFlag=1);
     //averages a vector of spectrograms. must be the same size.
     TH2D* avgSpectrograms(vector<TH2D*>  inh);
 
