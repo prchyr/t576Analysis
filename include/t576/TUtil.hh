@@ -90,6 +90,7 @@ namespace TUtil{
   static constexpr double pi = 3.1415927; //radians
   static constexpr double z_0=50; //ohms
   static constexpr double deg=pi/180.; //radians
+  static constexpr double kB=8.617343e-11;//MeV/kelvin
   /*lengths
  
     for example, if you wanted to calculate the time it took for a signal 
@@ -214,7 +215,7 @@ namespace TUtil{
   //return the value of a blackman-nuttall window
   double blackmanNuttallWindow(int i, int n);
     //and add it to the indicated region of the background graph.
-  TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max);
+  TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max, double scale=1.);
   double sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0);
   //degrees to radians
   double deg2Rad(double deg);
