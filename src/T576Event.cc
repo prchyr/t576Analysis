@@ -490,7 +490,10 @@ int T576Event::loadSurfEvent(int event){
     copy(fSurfData+index1+index2, fSurfData+index1+index2+len, surf->dat[i]);
     //feet to meter conversion
     surf->delays[i]=(surf->cableLengths[i]*ft)/(c_light*surf->velocityFactor);
-
+    //mV to V conversion
+    for(int j=0;j<len;j++){
+      surf->dat[i][j]*=.001;
+    }
     TGraph * graph=new TGraph(len, TUtil::makeIndices(len, 1./3.2, surf->delays[i]), surf->dat[i]);
 
     TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);

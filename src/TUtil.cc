@@ -1217,8 +1217,8 @@ TGraph * TUtil::lowpassFilter(TGraph *ingr, double cutoff, int order){
 
 TGraph * TUtil::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_max, double scale){
   auto sigchunk=getChunkOfGraph(sig, 0., (t_max-t_min));
-  auto backchunk=getChunkOfGraph(TUtil::scale(back, scale), t_min, t_max ,1);
-  return add(sigchunk, backchunk);
+  auto backchunk=getChunkOfGraph(back, t_min, t_max ,1);
+  return add(sigchunk, TUtil::scale(backchunk, scale));
 }
 
 
