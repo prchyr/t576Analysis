@@ -13,6 +13,7 @@ static TVirtualFFT * fftr2cSpec=TVirtualFFT::FFT(1, &fNSpec, "R2C ES");
 static TVirtualFFT * fftc2r=TVirtualFFT::FFT(1, &fN, "C2R ES");
 static TGraph2D *fXfrmGr2D = new TGraph2D();
 static TGraph *fXfrmGr = new TGraph();
+static TGraph *fPSDGr = new TGraph();
 
 
 /***************FFT things************************
@@ -63,8 +64,8 @@ TGraph2D * TUtil::FFT::fft(TGraph * inGr){
     outGr->GetZ()[i] *= norm;
   }
   *fXfrmGr2D=*outGr;
-  //  delete outGr;
-  return outGr;//fXfrmGr2D;
+  delete outGr;
+  return fXfrmGr2D;
 }
 
 
@@ -101,8 +102,8 @@ TGraph * TUtil::FFT::ifft(TGraph2D * inGr){
 
   for (int i=0;i<outGr->GetN();i++) outGr->GetY()[i] *= norm;
   *fXfrmGr=*outGr;
-  //  delete outGr;
-  return outGr;//fXfrmGr;
+  delete outGr;
+  return fXfrmGr;
 }
 
 /*
@@ -132,9 +133,9 @@ TGraph * TUtil::FFT::psd(TGraph * inGr, double rBW, int dbFlag){
 
   TGraph * outGr=new TGraph((n/2), xx, yy);
 
-  *fXfrmGr=*outGr;
-  //  delete outGr;
-  return outGr;//fXfrmGr;
+  *fPSDGr=*outGr;
+  delete outGr;
+  return fPSDGr;
 }
 
 
