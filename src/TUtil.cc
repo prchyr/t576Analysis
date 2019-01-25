@@ -134,8 +134,8 @@ TGraph * TUtil::FFT::psd(TGraph * inGr, double rBW, int dbFlag){
   TGraph * outGr=new TGraph((n/2), xx, yy);
 
   *fPSDGr=*outGr;
-  delete outGr;
-  return fPSDGr;
+  //delete outGr;
+  return outGr;//fPSDGr;
 }
 
 
@@ -159,7 +159,7 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
   for(int i=0;i<hilb->GetN();i++){
     out->SetPoint(i, inGr->GetX()[i], sqrt((inGr->GetY()[i]*inGr->GetY()[i])+(hilb->GetY()[i]*hilb->GetY()[i])));
   }
-  *fXfrmGr=*out;
+  //  *fXfrmGr=*out;
   //  delete out;
   return out;//fXfrmGr;
 }
