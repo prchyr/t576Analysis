@@ -918,7 +918,7 @@ auto scoperxgraph=new TGraph(3, scopex, scopey);
     surfrxgraph->Draw("p same");
   }
 
-  TLegend *leg = new TLegend(.83, .7, 1, .95);
+  TLegend *leg = new TLegend(.83, .6, 1, .95);
   leg->AddEntry(txgraph, "TX", "p");
   leg->AddEntry(surfrxgraph, "SURF", "p");
   leg->AddEntry(scoperxgraph, "Scope", "p");

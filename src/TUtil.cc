@@ -548,17 +548,22 @@ TGraph * TUtil::normalize(TGraph * inGr){
     return og;
   }
 
-TGraph * TUtil::CDF(TGraph * inGr){
+TGraph * TUtil::CDF(TGraph * inGr, int normed){
   auto outGr=new TGraph(inGr->GetN());
     double val=0;
   for(int i=0;i<inGr->GetN();i++){
     outGr->SetPoint(i, inGr->GetX()[i], val);
     val+=inGr->GetY()[i];
   }
-  auto normGr=normalize(outGr);
+  if(normed==1){
+    auto ynormGr=TUtil::scale(outGr, 1./outGr->GetY()[outGr->GetN()-1]);
+    auto xnormGr=TUtil::stretch(ynormGr, 1./outGr->GetX()[outGr->GetN()-1]);
+    outGr=(TGraph*)xnormGr->Clone();
+    delete(ynormGr);
+    delete(xnormGr);
+  }
 
-  delete(outGr);
-  return normGr;
+  return outGr;
 }
 
 double TUtil::mean(TGraph *gr, double t_low, double t_high){
