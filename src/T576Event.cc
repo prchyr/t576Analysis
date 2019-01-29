@@ -897,7 +897,7 @@ auto scoperxgraph=new TGraph(3, scopex, scopey);
  auto scopeChanGraph=new TGraph();
   if(scopeChan<4&&scopeChan>=0){
     scopeChanGraph->SetPoint(0, scopex[scopeChan], scopey[scopeChan]);
-    scopeChanGraph->SetMarkerSize(2);
+    scopeChanGraph->SetMarkerSize(2.5);
     scopeChanGraph->SetMarkerStyle(4);
     scopeChanGraph->SetLineWidth(2);
     scopeChanGraph->SetMarkerColor(kViolet);
