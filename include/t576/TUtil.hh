@@ -137,6 +137,8 @@ namespace TUtil{
   TGraph * normalize(TGraph *inGr);
   //return a chunk of a graph, specified by x-axis values.
   //if shift_to_zero==1, the time axis is shifted such that it starts at 0.
+  //  return the continuous distribution function of a graph, normalized to 1.
+  TGraph *CDF(TGraph *inGr);
   TGraph * getChunkOfGraph(TGraph *ingr, double start, double end, int delay_to_zero=0);
   //cross correlation of two graphs. returns the cross-correlation graph
   //maxDelay is the maximum starting offset between gr1 and gr2. defaults

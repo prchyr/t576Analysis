@@ -544,9 +544,22 @@ TGraph * TUtil::normalize(TGraph * inGr){
       norm+=inGr->GetY()[i]*inGr->GetY()[i];
     }
     TGraph *og = (TGraph*)inGr->Clone();
-    for(int i=0;i<length;i++)og->GetY()[i]*=norm;
+    for(int i=0;i<length;i++)og->GetY()[i]/=sqrt(norm);
     return og;
   }
+
+TGraph * TUtil::CDF(TGraph * inGr){
+  auto outGr=new TGraph(inGr->GetN());
+    double val=0;
+  for(int i=0;i<inGr->GetN();i++){
+    outGr->SetPoint(i, inGr->GetX()[i], val);
+    val+=inGr->GetY()[i];
+  }
+  auto normGr=normalize(outGr);
+
+  delete(outGr);
+  return normGr;
+}
 
 double TUtil::mean(TGraph *gr, double t_low, double t_high){
   auto data=gr->GetY();
