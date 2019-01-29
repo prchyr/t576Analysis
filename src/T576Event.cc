@@ -742,7 +742,7 @@ scope utilities
 
 **************************************************************/
 
-int T576Event::drawGeom(){
+int T576Event::drawGeom(int scopeChan, int surfChan){
   
 
   auto dummy=new TGraph();
@@ -772,7 +772,7 @@ int T576Event::drawGeom(){
     scopex[i]=scope->pos[i].Z();
     scopey[i]=scope->pos[i].X();
   }
-  
+
   
 
   auto txgraph=new TGraph();
@@ -893,11 +893,21 @@ int T576Event::drawGeom(){
   target->Draw("f same");
 
 auto scoperxgraph=new TGraph(3, scopex, scopey);
-  scoperxgraph->SetMarkerColor(kRed);
+
+ auto scopeChanGraph=new TGraph();
+  if(scopeChan<4&&scopeChan>=0){
+    scopeChanGraph->SetPoint(0, scopex[scopeChan], scopey[scopeChan]);
+    scopeChanGraph->SetMarkerSize(2);
+    scopeChanGraph->SetMarkerStyle(4);
+    scopeChanGraph->SetLineWidth(2);
+    scopeChanGraph->SetMarkerColor(kViolet);
+  }
+ scoperxgraph->SetMarkerColor(kRed);
   scoperxgraph->SetMarkerStyle(20);
   scoperxgraph->SetMarkerSize(1.5);
   if(fScopeLoaded){
     scoperxgraph->Draw("p same");
+    scopeChanGraph->Draw("p same");
   }
   
   auto surfrxgraph=new TGraph(12, surfx, surfy);
@@ -912,10 +922,14 @@ auto scoperxgraph=new TGraph(3, scopex, scopey);
   leg->AddEntry(txgraph, "TX", "p");
   leg->AddEntry(surfrxgraph, "SURF", "p");
   leg->AddEntry(scoperxgraph, "Scope", "p");
+if(scopeChan<4&&scopeChan>=0){
+    leg->AddEntry(scopeChanGraph, "CH"+TString::Itoa(scopeChan, 10), "p");
+  }
   leg->AddEntry(target, "target", "l");
   leg->AddEntry(wall, "wall", "l");
   leg->AddEntry(support, "blocks", "l");
   leg->AddEntry(bp, "beam pipe", "l");
+  
   leg->Draw();
   
   return 1;
