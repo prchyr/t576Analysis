@@ -167,7 +167,7 @@ ev->surf->ch[9]->Draw("al");
 
 //furthermore, you can set the level of interpolation for all events
 
-ev->setInterpGsNs(20);
+ev->setInterpGSs(20);
 
 //which will set the sample rate for all resultant graphs to 20GS/s.
 //subsequent calls to ev->loadSurf[Scope]Event(xx) will have this level
