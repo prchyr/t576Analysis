@@ -1340,10 +1340,10 @@ double TUtil::sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, d
 
   if(draw==1){
     h->Draw("colz");
-    double ymin = h->GetYaxis()->GetXmin();
-    double ymax = h->GetYaxis()->GetXmax();
-    double xmin = h->GetXaxis()->GetXmin();
-    double xmax = h->GetXaxis()->GetXmax();
+    double ymin = gPad->GetUymin();//h->GetYaxis()->GetXmin();
+    double ymax = gPad->GetUymax();//h->GetYaxis()->GetXmax();
+    double xmin = gPad->GetUxmin();//h->GetXaxis()->GetXmin();
+    double xmax = gPad->GetUxmax();//h->GetXaxis()->GetXmax();
 
     TLine *l1 = new TLine(x2, ymin, x2, ymax);
     TLine *l2 = new TLine(x3, ymin, x3, ymax);
