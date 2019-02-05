@@ -612,6 +612,18 @@ double TUtil::integrate(TGraph * gr, double t_low, double t_high){
   return integral;
 }
 
+double TUtil::integratePower(TGraph * gr, double t_low, double t_high){
+  t_low=t_low>0.?t_low:0.;
+  t_high>gr->GetX()[gr->GetN()-1]?gr->GetX()[gr->GetN()-1]:t_high;
+  double dt = gr->GetX()[1]-gr->GetX()[0];
+  double integral=0.;
+  for(int i=0;i<gr->GetN();i++){
+    if(gr->GetX()[i]<t_low||gr->GetX()[i]>t_high)continue;
+    integral+=(gr->GetY()[i]*gr->GetY()[i])*dt;
+  }
+  return integral;
+}
+
 
 
 
