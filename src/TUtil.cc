@@ -664,6 +664,20 @@ TGraph * TUtil::add(TGraph *g1, TGraph *g2, double constant){
   return outGr;
 }
 
+double TUtil::dot(TGraph *g1, TGraph *g2){
+  auto x = g1->GetY();
+  auto y = g2->GetY();
+  double num=0., xdenom=0., ydenom=0.;
+  auto n=g1->GetN()<g2->GetN()?g1->GetN():g2->GetN();
+  for(int i=0;i<n;i++){
+    num+=(x[i])*(y[i]);
+    xdenom+=pow(x[i], 2);
+    ydenom+=pow(y[i], 2);
+  }
+  return num/sqrt(xdenom*ydenom);
+  
+}
+
 TGraph * TUtil::scale(TGraph *g1, double factor){
   TGraph *outGr=new TGraph(g1->GetN());
   for(int i=0;i<g1->GetN();i++){
