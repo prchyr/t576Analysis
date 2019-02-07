@@ -130,7 +130,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event, bool remov
     fScopeFilename=thisScopeFilename;
 
     //open the file
-
+    fEventFile->Close();
     fEventFile=TFile::Open(directory+thisScopeFilename);
     fEventTree=(TTree*)fEventFile->Get("tree");
   
@@ -152,6 +152,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event, bool remov
   }
   if(loadScopeEvent(scopeEvNo+event, remove_dc_offset)==1){
     getCharge(scope->ch[3]);
+    //fEventFile->Close();
     return 1;
   }
   else return 0;
