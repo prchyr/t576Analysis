@@ -178,7 +178,14 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
 //   delete thing;
 //   return outvec;
   
-
+TGraph * TUtil::FFT::plotPhase(TGraph *inGr){
+  auto ht=hilbertTransform(inGr);
+  auto outGr=new TGraph(inGr->GetN());
+  for(int i=0;i<inGr->GetN();i++){
+    outGr->SetPoint(i, inGr->GetX()[i], atan(ht->GetY()[i]/inGr->GetY()[i]));
+  }
+  return outGr;
+}
 
 TGraph * TUtil::FFT::phasorTransform(TGraph *inGr){
   auto infft=fft(inGr);

@@ -241,6 +241,7 @@ namespace TUtil{
     TGraph * ifft(TGraph2D *inGr);
     //return the Hilbert transform
     TGraph * hilbertTransform(TGraph *inGr);
+    TGraph * plotPhase(TGraph *inGr);
     //DON'T USE NOT WORKING return the phasor transform DON'T USE NOT WORKING
     TGraph * phasorTransform(TGraph *inGr);
     //return the Hilbert envelope
