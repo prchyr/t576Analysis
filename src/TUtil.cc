@@ -355,6 +355,7 @@ TMatrixD TUtil::SVD::eventMatrix(vector<TGraph*> vecs){
 //make a density matrix partitioned along D
 TMatrixD TUtil::SVD::densityMatrix(TGraph *vec, int D, int xlim){
   int N=xlim==0?vec->GetN():xlim;
+  D=D==1?N:D;
   int d=(int) (N/D);
   TVectorD V(vec->GetN(), vec->GetY());
   TMatrixD A(D, D);
