@@ -531,13 +531,13 @@ TVectorD TUtil::SVD::flatten(TMatrixD m){
 }  
 
 TH2F * TUtil::SVD::matrixMap(TMatrixD M, TString name){
-  int sizex=M.GetNcols();
-  int sizey=M.GetNrows();
+  int sizex=M.GetNrows();
+  int sizey=M.GetNcols();
   //  cout<<sizey<<" "<<sizex<<endl;
   TH2F * map=new TH2F(name, name, sizex, 0.,sizex, sizey, 0,sizey);
   for(int i=0;i<sizex;i++){
     for(int j=0;j<sizey;j++){
-      map->SetBinContent(i+1,j+1, M[i][sizey-j-1]);
+      map->SetBinContent(i,j, M[i][j]);
     }
   }
   
@@ -1581,6 +1581,19 @@ double TUtil::rad2Deg(double rad) {
 /*************some plotting things****************/
 
 
+void TUtil::draw(vector<TGraph*> inGr){
+  inGr[0]->Draw("al PLC");
+  for(int i=0;i<inGr.size();i++){
+    inGr[i]->Draw("l same PLC");
+  }
+}
+
+// void TUtil::draw(TGraph** inGr){
+//   inGr[0]->Draw("al PLC");
+//   for(int i=0;i<inGr.size();i++){
+//     inGr[i]->Draw("l same PLC");
+//   }
+// }
 
 
 void TUtil::setWarmPalette(){

@@ -228,6 +228,8 @@ namespace TUtil{
   double deg2Rad(double deg);
   //radians to degrees
   double rad2Deg(double rad);
+  //draw a bunch of vectors
+  void draw(vector<TGraph*> inGr);
   //a pretty warm palette
   void setWarmPalette();
   //a pretty cool palette
