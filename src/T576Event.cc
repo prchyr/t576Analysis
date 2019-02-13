@@ -970,11 +970,11 @@ TGraph2D* T576Event::pointingMap(double dx, int draw){
   double maxTot=0;
   TGraph *outgraphs[12];
   double coordincr=dx;
-  for(double x=-8;x<8.01;x+=coordincr){
+  for(double x=-8.01;x<8.01;x+=coordincr){
 
     source.SetZ((double)x);//z = x
 
-    for(double y=-8;y<8.01;y+=coordincr){
+    for(double y=-8.01;y<8.01;y+=coordincr){
       tot=0;
       source.SetX((double)y);//x=y
 
