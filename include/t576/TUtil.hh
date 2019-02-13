@@ -135,6 +135,8 @@ namespace TUtil{
 
   //normalize a graph
   TGraph * normalize(TGraph *inGr);
+  //normalize a 2d graph
+  TGraph2D * normalize(TGraph2D * inGr);
   //return a chunk of a graph, specified by x-axis values.
   //if shift_to_zero==1, the time axis is shifted such that it starts at 0.
   //  return the cumulative distribution function of a graph. if normed is 1, the graph is scaled such that x and y axes spread from 0 to 1.

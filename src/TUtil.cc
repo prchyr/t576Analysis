@@ -585,6 +585,19 @@ TGraph * TUtil::normalize(TGraph * inGr){
     return og;
   }
 
+
+TGraph2D * TUtil::normalize(TGraph2D * inGr){
+    double length=inGr->GetN();
+    double norm=0;
+    for(int i=0;i<length;i++){
+      norm+=inGr->GetZ()[i]*inGr->GetZ()[i];
+    }
+    TGraph2D *og = (TGraph2D*)inGr->Clone();
+    for(int i=0;i<length;i++)og->GetZ()[i]/=sqrt(norm);
+    return og;
+}
+
+
 TGraph * TUtil::CDF(TGraph * inGr, int normed){
   auto outGr=new TGraph(inGr->GetN());
     double val=0;
