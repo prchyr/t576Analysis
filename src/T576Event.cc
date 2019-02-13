@@ -967,7 +967,7 @@ TGraph2D* T576Event::pointingMap(double dx, int draw){
   //  setWarmPalette();
   double maxTot=0;
   TGraph *outgraphs[12];
-  double coordincr=.2;
+  double coordincr=dx;
   for(double x=-8;x<8.01;x+=coordincr){
 
     source.SetZ((double)x);
