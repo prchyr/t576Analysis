@@ -970,6 +970,7 @@ TGraph2D* T576Event::pointingMap(double dx, int draw){
   double maxTot=0;
   TGraph *outgraphs[12];
   double coordincr=dx;
+  TVector3 offset(.5, .5, .5);
   for(double x=-8.01;x<8.01;x+=coordincr){
 
     source.SetZ((double)x);//z = x
@@ -983,7 +984,7 @@ TGraph2D* T576Event::pointingMap(double dx, int draw){
       yy.push_back((double)y);
       for(int j=0;j<12;j++){
 	if(j<1)continue;
-	TVector3 surfupdated=surf->pos[j];
+	TVector3 surfupdated=surf->pos[j];//+offset;
 	d1=source-surfupdated;//[j];
 	//cout<<j<<" "<<i<<" "<<l<<endl;
 	for(int k=0;k<12;k++){
@@ -1014,9 +1015,11 @@ TGraph2D* T576Event::pointingMap(double dx, int draw){
   gout->GetHistogram()->GetYaxis()->SetTitle("x (m)");
 
   if(draw==1){
+    gout->SetMarkerStyle(20);
     gout->Draw("colz");
-
-
+    //gPad->SetTheta(90.01);
+    //gPad->SetPhi(0.01);
+    //gPad->Update();
 
 
     //hist->Draw("colz");
