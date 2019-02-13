@@ -953,8 +953,8 @@ TGraph2D* T576Event::pointingMap(double dx, int draw){
   double tot=0;
   auto deltat=1./(3.2*fInterpGSs);
   for(int i=0;i<12;i++){
-    //graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1)));
-    graphs[i]=TUtil::normalize(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1));
+    graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1)));
+    //graphs[i]=TUtil::normalize(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1));
   }
   //auto window=rectangularWindow(10./deltat, 150./deltat, 250./deltat, deltat);
   for(int i=0;i<12;i++){
@@ -971,11 +971,11 @@ TGraph2D* T576Event::pointingMap(double dx, int draw){
   double coordincr=dx;
   for(double x=-8;x<8.01;x+=coordincr){
 
-    source.SetZ((double)x);
+    source.SetZ((double)x);//z = x
 
     for(double y=-8;y<8.01;y+=coordincr){
       tot=0;
-      source.SetX((double)y);
+      source.SetX((double)y);//x=y
 
       xx.push_back((double)x);
 
