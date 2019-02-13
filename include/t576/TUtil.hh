@@ -173,6 +173,7 @@ namespace TUtil{
   TGraph * avgGraph(vector<TGraph*> inGr);
   //add 2 TGraphs. if constant is -1, they are subtracted.
   TGraph * add(TGraph * g1, TGraph * g2, double constant=1.);
+  TGraph2D * add(TGraph2D * g1, TGraph2D * g2, double constant=1.);
   //dot product of 2 graphs
   double dot(TGraph *g1, TGraph *g2);
   //shift a graph along the y axis by the factor

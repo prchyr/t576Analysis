@@ -701,6 +701,19 @@ TGraph * TUtil::add(TGraph *g1, TGraph *g2, double constant){
   return outGr;
 }
 
+TGraph2D * TUtil::add(TGraph2D *g1, TGraph2D *g2, double constant){
+
+  int len=g1->GetN()<g2->GetN()?g1->GetN():g2->GetN();
+  TGraph2D *outGr=new TGraph2D(len);  
+  for(int i=0;i<len;i++){
+    outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i], g1->GetZ()[i]+(g2->GetZ()[i]*constant));
+  }
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
+  return outGr;
+}
+
 double TUtil::dot(TGraph *g1, TGraph *g2){
   auto x = g1->GetY();
   auto y = g2->GetY();
