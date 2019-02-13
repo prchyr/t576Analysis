@@ -131,7 +131,7 @@ public:
   //get the charge in this event from the ict trace.
   double getCharge(TGraph * ict);
   int drawGeom(int scopeChan=999, int surfChan=999);
-
+  TGraph2D* pointingMap(double dx=.3, int draw=1);
   
 private:
   int fNEntriesSurf=0, fNEntriesScope=0;
@@ -171,7 +171,7 @@ public:
     double  time[20000];
     //tgraphs of each event channel
     TGraph * ch[4]={new TGraph(), new TGraph(),new TGraph(),new TGraph()};
-
+    void draw();
     
 
   private:
@@ -201,6 +201,7 @@ public:
 
     TGraph2D * map=0;
     int drawGeom();
+    void draw();
     //int drawMap(int mStep=.5);
 
   private:
