@@ -1325,12 +1325,12 @@ TGraph * TUtil::brickWallFilter(TGraph * inGr, double low, double high){
   
   auto fT=TUtil::FFT::fft(inGr);
 
-  double fs=inGr->GetX()[1]-inGr->GetX()[0];
+  double fs=1./(inGr->GetX()[1]-inGr->GetX()[0]);
   double df=fs/(double)inGr->GetN();
 
   int indL=low/df;
   int indH=high/df;
-
+  //cout<<fs<<" "<<indL<<" "<<indH<<endl;
   for(int i=0;i<indL;i++){
     fT->SetPoint(i, fT->GetX()[i], 0., 0.);
   }
