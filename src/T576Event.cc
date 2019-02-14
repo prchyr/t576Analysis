@@ -998,7 +998,7 @@ TGraph2D* T576Event::pointingMap(double dx, int draw, int hilbert){
 	  d2=source-surf->pos[k];
 	  dt[j][k]=(d1.Mag()-d2.Mag())/TUtil::c_light;
 	  // cout<<dt[j][k]<<endl;
-	  tot+=grc[j][k]->Eval(dt[j][k]);
+	  tot+=grc[j][k]->Eval(-dt[j][k]);
 
 	}
       }
