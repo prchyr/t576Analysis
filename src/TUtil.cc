@@ -1325,8 +1325,8 @@ TGraph * TUtil::brickWallFilter(TGraph * inGr, double low, double high){
   
   auto fT=TUtil::FFT::fft(inGr);
 
-  auto fs=inGr->GetX()[1]-inGr->GetX()[0];
-  auto df=fs/inGr->GetN();
+  double fs=inGr->GetX()[1]-inGr->GetX()[0];
+  double df=fs/(double)inGr->GetN();
 
   int indL=low/df;
   int indH=high/df;
