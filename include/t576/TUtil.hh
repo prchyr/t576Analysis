@@ -206,6 +206,8 @@ namespace TUtil{
   TGraph * integrateByBin(TGraph *gr, double binNS);
   //simple 2 pole lowpass filter
   TGraph * lowpassFilter(TGraph *ingr, double cutoff, int order=2);
+  //a brick wall frequency domain filter
+  TGraph * brickWallFilter(TGraph *ingr, double low, double high);
     //will take the first chunk of the signal graph (equal to to t_high-t_low)
 
   // return the value of a window over sample numbers n. types are:

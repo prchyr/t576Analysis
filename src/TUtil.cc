@@ -1321,6 +1321,28 @@ TGraph * TUtil::lowpassFilter(TGraph *ingr, double cutoff, int order){
   return outgr;
 }
 
+TGraph * TUtil::brickWallFilter(TGraph * inGr, double low, double high){
+  
+  auto fT=TUtil::FFT::fft(inGr);
+
+  auto fs=inGr->GetX()[1]-inGr->GetX()[0];
+  auto df=fs/inGr->GetN();
+
+  int indL=low/df;
+  int indH=high/df;
+
+  for(int i=0;i<indL;i++){
+    fT->SetPoint(i, fT->GetX()[i], 0., 0.);
+  }
+
+  for(int i=indH;i<inGr->GetN();i++){
+    fT->SetPoint(i, fT->GetX()[i], 0., 0.);
+  }
+
+  auto outGr=(TGraph*)TUtil::FFT::ifft(fT)->Clone();
+  return outGr;
+}
+
 
 
 TGraph * TUtil::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_max, double scale){
