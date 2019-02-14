@@ -988,12 +988,12 @@ TGraph2D* T576Event::pointingMap(double dx, int draw, int hilbert){
 
       yy.push_back((double)y);
       for(int j=1;j<12;j++){
-	if(j<11&&j>1)continue;
+	//if(j<11&&j>2)continue;
 	TVector3 surfupdated=surf->pos[j];//+offset;
 	d1=source-surfupdated;//[j];
 	//cout<<j<<" "<<i<<" "<<l<<endl;
 	for(int k=1;k<12;k++){
-	  if(k<11&&k>1) continue;
+	  //if(k<11&&k>2) continue;
 	  if(j==k)continue;
 	  d2=source-surf->pos[k];
 	  dt[j][k]=(d1.Mag()-d2.Mag())/TUtil::c_light;
