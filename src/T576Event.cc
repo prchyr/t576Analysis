@@ -939,7 +939,7 @@ if(scopeChan<4&&scopeChan>=0){
 }
 
 
-TGraph2D* T576Event::pointingMap(double dx, int draw){
+TGraph2D* T576Event::pointingMap(double dx, int draw, int hilbert){
   double tmin=20;
   double tmax=150;
   double dt[12][12]={0};
@@ -954,8 +954,13 @@ TGraph2D* T576Event::pointingMap(double dx, int draw){
   auto deltat=1./(3.2*fInterpGSs);
   for(int i=0;i<12;i++){
     //graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1)));
-    //graphs[i]=TUtil::FFT::hilbertEnvelope(TUtil::brickWallFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5));
+    
+    if(hilbert==1){
+      graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::brickWallFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5)));
+    }
+    else{
     graphs[i]=TUtil::normalize(TUtil::brickWallFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5));
+    }
   }
   //auto window=rectangularWindow(10./deltat, 150./deltat, 250./deltat, deltat);
   for(int i=0;i<12;i++){
