@@ -977,7 +977,7 @@ TGraph2D* T576Event::pointingMap(double dx, int draw, int hilbert){
   double coordincr=dx;
   TVector3 offset(.5, .5, .5);
 
-  double dtt = .3;
+  double dtt = .2;
   for(double x=-8.01;x<8.01;x+=coordincr){
 
     source.SetZ((double)x);//z = x
