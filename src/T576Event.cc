@@ -976,6 +976,8 @@ TGraph2D* T576Event::pointingMap(double dx, int draw, int hilbert){
   TGraph *outgraphs[12];
   double coordincr=dx;
   TVector3 offset(.5, .5, .5);
+
+  double dtt = .3;
   for(double x=-8.01;x<8.01;x+=coordincr){
 
     source.SetZ((double)x);//z = x
@@ -998,7 +1000,10 @@ TGraph2D* T576Event::pointingMap(double dx, int draw, int hilbert){
 	  d2=source-surf->pos[k];
 	  dt[j][k]=(d1.Mag()-d2.Mag())/TUtil::c_light;
 	  // cout<<dt[j][k]<<endl;
-	  tot+=grc[j][k]->Eval(dt[j][k]);
+	  //tot+=grc[j][k]->Eval(dt[j][k]);
+	  auto temp=TUtil::getChunkOfGraph(grc[j][k], dt[j][k]-dtt, dt[j][k]+dtt);
+	  tot+=TMath::MaxElement(temp->GetN(), temp->GetY());
+	  delete temp;
 
 	}
       }
