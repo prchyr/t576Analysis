@@ -939,7 +939,7 @@ if(scopeChan<4&&scopeChan>=0){
 }
 
 
-TGraph2D* T576Event::pointingMap(double dx, int draw, int hilbert){
+TH2D* T576Event::pointingMap(double dx, int draw, int hilbert){
   double tmin=20;
   double tmax=150;
   double dt[12][12]={0};
@@ -976,7 +976,8 @@ TGraph2D* T576Event::pointingMap(double dx, int draw, int hilbert){
   TGraph *outgraphs[12];
   double coordincr=dx;
   TVector3 offset(.5, .5, .5);
-
+  int nbins=16.01/dx;
+  TH2D * gout=new TH2D("outhist", "outhist", nbins, -8, 8, nbins, -8, 8);
   double dtt = .2;
   for(double x=-8.01;x<8.01;x+=coordincr){
 
@@ -1000,7 +1001,8 @@ TGraph2D* T576Event::pointingMap(double dx, int draw, int hilbert){
 	  d2=source-surf->pos[k];
 	  dt[j][k]=abs(d1.Mag()-d2.Mag())/TUtil::c_light;
 	  // cout<<dt[j][k]<<endl;
-	  tot+=grc[j][k]->Eval(dt[j][k]);
+	  //	  tot+=grc[j][k]->Eval(dt[j][k]);
+	  gout->Fill(x, y, grc[j][k]->Eval(dt[j][k])); 
 	  //auto temp=TUtil::getChunkOfGraph(grc[j][k], dt[j][k]-dtt, dt[j][k]+dtt);
 	  //tot+=TMath::MaxElement(temp->GetN(), temp->GetY());
 	  //delete temp;
@@ -1013,16 +1015,18 @@ TGraph2D* T576Event::pointingMap(double dx, int draw, int hilbert){
   }
 
 
-  auto gout=new TGraph2D(xx.size(), &xx[0], &yy[0], &zz[0]);
+    //  auto gout=new TGraph2D(xx.size(), &xx[0], &yy[0], &zz[0]);
   gout->SetName("map"+minor);
   //    if(plot==1){
   //     auto crap=new TCanvas("map"+minor, "map"+minor, 700,600);
 
-  gout->SetMarkerStyle(20);
+  //gout->SetMarkerStyle(20);
   gout->SetTitle("");
 
-  gout->GetHistogram()->GetXaxis()->SetTitle("z (m)");
-  gout->GetHistogram()->GetYaxis()->SetTitle("x (m)");
+  gout->GetXaxis()->SetTitle("z (m)");
+  gout->GetYaxis()->SetTitle("x (m)");
+  //gout->GetHistogram()->GetXaxis()->SetTitle("z (m)");
+  //gout->GetHistogram()->GetYaxis()->SetTitle("x (m)");
 
   if(draw==1){
     gout->SetMarkerStyle(20);
