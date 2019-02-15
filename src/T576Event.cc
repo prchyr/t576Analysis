@@ -999,7 +999,7 @@ TH2D* T576Event::pointingMap(double dx, int draw, int hilbert){
 	  //if(k<11&&k>2) continue;
 	  if(j==k)continue;
 	  d2=source-surf->pos[k];
-	  dt[j][k]=abs(d1.Mag()-d2.Mag())/TUtil::c_light;
+	  dt[j][k]=(abs(d1.Mag())-abs(d2.Mag()))/TUtil::c_light;
 	  // cout<<dt[j][k]<<endl;
 	  //	  tot+=grc[j][k]->Eval(dt[j][k]);
 	  gout->Fill(x, y, grc[j][k]->Eval(dt[j][k])); 
