@@ -1000,10 +1000,10 @@ TGraph2D* T576Event::pointingMap(double dx, int draw, int hilbert){
 	  d2=source-surf->pos[k];
 	  dt[j][k]=abs(d1.Mag()-d2.Mag())/TUtil::c_light;
 	  // cout<<dt[j][k]<<endl;
-	  //tot+=grc[j][k]->Eval(dt[j][k]);
-	  auto temp=TUtil::getChunkOfGraph(grc[j][k], dt[j][k]-dtt, dt[j][k]+dtt);
-	  tot+=TMath::MaxElement(temp->GetN(), temp->GetY());
-	  delete temp;
+	  tot+=grc[j][k]->Eval(dt[j][k]);
+	  //auto temp=TUtil::getChunkOfGraph(grc[j][k], dt[j][k]-dtt, dt[j][k]+dtt);
+	  //tot+=TMath::MaxElement(temp->GetN(), temp->GetY());
+	  //delete temp;
 
 	}
       }
