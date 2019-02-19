@@ -91,6 +91,9 @@ namespace TUtil{
   static constexpr double z_0=50; //ohms
   static constexpr double deg=pi/180.; //radians
   static constexpr double kB=8.617343e-11;//MeV/kelvin
+  static constexpr double rho=1.168e-3;//sea level density
+  static constexpr double x_0=36.7;//radiation length in air
+  static constexpr double e_0=.078;//ionization energy 
   /*lengths
  
     for example, if you wanted to calculate the time it took for a signal 
@@ -322,7 +325,13 @@ win_type is an enumeration of window types to be applied to each bin. this helps
 
 
   }
-  
+
+  namespace SIM{
+    //the shower age expression for the NKG approximation  from arXiv:1503.02808
+    double ss(double x, double E, double x_0, double e_0);
+    //number of leptons as a function of depth in radiation lengths in the NKG approximation from  arXiv:1503.02808
+    double n(double x, double E, double x_0, double e_0);
+  }
 
 }
 

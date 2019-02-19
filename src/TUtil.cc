@@ -1645,6 +1645,7 @@ void TUtil::draw(vector<TGraph*> inGr){
 // }
 
 
+
 void TUtil::setWarmPalette(){
 
   const Int_t rgb = 3;
@@ -1673,4 +1674,21 @@ void TUtil::setCoolPalette(){
   gStyle->SetNumberContours(N);
 
 }
+
+
+
+
+double TUtil::SIM::ss(double x, double E, double x_0, double e_0){
+  return (3.*x/x_0)/((x/x_0)+2.*log(E/e_0));
+}
+
+
+double TUtil::SIM::n(double x, double E, double x_0, double e_0){
+  return (.31 * exp((x/x_0)*(1-1.5*log(TUtil::SIM::ss(x, E, x_0, e_0)))))/sqrt(log(E/e_0));
+}
+
+
+
+  
+
 

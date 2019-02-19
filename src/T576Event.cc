@@ -1002,7 +1002,7 @@ TH2D* T576Event::pointingMap(double dx, int draw, int hilbert){
 	  dt[j][k]=(abs(d1.Mag())-abs(d2.Mag()))/TUtil::c_light;
 	  // cout<<dt[j][k]<<endl;
 	  //	  tot+=grc[j][k]->Eval(dt[j][k]);
-	  gout->Fill(x, y, grc[j][k]->Eval(-dt[j][k])); 
+	  gout->Fill(x, y, grc[j][k]->Eval(dt[j][k])); 
 	  //auto temp=TUtil::getChunkOfGraph(grc[j][k], dt[j][k]-dtt, dt[j][k]+dtt);
 	  //tot+=TMath::MaxElement(temp->GetN(), temp->GetY());
 	  //delete temp;
