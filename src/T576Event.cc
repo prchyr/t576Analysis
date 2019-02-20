@@ -995,9 +995,9 @@ TH2D* T576Event::pointingMap(double dx, int draw, int hilbert){
 	TVector3 surfupdated=surf->pos[j];//+offset;
 	d1=source-surfupdated;//[j];
 	//cout<<j<<" "<<i<<" "<<l<<endl;
-	for(int k=1;k<12;k++){
+	for(int k=j+1;k<12;k++){
 	  //if(k<11&&k>2) continue;
-	  if(j==k)continue;
+	  //	  if(j==k)continue;
 	  d2=source-surf->pos[k];
 	  dt[j][k]=(abs(d1.Mag())-abs(d2.Mag()))/TUtil::c_light;
 	  // cout<<dt[j][k]<<endl;

@@ -181,8 +181,18 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
 TGraph * TUtil::FFT::plotPhase(TGraph *inGr){
   auto ht=hilbertTransform(inGr);
   auto outGr=new TGraph(inGr->GetN());
+  double lastPhase=0;
   for(int i=0;i<inGr->GetN();i++){
-    outGr->SetPoint(i, inGr->GetX()[i], atan(ht->GetY()[i]/inGr->GetY()[i]));
+    double phase=lastPhase+TMath::ATan2(ht->GetY()[i], inGr->GetY()[i]);
+
+    if((phase-lastPhase)>=TUtil::pi){
+      phase-=2.*TUtil::pi;
+    }
+    else if((phase-lastPhase)<=-TUtil::pi){
+      phase+=2.*TUtil::pi;
+    }
+    outGr->SetPoint(i, inGr->GetX()[i], phase);
+    lastPhase=phase;
   }
   return outGr;
 }
