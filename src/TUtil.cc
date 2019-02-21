@@ -1640,10 +1640,21 @@ double TUtil::rad2Deg(double rad) {
 /*************some plotting things****************/
 
 
-void TUtil::draw(vector<TGraph*> inGr){
-  inGr[0]->Draw("al PLC");
+void TUtil::draw(vector<TGraph*> inGr, TString option){
+  if(option=="norm"){
+    TUtil::normalize(inGr[0])->Draw("al PLC");
+  }
+  else{
+    inGr[0]->Draw("al PLC");
+  }
   for(int i=0;i<inGr.size();i++){
-    inGr[i]->Draw("l same PLC");
+    if(option=="norm"){
+      TUtil::normalize(inGr[i])->Draw("l same PLC");
+    }
+    else{
+      inGr[i]->Draw("l same PLC");
+    }
+    
   }
 }
 
