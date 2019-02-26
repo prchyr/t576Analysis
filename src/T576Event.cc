@@ -99,7 +99,7 @@ int T576Event::checkStatus(){
 
 //load a scope event using a run major/minor combination and event within that file
 
-int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
+int T576Event::loadScopeEvent(int run_major, int run_minor,int event, bool remove_dc_offset){
   if(fIndexBuilt==0){
     cout<<"event index not built yet. building..."<<endl;
     buildEventIndex();
@@ -130,7 +130,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
     fScopeFilename=thisScopeFilename;
 
     //open the file
-
+    fEventFile->Close();
     fEventFile=TFile::Open(directory+thisScopeFilename);
     fEventTree=(TTree*)fEventFile->Get("tree");
   
@@ -150,8 +150,9 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
     cout<<"major/minor combination doesn't exist"<<endl;
     return 0;
   }
-  if(loadScopeEvent(scopeEvNo+event)==1){
+  if(loadScopeEvent(scopeEvNo+event, remove_dc_offset)==1){
     getCharge(scope->ch[3]);
+    //fEventFile->Close();
     return 1;
   }
   else return 0;
@@ -195,7 +196,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event){
 
 
 //load an event from the global scope event number index 
-int T576Event::loadScopeEvent(int event){
+int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
 
   if(fIndexBuilt==0){
     cout<<"event index not built yet. building..."<<endl;
@@ -236,7 +237,7 @@ int T576Event::loadScopeEvent(int event){
   if(thisScopeFilename!=fScopeFilename){
 
     fEventFile->Close();
-    //cout<<thisScopeFilename<<endl;
+    // cout<<thisScopeFilename<<endl;
     fEventFile=TFile::Open(directory+thisScopeFilename);
     fEventTree=(TTree*)fEventFile->Get("tree");
 
@@ -266,35 +267,45 @@ int T576Event::loadScopeEvent(int event){
   //check the length of the record.
   auto length=sizeof(scope->time)/sizeof(*scope->time);
   if(length!=20000)cout<<length;
-  //  if(minor==4)  cout<<major<<" "<<minor<<" "<<subEvNo<<" "<<length<<" "<<fEventTree->GetEntries()<<endl;
+  //cout<<major<<" "<<minor<<" "<<subEvNo<<" "<<length<<" "<<fEventTree->GetEntries()<<" "<<scope->dat[1][18]<<endl;
   //fill the event graphs for the scope->
   //fix the first and last values, which were recorded incorrectly
   scope->time[0]=0.;
   scope->time[19999]=scope->time[19998]+.05;
   for(int i=0;i<4;i++){
     TGraph * graph=new TGraph(length, scope->time, scope->dat[i]);
-    graph->SetTitle("");
-    graph->SetName("ch"+TString::Itoa(i, 10));
-    graph->GetXaxis()->SetTitle("Time (ns)");
-    graph->GetYaxis()->SetTitle("Volts (V)");
-    graph->GetYaxis()->SetTitleOffset(1.15);
-    graph->GetHistogram()->SetName("");
+    if(remove_dc_offset==true){
+      TUtil::removeMeanInPlace(graph, 0., 300.);
+    }
+    
     if(fInterpGSs>0.){
-      getInterpolatedGraph(graph, scope->ch[i]);
+      getInterpolatedGraph(graph, scope->ch[i], fInterpGSs);
     }
     else{
       *scope->ch[i]=*graph;
     }
+    scope->ch[i]->SetTitle("");
+    scope->ch[i]->SetName("ch"+TString::Itoa(i, 10));
+    scope->ch[i]->GetXaxis()->SetTitle("Time (ns)");
+    scope->ch[i]->GetYaxis()->SetTitle("Volts (V)");
+    scope->ch[i]->GetYaxis()->SetTitleOffset(1.15);
+    scope->ch[i]->GetHistogram()->SetName("");
+    
    delete(graph);
+
   }
-  
-  // if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
+  //  cout<<"here"<<endl;
+  //  if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
   //delete(file);
   getCharge(scope->ch[3]);
   
   //  delete (files);
-  
-  
+
+  if(charge<.1){
+    isGood=0;
+  }
+
+  fScopeLoaded=true;  
   return 1;
 }
 
@@ -329,6 +340,10 @@ int T576Event::loadSurfEvent(int run_major, int run_minor, int event){
   }
   if(run_major!=major &&run_minor!=minor){
     cout<<"no surf file for requested major/minor combination."<<endl;
+    return 0;
+  }
+  if(strncmp(surfFilename->Data(), "null", 4)==0){
+    cout<<"no surf events for this run."<<endl;
     return 0;
   }
   if(major<1)return 0;
@@ -423,16 +438,18 @@ int T576Event::loadSurfEvent(int event){
 
   fRunLogTree->GetEntry(fRunLogTree->GetEntryNumberWithBestIndex(major, minor));
 
+  //  while(surfFilename=="null"){
+  //fIndexTree->GetEntry(
   txPos.SetMagThetaPhi(txDist, txAng*pi/180., pi);
   
   for(int i=0;i<12;i++){
-    surf->pos[i].SetMagThetaPhi(surf->dist[i], surf->ang[i]*pi/180., pi);
+    surf->pos[i].SetMagThetaPhi(surf->dist[i], surf->ang[i]*deg, pi);
   }
   if(major<1)return 0;
 
   TString thisSurfFilename=surfFilename->Data();
   //open the file
-
+  //cout<<thisSurfFilename<<endl<<" "<<event<<endl;
   if(thisSurfFilename!=fSurfFilename){
     //load the event file
     TString openf=directory+thisSurfFilename;
@@ -473,71 +490,75 @@ int T576Event::loadSurfEvent(int event){
     int index2=i*len;//i is channel number
     copy(fSurfData+index1+index2, fSurfData+index1+index2+len, surf->dat[i]);
     //feet to meter conversion
-    surf->delays[i]=(surf->cableLengths[i]/3.2808)/(c_light*surf->velocityFactor);
-
+    surf->delays[i]=(surf->cableLengths[i]*ft)/(c_light*surf->velocityFactor);
+    //mV to V conversion
+    for(int j=0;j<len;j++){
+      surf->dat[i][j]*=.001;
+    }
     TGraph * graph=new TGraph(len, TUtil::makeIndices(len, 1./3.2, surf->delays[i]), surf->dat[i]);
 
     TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);
-    grChunk->SetTitle("");
-    grChunk->SetName("ch"+TString::Itoa(i, 10));
-    grChunk->GetXaxis()->SetTitle("Time (ns)");
-    grChunk->GetYaxis()->SetTitle("Volts (V)");
-    grChunk->GetYaxis()->SetTitleOffset(1.15);
-    grChunk->GetHistogram()->SetName("");
+
     if(fInterpGSs>0.){
-      getInterpolatedGraph(grChunk, surf->ch[i]);
+      getInterpolatedGraph(grChunk, surf->ch[i], fInterpGSs);
     }
     else{
       *surf->ch[i]=*grChunk;
     }
+
+    surf->ch[i]->SetTitle("");
+    surf->ch[i]->SetName("ch"+TString::Itoa(i, 10));
+    surf->ch[i]->GetXaxis()->SetTitle("Time (ns)");
+    surf->ch[i]->GetYaxis()->SetTitle("Volts (V)");
+    surf->ch[i]->GetYaxis()->SetTitleOffset(1.15);
+    surf->ch[i]->GetHistogram()->SetName("");
+    
     delete(grChunk);
     delete(graph);
   }
-  
+
+  fSurfLoaded=true;
   //getCharge();  
   return 1;
 }
 
 
 double T576Event::getCharge(TGraph *ict){
-  double tot=0.;
-  for(int i=0;i<ict->GetN();i++){
-    tot+=ict->GetY()[i];
-  }
-  double xval=ict->GetX()[10]-ict->GetX()[9];
-
-  charge = .4*tot*xval;
+  //TUtil::removeMeanInPlace(ict, 0., 400.)
+  charge = .4*TUtil::integrate(ict, 455, 550);
   return charge;
 }
 
 
-int T576Event::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph){
-  ROOT::Math::Interpolator interp(inGraph->GetN(), ROOT::Math::Interpolation::kAKIMA);
-  interp.SetData(inGraph->GetN(), inGraph->GetX(), inGraph->GetY());
+// int T576Event::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph){
+//   ROOT::Math::Interpolator interp(inGraph->GetN(), ROOT::Math::Interpolation::kAKIMA);
+//   interp.SetData(inGraph->GetN(), inGraph->GetX(), inGraph->GetY());
 
-  //get dt, assuming even sampling.
-  double inDt=inGraph->GetX()[50]-inGraph->GetX()[49];
-  double inGsPerS=1./inDt;
+//   //get dt, assuming even sampling.
+//   double inDt=inGraph->GetX()[50]-inGraph->GetX()[49];
+//   double inGsPerS=1./inDt;
 
-  double outDt=1./fInterpGSs;
+//   double outDt=1./fInterpGSs;
 
-  int samps=(int) (inGraph->GetN()*(fInterpGSs/inGsPerS));
+//   int samps=(int) (inGraph->GetN()*(fInterpGSs/inGsPerS));
 
-  vector<double> xx, yy;
-  for(int i=0;i<samps;i++){
-    double time = i*outDt;
-    if(time>inGraph->GetX()[inGraph->GetN()-1])continue;
-    xx.push_back(time);
-    yy.push_back(interp.Eval(time));
-  }
+//   vector<double> xx, yy;
+//   for(int i=0;i<samps;i++){
+//     double time = i*outDt;
+//     if(time>inGraph->GetX()[inGraph->GetN()-1])continue;
+//     xx.push_back(time);
+//     yy.push_back(interp.Eval(time));
+//   }
 
-  auto tempGr=new TGraph(xx.size(), &xx[0], &yy[0]);
-  *outGraph=*tempGr;
-  delete(tempGr);
+//   auto tempGr=new TGraph(xx.size(), &xx[0], &yy[0]);
+//   *outGraph=*tempGr;
+//   delete(tempGr);
 			 
 
-  return 1;
-}
+//   return 1;
+// }
+
+
 
 
 int T576Event::buildEventIndex(int force){
@@ -711,4 +732,434 @@ TString T576Event::getSurfFilename(int inMaj, int inMin){
     }
   }
   return "null";
+}
+
+
+
+
+/***************************************************************
+
+scope utilities
+
+**************************************************************/
+
+int T576Event::drawGeom(int scopeChan, int surfChan){
+  
+
+  auto dummy=new TGraph();
+
+  dummy->SetPoint(dummy->GetN(), -8, -8);
+  dummy->SetPoint(dummy->GetN(), 8, -8);
+  dummy->SetPoint(dummy->GetN(), 8, 8);
+  dummy->SetPoint(dummy->GetN(), -8, 8);
+  dummy->SetMarkerSize(0);
+  dummy->Draw("ap");
+  dummy->GetXaxis()->SetRangeUser(-8, 8);
+  dummy->GetYaxis()->SetRangeUser(-8, 8);
+  dummy->GetXaxis()->SetTitle("z (m)");
+  dummy->GetYaxis()->SetTitle("x (m)");
+
+  double scopex[4], scopey[4], surfx[12], surfy[12];
+
+  for(int i=0;i<12;i++){
+    surfx[i]=surf->pos[i].Z();
+    surfy[i]=surf->pos[i].X();
+    //        cout<<surf[i].x<<" "<<surf[i].y<<" "<<surf[i].z<<endl;
+  }
+
+
+  
+  for(int i=0;i<3;i++){
+    scopex[i]=scope->pos[i].Z();
+    scopey[i]=scope->pos[i].X();
+  }
+
+  
+
+  auto txgraph=new TGraph();
+  txgraph->SetPoint(0, txPos.Z(), txPos.X());
+  txgraph->SetMarkerColor(kBlue);
+  txgraph->SetMarkerStyle(21);
+  txgraph->SetMarkerSize(1.5);
+  txgraph->Draw("p same");
+
+ 
+
+  double bdx[5], bdy[5];
+  bdx[0] = 2;
+  bdx[1]=5.6;
+  bdx[2]=5.6;
+  bdx[3]=2;
+  bdx[4]=2;
+  
+  bdy[0]=2.44;
+  bdy[1]=2.44;
+  bdy[2]=-1.24;
+  bdy[3]=-1.24;
+  bdy[4]=2.44;
+  auto bd=new TPolyLine(5, bdx, bdy);
+  bd->SetLineColor(kBlack);
+  bd->Draw("l same");
+
+  double wallx[5], wally[5];
+  wallx[0] = 5.6;
+  wallx[1]=5.6;
+  
+  wally[0]=8;
+  wally[1]=-8;
+
+  auto wall=new TPolyLine(2, wallx, wally);
+  wall->SetLineColor(kBlack);
+  wall->SetLineStyle(3);
+  wall->Draw("l same");
+
+  double bd2x[5], bd2y[5];
+  bd2x[0] = 3.83;
+  bd2x[1]=3.83;
+  
+  bd2y[0]=-1.24;
+  bd2y[1]=2.44;
+
+  auto bd2=new TPolyLine(2, bd2x, bd2y);
+  bd2->SetLineColor(kBlack);
+  bd2->Draw("l same");
+
+  double blockx[5], blocky[5];
+  blockx[0] = -6;
+  blockx[1]=-5;
+  blockx[2]=-5.5;
+  blockx[3]=-6.5;
+  blockx[4]=-6;
+  
+  blocky[0]=-3;
+  blocky[1]=-5;
+  blocky[2]=-5.5;
+  blocky[3]=-3.5;
+  blocky[4]=-3;
+  auto block=new TPolyLine(5, blockx, blocky);
+  block->SetLineColor(kBlack);
+  block->Draw("l same");
+
+
+  double supportx[5], supporty[5];
+  supportx[0] = -7.2075;
+  supportx[1]=2;
+  supportx[2]=2;
+  supportx[3]=-7.2075;
+  supportx[4]=-7.2075;
+  
+  supporty[0]=1.517;
+  supporty[1]=1.517;
+  supporty[2]=-.317;
+  supporty[3]=-.317;
+  supporty[4]=1.517;
+  auto support=new TPolyLine(5, supportx, supporty);
+  support->SetLineColor(kBlack);
+  support->Draw("l same");
+
+    double bpx[5], bpy[5];
+  bpx[0] = -8.;
+  bpx[1]=-3.6;
+  bpx[2]=-3.6;
+  bpx[3]=-8;
+
+  bpy[0]=.5;
+  bpy[1]=.5;
+  bpy[2]=.7;
+  bpy[3]=.7;
+  bpy[4]=0;
+  auto bp=new TPolyLine(4, bpx, bpy);
+  bp->SetLineColor(kBlack);
+  bp->SetLineStyle(2);
+  bp->Draw("l same");
+
+
+  double tgtx[5], tgty[5];
+  tgtx[0] = -2.;
+  tgtx[1]=2.;
+  tgtx[2]=2.;
+  tgtx[3]=-2.;
+  tgtx[4]=-2.;
+
+  tgty[0]=0.3087;
+  tgty[1]=0.3087;
+  tgty[2]=.9087;
+  tgty[3]=.9087;
+  tgty[4]=.3087;
+  auto target=new TPolyLine(5, tgtx, tgty);
+  target->SetLineColor(kGreen);
+  target->SetFillColor(kGreen);
+  target->SetFillStyle(1001);
+  //  target->SetTitle("target");
+  target->Draw("f same");
+
+auto scoperxgraph=new TGraph(3, scopex, scopey);
+
+ auto scopeChanGraph=new TGraph();
+  if(scopeChan<4&&scopeChan>=0){
+    scopeChanGraph->SetPoint(0, scopex[scopeChan], scopey[scopeChan]);
+    scopeChanGraph->SetMarkerSize(2.5);
+    scopeChanGraph->SetMarkerStyle(4);
+    scopeChanGraph->SetLineWidth(2);
+    scopeChanGraph->SetMarkerColor(kViolet);
+  }
+ scoperxgraph->SetMarkerColor(kRed);
+  scoperxgraph->SetMarkerStyle(20);
+  scoperxgraph->SetMarkerSize(1.5);
+  if(fScopeLoaded){
+    scoperxgraph->Draw("p same");
+    scopeChanGraph->Draw("p same");
+  }
+  
+  auto surfrxgraph=new TGraph(12, surfx, surfy);
+  surfrxgraph->SetMarkerColor(kRed);
+  surfrxgraph->SetMarkerStyle(24);
+  surfrxgraph->SetMarkerSize(1.5);
+  if(fSurfLoaded){
+    surfrxgraph->Draw("p same");
+  }
+
+  TLegend *leg = new TLegend(.83, .6, 1, .95);
+  leg->AddEntry(txgraph, "TX", "p");
+  leg->AddEntry(surfrxgraph, "SURF", "p");
+  leg->AddEntry(scoperxgraph, "Scope", "p");
+if(scopeChan<4&&scopeChan>=0){
+    leg->AddEntry(scopeChanGraph, "CH"+TString::Itoa(scopeChan, 10), "p");
+  }
+  leg->AddEntry(target, "target", "l");
+  leg->AddEntry(wall, "wall", "l");
+  leg->AddEntry(support, "blocks", "l");
+  leg->AddEntry(bp, "beam pipe", "l");
+  
+  leg->Draw();
+  
+  return 1;
+
+  
+}
+
+
+TH2D* T576Event::pointingMap(double dx, int draw, int hilbert){
+  double tmin=20;
+  double tmax=150;
+  double dt[12][12]={0};
+  double maxdt[12][12]={0};
+  TGraph *grc[12][12]={new TGraph()};
+  TVector3 source, d1, d2;
+  vector<double>xx, yy,zz;
+  auto graphs = vector<TGraph*>(12);
+  auto surfx=vector<double>(12);
+  auto surfy=vector<double>(12);
+  double tot=0;
+  auto deltat=1./(3.2*fInterpGSs);
+  for(int i=0;i<12;i++){
+    //graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1)));
+    
+    if(hilbert==1){
+      graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::brickWallFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5)));
+    }
+    else{
+    graphs[i]=TUtil::normalize(TUtil::brickWallFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5));
+    }
+  }
+  //auto window=rectangularWindow(10./deltat, 150./deltat, 250./deltat, deltat);
+  for(int i=0;i<12;i++){
+    for(int j=0;j<12;j++){
+      double maxdelay=(surf->pos[i]-surf->pos[j]).Mag()/TUtil::c_light;
+      // cout<<i<<" "<<j<<" "<<maxdelay<<" "<<maxdelay/deltat<<endl;
+      grc[i][j]=TUtil::crossCorrelate(graphs[i], graphs[j], maxdelay);
+      // grc[i][j]=crossCorrelateUseful(graphs[j], graphs[i], graphs[j]->GetN(), (int)((graphs[i]->GetN()/2) -maxdt/deltat), (int)((graphs[i]->GetN()/2) +maxdt/deltat));
+    }
+  }
+  //  setWarmPalette();
+  double maxTot=0;
+  TGraph *outgraphs[12];
+  double coordincr=dx;
+  TVector3 offset(.5, .5, .5);
+  int nbins=16.01/dx;
+  TH2D * gout=new TH2D("outhist", "outhist", nbins, -8, 8, nbins, -8, 8);
+  double dtt = .2;
+  for(double x=-8.01;x<8.01;x+=coordincr){
+
+    source.SetZ((double)x);//z = x
+
+    for(double y=-8.01;y<8.01;y+=coordincr){
+      tot=0;
+      source.SetX((double)y);//x=y
+
+      xx.push_back((double)x);
+
+      yy.push_back((double)y);
+      for(int j=1;j<12;j++){
+	//if(j<11&&j>2)continue;
+	TVector3 surfupdated=surf->pos[j];//+offset;
+	d1=source-surfupdated;//[j];
+	//cout<<j<<" "<<i<<" "<<l<<endl;
+	for(int k=j+1;k<12;k++){
+	  //if(k<11&&k>2) continue;
+	  //	  if(j==k)continue;
+	  d2=source-surf->pos[k];
+	  dt[j][k]=(abs(d1.Mag())-abs(d2.Mag()))/TUtil::c_light;
+	  // cout<<dt[j][k]<<endl;
+	  //	  tot+=grc[j][k]->Eval(dt[j][k]);
+	  gout->Fill(x, y, grc[j][k]->Eval(dt[j][k])); 
+	  //auto temp=TUtil::getChunkOfGraph(grc[j][k], dt[j][k]-dtt, dt[j][k]+dtt);
+	  //tot+=TMath::MaxElement(temp->GetN(), temp->GetY());
+	  //delete temp;
+
+	}
+      }
+
+      zz.push_back(tot);
+    }
+  }
+
+
+    //  auto gout=new TGraph2D(xx.size(), &xx[0], &yy[0], &zz[0]);
+  gout->SetName("map"+minor);
+  //    if(plot==1){
+  //     auto crap=new TCanvas("map"+minor, "map"+minor, 700,600);
+
+  //gout->SetMarkerStyle(20);
+  gout->SetTitle("");
+
+  gout->GetXaxis()->SetTitle("z (m)");
+  gout->GetYaxis()->SetTitle("x (m)");
+  //gout->GetHistogram()->GetXaxis()->SetTitle("z (m)");
+  //gout->GetHistogram()->GetYaxis()->SetTitle("x (m)");
+
+  if(draw==1){
+    gout->SetMarkerStyle(20);
+    gout->Draw("colz");
+    //gPad->SetTheta(90.01);
+    //gPad->SetPhi(0.01);
+    //gPad->Update();
+
+
+    //hist->Draw("colz");
+    for(int i=0;i<12;i++){
+      surfx[i]=surf->pos[i].Z();
+      surfy[i]=surf->pos[i].X();
+      //        cout<<surf[i].x<<" "<<surf[i].y<<" "<<surf[i].z<<endl;
+    }
+    auto rxgraph=new TGraph(12, &surfx[0], &surfy[0]);
+    rxgraph->SetMarkerColor(kOrange);
+    rxgraph->SetMarkerStyle(20);
+    rxgraph->Draw("p same");
+
+    //     auto rxtruegraph=new TGraph(12, surftruex, surftruey);
+    //     rxtruegraph->SetMarkerColor(kRed);
+    //     rxtruegraph->SetMarkerStyle(20);
+    //     rxtruegraph->Draw("p same");
+
+    auto txgraph=new TGraph();
+    TVector3 tx(0,0,0);
+    tx=txPos;
+    txgraph->SetPoint(txgraph->GetN(), tx.Z(), tx.X());
+    txgraph->SetMarkerColor(kYellow);
+    txgraph->SetMarkerStyle(21);
+    txgraph->Draw("p same");
+
+    double tgtx[5], tgty[5];
+    tgtx[0] = -2.;
+    tgtx[1]=2.;
+    tgtx[2]=2.;
+    tgtx[3]=-2.;
+    tgtx[4]=-2.;
+
+    tgty[0]=0.3087;
+    tgty[1]=0.3087;
+    tgty[2]=.9087;
+    tgty[3]=.9087;
+    tgty[4]=.3087;
+    auto target=new TPolyLine(5, tgtx, tgty);
+    target->SetLineColor(kGreen);
+    target->Draw("l same");
+
+    double bpx[5], bpy[5];
+    bpx[0] = -8.;
+    bpx[1]=-3.6;
+    bpx[2]=-3.6;
+    bpx[3]=-8;
+
+    bpy[0]=.5;
+    bpy[1]=.5;
+    bpy[2]=.7;
+    bpy[3]=.7;
+    bpy[4]=0;
+    auto bp=new TPolyLine(4, bpx, bpy);
+    bp->SetLineColor(kPink);
+    bp->Draw("l same");
+
+    double bdx[5], bdy[5];
+    bdx[0] = 2;
+    bdx[1]=5.6;
+    bdx[2]=5.6;
+    bdx[3]=2;
+    bdx[4]=2;
+
+    bdy[0]=2.44;
+    bdy[1]=2.44;
+    bdy[2]=-1.24;
+    bdy[3]=-1.24;
+    bdy[4]=2.44;
+    auto bd=new TPolyLine(5, bdx, bdy);
+    bd->SetLineColor(kPink);
+    bd->Draw("l same");
+
+    double wallx[5], wally[5];
+    wallx[0] = 5.6;
+    wallx[1]=5.6;
+
+    wally[0]=8;
+    wally[1]=-8;
+
+    auto wall=new TPolyLine(2, wallx, wally);
+    wall->SetLineColor(kPink);
+    wall->Draw("l same");
+
+    double bd2x[5], bd2y[5];
+    bd2x[0] = 3.83;
+    bd2x[1]=3.83;
+
+    bd2y[0]=-1.24;
+    bd2y[1]=2.44;
+
+    auto bd2=new TPolyLine(2, bd2x, bd2y);
+    bd2->SetLineColor(kPink);
+    bd2->Draw("l same");
+
+    double blockx[5], blocky[5];
+    blockx[0] = -6;
+    blockx[1]=-5;
+    blockx[2]=-5.3;
+    blockx[3]=-6.3;
+    blockx[4]=-6;
+
+    blocky[0]=-3;
+    blocky[1]=-5;
+    blocky[2]=-5.3;
+    blocky[3]=-3.3;
+    blocky[4]=-3.;
+    auto block=new TPolyLine(5, blockx, blocky);
+    block->SetLineColor(kPink);
+    block->Draw("l same");
+
+    double supportx[5], supporty[5];
+    supportx[0] = -7.2075;
+    supportx[1]=2;
+    supportx[2]=2;
+    supportx[3]=-7.2075;
+    supportx[4]=-7.2075;
+
+    supporty[0]=1.517;
+    supporty[1]=1.517;
+    supporty[2]=-.317;
+    supporty[3]=-.317;
+    supporty[4]=1.517;
+    auto support=new TPolyLine(5, supportx, supporty);
+    support->SetLineColor(kPink);
+    support->Draw("l same");
+  }
+  return gout;
 }

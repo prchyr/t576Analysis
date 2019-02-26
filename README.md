@@ -22,9 +22,23 @@ we have included the relevant source from cnpy in this project (so you don't nee
 
 # Install:
 
-the software uses CMAKE, and you need to set a couple environment variables. T576_INSTALL_DIR is the top directory for the install. headers will install to T576_INSTALL_DIR/include/t576, sources to  T576_INSTALL_DIR/src/t576,  run logs and index files to T576_INSTALL_DIR/share/t576 and the t576 library to T576_INSTALL_DIR/lib. any directories below T576_INSTALL_DIR/ which don't exist will be automatically created.
+2 things to note straight away:
 
-T576_DATA_DIR is where the data is, more on that below.
+1) you need compile these tools with the same compiler version you used to compile ROOT above
+
+2) this compiler must be greater than or equal to gcc 4.9. 
+
+
+the software uses CMAKE, and you need to set a couple environment variables. ```T576_INSTALL_DIR``` is the top directory for the install. headers will install to ```T576_INSTALL_DIR/include/t576```, sources to  ```T576_INSTALL_DIR/src/t576```,  run logs and index files to ```T576_INSTALL_DIR/share/t576``` and the t576 library to ```T576_INSTALL_DIR/lib```. any directories below ```T576_INSTALL_DIR/``` which don't exist will be automatically created.
+
+```T576_DATA_DIR``` is where the data is. set it to yhe directory just above root/ and py/ if you have a full copy of the source. e.g. if the data is ```/path/to/t576/run2``` (below which are ```root/``` and ```py/```, do:
+
+```bash
+export T576_DATA_DIR=/path/to/t576/run2
+```
+
+more on the data below. the installation instructions which follow use generic directories, replace them with the correct ones as above.
+
 
 to install: 
 
@@ -52,12 +66,31 @@ and it will compile, install, and then compile a little test macro that you can 
 details about the above:
 
 
-Firstly for anything to work you need to tell it where to find ROOT. this is usually done already when you run the "source thisroot.sh" script from root. I'll assume you know what this is already. to know if things are sourced correctly, type "echo $ROOTSYS", and you should get the correct directory to ROOT.
+Firstly for anything to work you need to tell it where to find ROOT. this is usually done already when you run the "source thisroot.sh" script from root. I'll assume you know what this is already. to know if things are sourced correctly, type ```echo $ROOTSYS```, and you should get the correct directory to ROOT.
 
 
-then, (optional) tell it where you'd like to install the software, as above. if you don't do this, it will install to /usr/local/.
+then, (optional) tell it where you'd like to install the software, as above. if you don't do this, it will install to ```/usr/local/```.
 
-finally, tell it where the t576 data lives. the data directory structure must be /path/to/t576/data/(root/ py/) meaning root/ and py/ live under some common directory. and under py/, lives dat/ and ped/. contact me if there are questions on this.
+finally, tell it where the t576 data lives. the data directory structure must be ```/path/to/t576/data/(root/ py/)``` meaning ```root/``` and ```py/``` live under some common directory. and under ```py/```, lives ```dat/``` and ```ped/```. contact me if there are questions on this.
+
+## setting your paths
+
+if you didn't install to the default ```/usr/local```, then you'll need to add the installation directories to the correct paths. to do so, add these to your .bashrc
+
+```bash
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$T576_INSTALL_DIR/include
+export LIBRARY_PATH=$LIBRARY_PATH:$T576_INSTALL_DIR/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$T576_INSTALL_DIR/lib
+```
+
+
+#### builds
+
+so far we've had successful builds on:
+
+Ubuntu 16/gcc 5.4
+Red Hat/gcc 7.3
+
 
 # Using:
 
@@ -78,9 +111,9 @@ to use the software in your own standalone programs, just include the header and
 ```
 and compile with
 ```bash
-g++ -std=c++11 your_script.cc -o your_script `root-config --cflags --glibs --libs` -L$T576_INSTALL_DIR/include/t576 -lt576
+g++ -std=c++11 your_script.cc -o your_script `root-config --cflags --glibs --libs` -I$T576_INSTALL_DIR/include/ -lt576
 ```
-ignore the -L flag if you have $T576_INSTALL_DIR/include in your include path.
+ignore the -I flag if you have ```$T576_INSTALL_DIR/include``` in your include path.
 
 
 # T576Event class
@@ -125,7 +158,7 @@ double z = ev->scope->pos[2].Z();
 //ev->loadScopeEvent(event number). 
 
 //the same can be done for the surf, of course
-ev->surf->loadSurfEvent(9000);
+ev->loadSurfEvent(9000);
 
 //which will put all the things in the proper place, e.g. to draw a graph
 //for channel 9 in the surf for this event, do
@@ -134,12 +167,15 @@ ev->surf->ch[9]->Draw("al");
 
 //furthermore, you can set the level of interpolation for all events
 
-ev->setInterpGsNs(20);
+ev->setInterpGSs(20);
 
 //which will set the sample rate for all resultant graphs to 20GS/s.
 //subsequent calls to ev->loadSurf[Scope]Event(xx) will have this level
 //of interpolation applied. details are in the source.
 
+//to see the antena geometry of the specified event:
+ev->drawGeom();
+//this will draw the surf or scope geometry (whichever has been loaded) or both, if both have been loaded for this event.
 
 ```
 future releases will have all sorts of things, like pointing maps and correlations etc.

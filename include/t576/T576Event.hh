@@ -18,6 +18,7 @@ released under the GNU General Public License version 3
 //#include "TIter.h"
 #include "TSystemFile.h"
 #include "TCanvas.h"
+#include "TLegend.h"
 #include "TH1F.h"
 #include "TString.h"
 #include "TTree.h"
@@ -28,22 +29,23 @@ released under the GNU General Public License version 3
 #include "TMath.h"
 #include "TColor.h"
 #include "TStyle.h"
+#include "TPolyLine.h"
 #include "Math/Interpolator.h"
 #include "Math/InterpolationTypes.h"
 #include <iostream>
+#include <stdio.h>
+#include <string.h>
 #include <fstream>
 #include <vector>
 
 
 
-// #include "CLHEP/Units/PhysicalConstants.h"
-// #include "CLHEP/Vector/LorentzVector.h"
-// #include "CLHEP/Vector/ThreeVector.h"
+
  #include "TUtil.hh"
 
-//using namespace CLHEP;
-using namespace std;
 
+using namespace std;
+using namespace TUtil;
 
 class T576Event : public TObject{
 public:
@@ -106,12 +108,12 @@ public:
   /****************operational functions*****************/
   
   //load an event from a particular run file. actual file name not needed, just the major and minor associated with it. so XXXXrun4_6.root event number 15 is loaded by doing loadScopeEvent(4, 6, 15); 
-  int loadScopeEvent(int run_major, int run_minor, int event);
+  int loadScopeEvent(int run_major, int run_minor, int event, bool remove_dc_offset=true);
   //same for surf
   int loadSurfEvent(int run_major, int run_minor, int event);
   //load an event using a running scope event number index. this index is built the first time the T576Event class is used, starting at 0 for the first event in run 0_0 and going upward.
   //when you use this, the correct positions and stuff will be loaded for the correct run etc.
-  int loadScopeEvent(int event);
+  int loadScopeEvent(int event, bool remove_dc_offset=true);
   //same for surf
   int loadSurfEvent(int event);
   //build the event index ROOT file which allows for rapid grabbing of the right data (done once, first time you use the class. you can also force a re-build if you change the data directory [don't.]) 
@@ -128,8 +130,8 @@ public:
 
   //get the charge in this event from the ict trace.
   double getCharge(TGraph * ict);
-  //provide a graph and a pointer to a graph, and the desired samplerate in GS/s
-  int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph);
+  int drawGeom(int scopeChan=999, int surfChan=999);
+  TH2D* pointingMap(double dx=.3, int draw=1, int hilbert=1);
   
 private:
   int fNEntriesSurf=0, fNEntriesScope=0;
@@ -153,10 +155,13 @@ private:
   TFile * fRunLog= new TFile();
   TTree * fRunLogTree = new TTree();
 
+  bool fScopeLoaded=false;
+  bool fSurfLoaded=false;
   
 public:
-  class Scope {
+  class Scope  {
   public:
+    //    Scope(): fTxPos(txPos){};
     //receiver positions
     TVector3 pos[4];
     double dist[4], ang[4];
@@ -166,8 +171,8 @@ public:
     double  time[20000];
     //tgraphs of each event channel
     TGraph * ch[4]={new TGraph(), new TGraph(),new TGraph(),new TGraph()};
-
-
+    void draw();
+    
 
   private:
     
@@ -195,8 +200,9 @@ public:
     double  time[1024];
 
     TGraph2D * map=0;
-
-    TGraph2D *buildMap(int mmStep=500);
+    int drawGeom();
+    void draw();
+    //int drawMap(int mStep=.5);
 
   private:
 

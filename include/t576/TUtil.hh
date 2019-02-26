@@ -3,6 +3,25 @@
   released under the GNU General Public License version 3
 */
 
+
+/*
+The TUtil namespace provides numerous useful functions which act primarily on TGraphs. 
+
+The FFT namespace has FFT functions built on ROOT's implementation of FFTW3. 
+
+The SVD namespace has SVD functions built on the ROOT implementation of the GSL linear algebra tools.
+
+The global system of units is: 
+
+time: ns
+length: m
+frequency: GHz
+power spectral density: dBm/Hz
+amplitude: V
+charge: nC
+
+ */
+
 #ifndef TUTIL_BASE_H
 #define TUTIL_BASE_H
 
@@ -12,13 +31,16 @@
 #include "TSystem.h"
 #include "TRandom.h"
 #include "TObject.h"
+#include "TLine.h"
 #include "TFile.h"
 #include "TSystemDirectory.h"
 #include "TList.h"
 #include "cnpy.h"
 #include "TSystemFile.h"
 #include "TH1F.h"
+#include "TH1D.h"
 #include "TH2F.h"
+#include "TH2D.h"
 #include "TString.h"
 #include "TStyle.h"
 #include "TCanvas.h"
@@ -38,37 +60,91 @@
 #include <fstream>
 #include <vector>
 
-// #include "CLHEP/Units/PhysicalConstants.h"
-// #include "CLHEP/Vector/LorentzVector.h"
-// #include "CLHEP/Vector/ThreeVector.h"
+
 
 #include "TUtilGraph.hh"
 
-#define c_light .29979246 //  m/ns
-#define pi 3.1415927
 
-//using namespace CLHEP;
+
 using namespace std;
+
+
+
 
 class TUtilGraph;
 namespace TUtil{
 
+  /*some useful units. inspired by the CLHEP global system of units. 
+
+    use these to keep your numbers in the global system of units defined above:
+    ns, GHz, m, nC
+
+    if you want to write something in terms of MHz, for example, just do 
+    
+    freq = 1200*MHz
+
+    and then freq will have units of GHz, as it should.
+  */
+  //constants
+  static constexpr double c_light = .29979246; //  m/ns
+  static constexpr double pi = 3.1415927; //radians
+  static constexpr double z_0=50; //ohms
+  static constexpr double deg=pi/180.; //radians
+  static constexpr double kB=8.617343e-11;//MeV/kelvin
+  static constexpr double rho=1.168e-3;//sea level density
+  static constexpr double x_0=36.7;//radiation length in air
+  static constexpr double e_0=.078;//ionization energy 
+  /*lengths
+ 
+    for example, if you wanted to calculate the time it took for a signal 
+    to propagate 75 feet, you'd do:
+    
+    75*ft/c_light
+    
+    and it would return the correct time in nanoseconds. 
+  */
+  static constexpr double m = 1.;
+  static constexpr double ft = .3047*m;
+  static constexpr double cm = .01*m;
+  static constexpr double mm = .001*m;
+
+
+  //time
+  static constexpr double ns = 1.;
+  static constexpr double us = ns*1e3;
+  static constexpr double ms = ns*1e6;
+  static constexpr double s = ns*1e9;
+
+  //frequency
+  static constexpr double GHz = 1.;
+  static constexpr double MHz = .001*GHz;
+  static constexpr double kHz = 1e-6*GHz;
+  static constexpr double Hz = 1e-9*GHz;
+  
+
+  
   //volts to dbm/hz
   double vToDbmHz(double bandwidthGSs, double re, double im=0);
   //make an axis with linearly increasing values.
   double * makeIndices(int n, double step, double offset=0);
   //the normalized sinc function: sin(pi x)/(pi x)
   double sinc(double x);
-  //return a TGraph interpoltaed using simple sinc interpolation.
+  //return a TGraph interpoltaed using simple sinc interpolation.(slow)
   TGraph * sincInterpolateGraph(TGraph *inGr, double interpGSs);
+  //approximated (fast) sinc interpolation.(broken)
   TGraph * sincInterpolateGraphSimple(TGraph *inGr, double interpGSs);
-  //interpolate a tgraph using the ROOT interpolation functions
+  //interpolate a tgraph using the ROOT interpolation functions(works well)
   int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs);
 
   //normalize a graph
   TGraph * normalize(TGraph *inGr);
-  //return a chunk of a graph, specified by x-axis values. 
-  TGraph * getChunkOfGraph(TGraph *ingr, double start, double end);
+  //normalize a 2d graph
+  TGraph2D * normalize(TGraph2D * inGr);
+  //return a chunk of a graph, specified by x-axis values.
+  //if shift_to_zero==1, the time axis is shifted such that it starts at 0.
+  //  return the cumulative distribution function of a graph. if normed is 1, the graph is scaled such that x and y axes spread from 0 to 1.
+  TGraph *CDF(TGraph *inGr, int normed=0);
+  TGraph * getChunkOfGraph(TGraph *ingr, double start, double end, int delay_to_zero=0);
   //cross correlation of two graphs. returns the cross-correlation graph
   //maxDelay is the maximum starting offset between gr1 and gr2. defaults
   //to the full length of the graphs.
@@ -81,7 +157,12 @@ namespace TUtil{
   //the same as the crossCorrelate() function, but returns gr2 shifted in time
   //to the point of peak cross correlation with gr1.
   TGraph * align(TGraph * gr1, TGraph * gr2, double max_delay=999999., double t_low=0., double t_high=999999.);
-  //align gr2 to gr1, but returning othGr, delayed correctly. 
+  /*align gr2 to gr1, but returning othGr, delayed by the amount needed to
+  align gr2 to gr1 at the point of peak correlation. 
+  for example, gr1 and gr2 are events which are causal, and othGr
+  is some other graph which you'd like to align with these, but can't for
+  whatever reason (contaminated with CW, etc.). 
+  */
   TGraph * alignToOther(TGraph * gr1, TGraph * gr2, TGraph* othGr, double max_delay=999999., double t_low=0., double t_high=999999.);
   //align a large number of graphs to the first graph in the set.
   vector<TGraph*> alignMultiple(vector<TGraph*> inGr, double max_delay=999999., double t_low=0., double t_high=999999.);
@@ -93,13 +174,73 @@ namespace TUtil{
   int delayGraph(TGraph * ingr, TGraph *outgr, double delay);
   //plot \Delta(gr1[i], gr2[i]) for each graph point i
   TH1F * plotResiduals(TGraph *gr1, TGraph *gr2, int nbins=40, double min=1, double max=-1);
+  //average some graphs
+  TGraph * avgGraph(vector<TGraph*> inGr);
   //add 2 TGraphs. if constant is -1, they are subtracted.
   TGraph * add(TGraph * g1, TGraph * g2, double constant=1.);
+  TGraph2D * add(TGraph2D * g1, TGraph2D * g2, double constant=1.);
+  //dot product of 2 graphs
+  double dot(TGraph *g1, TGraph *g2);
+  //shift a graph along the y axis by the factor
+  TGraph * shiftY(TGraph *g1, double factor);
+  //shift a graph along the x axis by the factor
+  TGraph * shiftX(TGraph *g1, double factor);
+  //scale a TGraph by a constant factor
+  TGraph * scale(TGraph *g1, double factor);
+  //stretch a TGraph in time by a factor
+  TGraph *stretch(TGraph *g1, double factor);
+  //find the mean of a TGraph. range is optional
+  double mean(TGraph *gr, double t_low=0., double t_high=999999.);
+  //remove the mean of a TGraph. range to compute the mean over is optional.
+  //the mean computed within a sub-range will be removed from the full graph.
+  TGraph * removeMean(TGraph *gr, double t_low=0., double t_high=999999.);
+  //same as removeMean but the original graph is changed
+  int removeMeanInPlace(TGraph *gr, double t_low=0., double t_high=999999.);
+  //make CW with given parameters.
   TGraph * makeCW(double freq,  double amp, double t_min=0., double t_max=1000., double GSs=20., double phase=0.);
+  //integrate a TGraph. lower and upper bounds are optional.
   double integrate(TGraph * gr, double t_low=0, double t_high=999999.);
+  //integrate a TGraph but square it first to get units of power.
+  double integratePower(TGraph * gr, double t_low=0, double t_high=999999.);
+  
+  //integrate a graph bin-by-bin, putting the result in a tgraph
+  //binNS is the desired bin width in nanoseconds
+  double integrate2D(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err);
+  TGraph * integrateByBin(TGraph *gr, double binNS);
+  //simple 2 pole lowpass filter
+  TGraph * lowpassFilter(TGraph *ingr, double cutoff, int order=2);
+  //a brick wall frequency domain filter
+  TGraph * brickWallFilter(TGraph *ingr, double low, double high);
+    //will take the first chunk of the signal graph (equal to to t_high-t_low)
+
+  // return the value of a window over sample numbers n. types are:
+  /*
+    0=bartlett (triangle) (default)
+    1=welch (parabolic)
+    2=hann (gaussian ish)
+    3=blackman-nuttall (gaussian ish);
+   */
+  double window(int i, int n, int type=0);
+  //return the value of a bartlett window over sample numbers n
+  double bartlettWindow(int i, int n);
+  //return the value of a welch window over sample numbers n
+  double welchWindow(int i, int n);
+  //return the value of a hann window over sample numbers n
+  double hannWindow(int i, int n);
+  //return the value of a blackman-nuttall window
+  double blackmanNuttallWindow(int i, int n);
+    //and add it to the indicated region of the background graph.
+  TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max, double scale=1.);
+  double sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0);
+  //degrees to radians
   double deg2Rad(double deg);
+  //radians to degrees
   double rad2Deg(double rad);
+  //draw a bunch of vectors
+  void draw(vector<TGraph*> inGr, TString option="");
+  //a pretty warm palette
   void setWarmPalette();
+  //a pretty cool palette
   void setCoolPalette();
   
   namespace FFT{
@@ -110,13 +251,27 @@ namespace TUtil{
     TGraph * ifft(TGraph2D *inGr);
     //return the Hilbert transform
     TGraph * hilbertTransform(TGraph *inGr);
+    TGraph * plotPhase(TGraph *inGr);
+    //DON'T USE NOT WORKING return the phasor transform DON'T USE NOT WORKING
+    TGraph * phasorTransform(TGraph *inGr);
     //return the Hilbert envelope
     TGraph * hilbertEnvelope(TGraph *inGr);
-    //return the power spectral density in dBm/Hz
-    TGraph * psd(TGraph *inGr);
-    //return the spectrogram, with various options. 
-    TGraph2D * spectrogram(TGraph *inGr, int nfft=256, int noverlap=0);
+    //return the power spectral density in dBm/Hz, rBW is the resolution bandwith of the system, used to calculate the density. defaults to Nyquist.
+    TGraph * psd(TGraph *inGr, double rBW=0., int dbFlag=1);
+    /*
+      return the spectrogram, with various options:
 
+binsize is what python calls nfft. it's the number of samples in the chunk over which the FFT is calculated. this is one spectrogram 'bin'
+
+overlap is how many samples each bin overlaps with the next. helps somewhat with smoothing.
+
+zero pad length is the length to which the chunk is symmetrically zero-padded.
+
+win_type is an enumeration of window types to be applied to each bin. this helps avoid discontinuities and noise in the spectrogram. see the window function for the window types.
+     */
+    TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128, int win_type=0, int dbFlag=1);
+    //averages a vector of spectrograms. must be the same size.
+    TH2D* avgSpectrograms(vector<TH2D*>  inh);
 
   }
 
@@ -124,6 +279,7 @@ namespace TUtil{
 
     //normmalize a tvector
     TVectorD normalize(TVectorD vec);
+    //return the norm of a vector
     double norm(TVectorD vec);
     //build a matrix out of events, with each event a row in the matrix.
     //must all be the same length.
@@ -148,8 +304,15 @@ namespace TUtil{
     //expands a vector in a basis B
     TVectorD expandInBasis(TVectorD V, TMatrixD B, int num=10);
     TGraph * expandInBasis(TGraph * G, TMatrixD B, int num=10);
+
+    //filter a vector using a basis. the expansion of the vector in the basis B (to
+    //order num) will be removed from the vector.
     TVectorD filter(TVectorD V, TMatrixD B, int num);
     TGraph * filter(TGraph *G, TMatrixD B, int num);
+    //will align a signal matrix and a background matrix to their respective
+    //reference matrices, build a basis out of backs ,
+    //and filter sigs using this basis to order num
+    TGraph * alignAndFilter(vector<TGraph*> sigs, vector<TGraph*> sigsref, vector<TGraph*> backs, vector<TGraph*> backsref, int num);
 
     //must be for square matrix, a Ralston-style filter matrix
     TMatrixD makeFilter(TDecompSVD svd, int below, int above=0);
@@ -162,7 +325,13 @@ namespace TUtil{
 
 
   }
-  
+
+  namespace SIM{
+    //the shower age expression for the NKG approximation  from arXiv:1503.02808
+    double ss(double x, double E, double x_0, double e_0);
+    //number of leptons as a function of depth in radiation lengths in the NKG approximation from  arXiv:1503.02808
+    double n(double x, double E, double x_0, double e_0);
+  }
 
 }
 
