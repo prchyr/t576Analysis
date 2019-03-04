@@ -692,6 +692,19 @@ TGraph * TUtil::derivative(TGraph *gr, int direction){
   return outGr;
 }
 
+double TUtil::rms(TGraph * gr, double t_low, double t_high){
+  t_low=t_low>0.?t_low:0.;
+  t_high>gr->GetX()[gr->GetN()-1]?gr->GetX()[gr->GetN()-1]:t_high;
+  
+  double rms=0.;
+  for(int i=0;i<gr->GetN();i++){
+    if(gr->GetX()[i]<t_low||gr->GetX()[i]>t_high)continue;
+    rms+=gr->GetY()[i]*gr->GetY()[i];
+  }
+  return sqrt(rms);
+}
+
+
 
 TGraph * TUtil::gObs(TGraph *inGr, double thetaDeg, double tUnits){
   auto tRet=inGr->GetX();

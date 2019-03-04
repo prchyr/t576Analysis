@@ -204,7 +204,10 @@ namespace TUtil{
   TGraph * makeCW(double freq,  double amp, double t_min=0., double t_max=1000., double GSs=20., double phase=0.);
   //integrate a TGraph. lower and upper bounds are optional.
   double integrate(TGraph * gr, double t_low=0, double t_high=999999.);
-  //take the derivative. if direction=-1, takes derivative along other direction of axis.
+  
+  //get the RMS
+  double rms(TGraph * gr, double t_low, double t_high);
+//take the derivative. if direction=-1, takes derivative along other direction of axis.
   TGraph * derivative(TGraph *gr, int direction=1);
   //get the observer graph from a retarded graph. tUnits is the multiplier for ns (eg for ms, tUinits=1e6);
   TGraph * gObs(TGraph *inGr, double thetaDeg, double tUnits=1.);
