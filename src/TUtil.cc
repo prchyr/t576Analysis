@@ -672,6 +672,54 @@ double TUtil::integrate(TGraph * gr, double t_low, double t_high){
   return integral;
 }
 
+TGraph * TUtil::derivative(TGraph *gr, int direction){
+  double x, y, lastx, lasty;
+  int n=gr->GetN();
+  lastx=gr->GetX()[0];
+  lasty=gr->GetY()[0];
+  
+  auto outGr=new TGraph();
+  for(int i=1;i<n;i++){
+    x=gr->GetX()[i];
+    y=gr->GetY()[i];
+    
+    auto dx=x-lastx;
+    auto dy=y-lasty;
+    outGr->SetPoint(outGr->GetN(), lastx, direction*dy/dx);
+    lastx=x;
+    lasty=y;
+  }
+  return outGr;
+}
+
+
+TGraph * TUtil::gObs(TGraph *inGr, double thetaDeg, double tUnits){
+  auto tRet=inGr->GetX();
+  auto aRet=inGr->GetY();
+  auto N=inGr->GetN();
+  auto cc=TUtil::c_light*tUnits;//adjust the speed of light for the observer time (if needed)
+  auto n=1.0003;
+  auto theta=TUtil::deg2Rad(thetaDeg);
+  vector<double>tObs;
+  vector<double>aObs;
+  
+  for(int i=0;i<N;i++){
+    double R=cc*tRet[i]/cos(theta);//for an observer on the ground theta degrees from shower axis
+
+    tObs.push_back((R/cc)+tRet[i]);
+    double D=(R*(1.-n*cos(theta)));
+
+    auto A=aRet[i]/abs(D);
+    if(R==0)A=0;
+    aObs.push_back(A);
+  }
+  auto outGr=new TGraph(tObs.size(), &tObs[0], &aObs[0]);
+
+  return outGr;
+}
+
+
+
 double TUtil::integratePower(TGraph * gr, double t_low, double t_high){
   t_low=t_low>0.?t_low:0.;
   t_high>gr->GetX()[gr->GetN()-1]?gr->GetX()[gr->GetN()-1]:t_high;
@@ -685,7 +733,18 @@ double TUtil::integratePower(TGraph * gr, double t_low, double t_high){
 }
 
 
+// double * TUtil::flip(int n, double * in){
+//   double out[n];
+//   for(int i=0;i<n;i++){
+//     out[n]=in[n-1-i];
+//   }
+//   return out;
+// }
 
+TGraph * TUtil::swap(TGraph *inGr){
+  auto outGr=new TGraph(inGr->GetN(), inGr->GetY(), inGr->GetX());
+    return outGr;
+}
 
 TGraph * TUtil::integrateByBin(TGraph *gr, double binNS){
   int nbins=gr->GetX()[gr->GetN()-1]/binNS;
@@ -1362,7 +1421,7 @@ TGraph * TUtil::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_m
 }
 
 
-double TUtil::integrate2D(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err){
+double TUtil::integrate(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err){
   Int_t xmin_bin = h->GetXaxis()->FindBin(xmin);
   Int_t xmax_bin = h->GetXaxis()->FindBin(xmax);
   Int_t ymin_bin = h->GetYaxis()->FindBin(ymin);
@@ -1370,6 +1429,10 @@ double TUtil::integrate2D(TH2D *h, double xmin, double xmax, double ymin, double
 
   return  h->IntegralAndError(xmin_bin, xmax_bin, ymin_bin, ymax_bin, err);
   
+}
+
+double TUtil::integrate2D(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err){
+  return  TUtil::integrate(h, xmin, xmax, ymin, ymax, err);
 }
 
 
@@ -1648,6 +1711,25 @@ void TUtil::draw(vector<TGraph*> inGr, TString option){
     inGr[0]->Draw("al PLC");
   }
   for(int i=0;i<inGr.size();i++){
+    if(option=="norm"){
+      TUtil::normalize(inGr[i])->Draw("l same PLC");
+    }
+    else{
+      inGr[i]->Draw("l same PLC");
+    }
+    
+  }
+}
+
+
+void TUtil::draw(int nGraphs, TGraph** inGr, TString option){
+  if(option=="norm"){
+    TUtil::normalize(inGr[0])->Draw("al PLC");
+  }
+  else{
+    inGr[0]->Draw("al PLC");
+  }
+  for(int i=0;i<nGraphs;i++){
     if(option=="norm"){
       TUtil::normalize(inGr[i])->Draw("l same PLC");
     }

@@ -194,17 +194,26 @@ namespace TUtil{
   //remove the mean of a TGraph. range to compute the mean over is optional.
   //the mean computed within a sub-range will be removed from the full graph.
   TGraph * removeMean(TGraph *gr, double t_low=0., double t_high=999999.);
+  //flip an array ([0]=[n-1]) (NOT WORKING)
+  double * flip(int n, double * in);
+  //swap the x and y arrays of a TGraph
+  TGraph * swap(TGraph * inGr);
   //same as removeMean but the original graph is changed
   int removeMeanInPlace(TGraph *gr, double t_low=0., double t_high=999999.);
   //make CW with given parameters.
   TGraph * makeCW(double freq,  double amp, double t_min=0., double t_max=1000., double GSs=20., double phase=0.);
   //integrate a TGraph. lower and upper bounds are optional.
   double integrate(TGraph * gr, double t_low=0, double t_high=999999.);
+  //take the derivative. if direction=-1, takes derivative along other direction of axis.
+  TGraph * derivative(TGraph *gr, int direction=1);
+  //get the observer graph from a retarded graph. tUnits is the multiplier for ns (eg for ms, tUinits=1e6);
+  TGraph * gObs(TGraph *inGr, double thetaDeg, double tUnits=1.);
   //integrate a TGraph but square it first to get units of power.
   double integratePower(TGraph * gr, double t_low=0, double t_high=999999.);
   
   //integrate a graph bin-by-bin, putting the result in a tgraph
   //binNS is the desired bin width in nanoseconds
+  double integrate(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err);
   double integrate2D(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err);
   TGraph * integrateByBin(TGraph *gr, double binNS);
   //simple 2 pole lowpass filter
@@ -236,8 +245,10 @@ namespace TUtil{
   double deg2Rad(double deg);
   //radians to degrees
   double rad2Deg(double rad);
-  //draw a bunch of vectors
+  //draw a bunch of graphs
   void draw(vector<TGraph*> inGr, TString option="");
+    //draw a bunch of graphs
+  void draw(int nGraphs, TGraph ** inGr, TString option="");
   //a pretty warm palette
   void setWarmPalette();
   //a pretty cool palette
