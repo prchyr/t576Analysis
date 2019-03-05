@@ -265,6 +265,9 @@ namespace TUtil{
     TGraph * ifft(TGraph2D *inGr);
     //return the Hilbert transform
     TGraph * hilbertTransform(TGraph *inGr);
+    //return the phase at a single point
+    double phase(TGraph *inGr, double t);
+    //plot the phase of the full graph (NOT WORKING)
     TGraph * plotPhase(TGraph *inGr);
     //DON'T USE NOT WORKING return the phasor transform DON'T USE NOT WORKING
     TGraph * phasorTransform(TGraph *inGr);

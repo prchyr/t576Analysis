@@ -177,7 +177,12 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
 //   delete[] fftd;
 //   delete thing;
 //   return outvec;
-  
+
+double TUtil::FFT::phase(TGraph *inGr, double t){
+  auto ht=hilbertTransform(inGr);
+  return TMath::ATan2(ht->Eval(t), inGr->Eval(t));
+}
+
 TGraph * TUtil::FFT::plotPhase(TGraph *inGr){
   auto ht=hilbertTransform(inGr);
   auto outGr=new TGraph(inGr->GetN());

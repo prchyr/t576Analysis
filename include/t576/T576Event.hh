@@ -50,7 +50,7 @@ using namespace TUtil;
 class T576Event : public TObject{
 public:
   /************constructors**********/
-  T576Event(double interpGSs=0){
+  T576Event(double interpGSs=0.){
     checkStatus();
     if (interpGSs!=0){
       setInterpGSs(interpGSs);
