@@ -50,7 +50,12 @@ using namespace TUtil;
 class T576Event : public TObject{
 public:
   /************constructors**********/
-  T576Event(){checkStatus();}
+  T576Event(double interpGSs=0){
+    checkStatus();
+    if (interpGSs!=0){
+      setInterpGSs(interpGSs);
+    }
+  }
   //load a T576 event using run major and minor. actual file name not needed.
   T576Event(int run_major, int run_minor, int event){
     major=run_major;
