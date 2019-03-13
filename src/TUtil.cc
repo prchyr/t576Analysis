@@ -759,6 +759,14 @@ double TUtil::integratePower(TGraph * gr, double t_low, double t_high){
 //   return out;
 // }
 
+TGraph * TUtil::flip(TGraph *inGr){
+  auto outGr=new TGraph();
+  for(int i=0;i<inGr->GetN();i++){
+    outGr->SetPoint(outGr->GetN(), inGr->GetX()[i], inGr->GetY()[inGr->GetN()-1-i]);
+  }
+  return outGr;
+}
+
 TGraph * TUtil::swap(TGraph *inGr){
   auto outGr=new TGraph(inGr->GetN(), inGr->GetY(), inGr->GetX());
     return outGr;
@@ -827,6 +835,20 @@ double TUtil::dot(TGraph *g1, TGraph *g2){
   return num/sqrt(xdenom*ydenom);
   
 }
+
+TGraph * TUtil::mult(TGraph *g1, TGraph *g2, double constant){
+
+  int len=g1->GetN()<g2->GetN()?g1->GetN():g2->GetN();
+  TGraph *outGr=new TGraph(len);  
+  for(int i=0;i<len;i++){
+    outGr->SetPoint(i, g1->GetX()[i], g1->GetY()[i]*(constant*g2->Eval(g1->GetX()[i])));
+  }
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
+  return outGr;
+}
+
 
 TGraph * TUtil::scale(TGraph *g1, double factor){
   TGraph *outGr=new TGraph(g1->GetN());
@@ -972,6 +994,34 @@ int TUtil::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double inter
 			 
 
   return 1;
+}
+
+
+TGraph * TUtil::interpolateGraph(TGraph * inGraph, double interpGSs){
+  ROOT::Math::Interpolator interp(inGraph->GetN(), ROOT::Math::Interpolation::kAKIMA);
+  interp.SetData(inGraph->GetN(), inGraph->GetX(), inGraph->GetY());
+
+  //get dt, assuming even sampling.
+  double inDt=inGraph->GetX()[50]-inGraph->GetX()[49];
+  double inGSs=1./inDt;
+
+  double outDt=1./interpGSs;
+
+  int samps=(int) (inGraph->GetN()*(interpGSs/inGSs));
+
+  vector<double> xx, yy;
+  for(int i=0;i<samps;i++){
+    double time = i*outDt;
+    if(time>inGraph->GetX()[inGraph->GetN()-1])continue;
+    xx.push_back(time);
+    yy.push_back(interp.Eval(time));
+  }
+
+  auto outGr=new TGraph(xx.size(), &xx[0], &yy[0]);
+
+			 
+
+  return outGr;
 }
 
 TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end, int delay_to_zero){
@@ -1408,6 +1458,55 @@ TGraph * TUtil::lowpassFilter(TGraph *ingr, double cutoff, int order){
   return outgr;
 }
 
+
+TGraph * TUtil::highpassFilter(TGraph *ingr, double cutoff, int order){
+  double * yy=ingr->GetY();
+  double *xx= ingr->GetX();
+  int n = ingr->GetN();
+  vector<double> outx, outy;
+  
+  double w = cutoff*2.*pi*1.e9;
+  double T = (xx[10]-xx[9])*1.e-9;;
+  double a, b, c, value, x;
+  x=exp(-w*T);  
+  //cout<<setprecision(12);
+  //cout<<"filter coefficients"<<endl<<a<<endl<<b<<endl<<c<<endl;
+  //  int size = in.size();
+  if(order==1){
+    //a = pow(T, 2.)*pow(w, 2.)*exp(-2.*w*T);
+    auto a0 = (1.+x)/2.;
+    auto a1 = -(1.+x)/2.;
+    auto b1 = x	;
+    //	cout<<"filter coefficients"<<endl<<a<<endl<<b<<endl<<c<<endl;
+
+    for(int i=0;i<n;i++){
+      if(i>1){
+	value = a0*yy[i-1]+a1*yy[i-2]+b1*outy[i-1];
+	outy.push_back(value);
+
+      }
+      if(i==1){
+	value = a0*yy[i-1]+b1*outy[i-1];
+	outy.push_back(value);
+			
+      }
+      if(i==0){
+	outy.push_back(0.);
+      } 
+      // outx.push_back(xx[i]);
+    }
+  }
+  TGraph *outgr = new TGraph(n, ingr->GetX(), &outy[0]);
+  return outgr;
+}
+
+TGraph * TUtil::bandpassFilter(TGraph *inGr, double low, double high){
+  auto lp=TUtil::lowpassFilter(inGr, high);
+  auto hp=TUtil::highpassFilter(lp, low);
+  delete lp;
+  return hp;
+}
+
 TGraph * TUtil::brickWallFilter(TGraph * inGr, double low, double high){
   
   auto fT=TUtil::FFT::fft(inGr);
@@ -1430,7 +1529,14 @@ TGraph * TUtil::brickWallFilter(TGraph * inGr, double low, double high){
   return outGr;
 }
 
-
+TGraph * TUtil::addNoise(TGraph * inGr, double level){
+  auto outGr=new TGraph();
+  for(int i=0;i<inGr->GetN();i++){
+    auto ranN=level*((double)rand()/(double)RAND_MAX)-.5;
+    outGr->SetPoint(outGr->GetN(), inGr->GetX()[i], inGr->GetY()[i]+ranN);
+  }
+  return outGr;
+}
 
 TGraph * TUtil::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_max, double scale){
   auto sigchunk=getChunkOfGraph(sig, 0., (t_max-t_min));
@@ -1796,8 +1902,32 @@ void TUtil::setCoolPalette(){
 
 }
 
+TGraph * TUtil::evenSample(TGraph *inGr, double dt){
+  double maxT=inGr->GetX()[inGr->GetN()-1];
+  double minT=inGr->GetX()[0];
 
+  double t=minT;
+  auto xx=vector<double>();
+  auto yy=vector<double>();
+  while(t<maxT){
+    xx.push_back(t);
+    yy.push_back(inGr->Eval(t));
+    t+=dt;
+  }
+  TGraph * outGr=new TGraph(xx.size(), &xx[0], &yy[0]);
+  return outGr;
+    
+}
 
+TGraph * TUtil::zeroPad(TGraph *inGr, int num, int whichEnd){
+  auto dt=inGr->GetX()[1]-inGr->GetX()[0];
+  auto outGr=(TGraph*)inGr->Clone();
+  auto lastt=inGr->GetX()[inGr->GetN()-1];
+  for(int i=0;i<num;i++){
+    outGr->SetPoint(outGr->GetN(), lastt+((double)i*dt), 0.);
+  }
+  return outGr;
+}
 
 double TUtil::SIM::ss(double x, double E, double x_0, double e_0){
   return (3.*x/x_0)/((x/x_0)+2.*log(E/e_0));

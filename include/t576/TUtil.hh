@@ -133,11 +133,15 @@ namespace TUtil{
   TGraph * sincInterpolateGraph(TGraph *inGr, double interpGSs);
   //approximated (fast) sinc interpolation.(broken)
   TGraph * sincInterpolateGraphSimple(TGraph *inGr, double interpGSs);
-  //interpolate a tgraph using the ROOT interpolation functions(works well)
+  //interpolate a tgraph using the ROOT interpolation functions (no memory use
   int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs);
+  //return the interpolater graph (memory use)
+  TGraph * interpolateGraph(TGraph * inGraph, double interpGSs);
 
   //normalize a graph
   TGraph * normalize(TGraph *inGr);
+  //normalize to peak
+  TGraph * normToPeak(TGraph *inGr);
   //normalize a 2d graph
   TGraph2D * normalize(TGraph2D * inGr);
   //return a chunk of a graph, specified by x-axis values.
@@ -181,6 +185,8 @@ namespace TUtil{
   TGraph2D * add(TGraph2D * g1, TGraph2D * g2, double constant=1.);
   //dot product of 2 graphs
   double dot(TGraph *g1, TGraph *g2);
+  //multiply two graphs: out(t)=g1(t)*consant*g2(t)
+  TGraph * mult(TGraph *g1, TGraph *g2, double constant=1.);
   //shift a graph along the y axis by the factor
   TGraph * shiftY(TGraph *g1, double factor);
   //shift a graph along the x axis by the factor
@@ -196,6 +202,8 @@ namespace TUtil{
   TGraph * removeMean(TGraph *gr, double t_low=0., double t_high=999999.);
   //flip an array ([0]=[n-1]) (NOT WORKING)
   double * flip(int n, double * in);
+  //flip a graph
+  TGraph * flip(TGraph *inGr);
   //swap the x and y arrays of a TGraph
   TGraph * swap(TGraph * inGr);
   //same as removeMean but the original graph is changed
@@ -203,8 +211,7 @@ namespace TUtil{
   //make CW with given parameters.
   TGraph * makeCW(double freq,  double amp, double t_min=0., double t_max=1000., double GSs=20., double phase=0.);
   //integrate a TGraph. lower and upper bounds are optional.
-  double integrate(TGraph * gr, double t_low=0, double t_high=999999.);
-  
+  double integrate(TGraph * gr, double t_low=0, double t_high=999999.);  
   //get the RMS
   double rms(TGraph * gr, double t_low, double t_high);
 //take the derivative. if direction=-1, takes derivative along other direction of axis.
@@ -213,14 +220,18 @@ namespace TUtil{
   TGraph * gObs(TGraph *inGr, double thetaDeg, double tUnits=1.);
   //integrate a TGraph but square it first to get units of power.
   double integratePower(TGraph * gr, double t_low=0, double t_high=999999.);
-  
-  //integrate a graph bin-by-bin, putting the result in a tgraph
-  //binNS is the desired bin width in nanoseconds
+  //integrate a histogram
   double integrate(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err);
   double integrate2D(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err);
+  //integrate a graph bin-by-bin, putting the result in a tgraph
+  //binNS is the desired bin width in nanoseconds
   TGraph * integrateByBin(TGraph *gr, double binNS);
   //simple 2 pole lowpass filter
   TGraph * lowpassFilter(TGraph *ingr, double cutoff, int order=2);
+  //highpass filter
+  TGraph * highpassFilter(TGraph *ingr, double cutoff, int order=1);
+  //a bandpass filter made of one of each of the above filters.
+  TGraph * bandpassFilter(TGraph *ingr, double low, double high);
   //a brick wall frequency domain filter
   TGraph * brickWallFilter(TGraph *ingr, double low, double high);
     //will take the first chunk of the signal graph (equal to to t_high-t_low)
@@ -248,6 +259,10 @@ namespace TUtil{
   double deg2Rad(double deg);
   //radians to degrees
   double rad2Deg(double rad);
+  //add some noise to a graph
+  TGraph * addNoise(TGraph * inGr, double level);
+  //drawing things
+
   //draw a bunch of graphs
   void draw(vector<TGraph*> inGr, TString option="");
     //draw a bunch of graphs
@@ -256,6 +271,14 @@ namespace TUtil{
   void setWarmPalette();
   //a pretty cool palette
   void setCoolPalette();
+
+  //miscellaneous TGraph things
+
+
+  //return a TGraph, evenly sampled along dt
+  TGraph * evenSample(TGraph *inGr, double dt);
+  //zero pad a tgraph. requires an evenly sampled tgraph.
+  TGraph * zeroPad(TGraph *inGr, int num, int whichEnd=0);
   
   namespace FFT{
 
