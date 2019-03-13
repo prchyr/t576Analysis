@@ -1532,7 +1532,7 @@ TGraph * TUtil::brickWallFilter(TGraph * inGr, double low, double high){
 TGraph * TUtil::addNoise(TGraph * inGr, double level){
   auto outGr=new TGraph();
   for(int i=0;i<inGr->GetN();i++){
-    auto ranN=level*((double)rand()/(double)RAND_MAX)-.5;
+    auto ranN=level*(((double)rand()/(double)RAND_MAX)-.5);
     outGr->SetPoint(outGr->GetN(), inGr->GetX()[i], inGr->GetY()[i]+ranN);
   }
   return outGr;
