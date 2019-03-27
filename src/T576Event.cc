@@ -1163,3 +1163,343 @@ TH2D* T576Event::pointingMap(double dx, int draw, int hilbert){
   }
   return gout;
 }
+
+
+TH2D* T576Event::pointingMapDev(double dx, int draw, int hilbert, TVector3 * position){
+  double tmin=20;
+  double tmax=150;
+  double dt[12][12]={0};
+  double maxdt[12][12]={0};
+  TGraph *grc[12][12]={new TGraph()};
+  TVector3 source, d1, d2;
+  vector<double>xx, yy,zz;
+  auto graphs = vector<TGraph*>(12);
+  auto surfx=vector<double>(12);
+  auto surfy=vector<double>(12);
+  double tot=0;
+  auto deltat=1./(3.2*fInterpGSs);
+  for(int i=0;i<12;i++){
+    //graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1)));
+    
+    if(hilbert==1){
+      graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::brickWallFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5)));
+    }
+    else{
+    graphs[i]=TUtil::normalize(TUtil::brickWallFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5));
+    }
+  }
+  //auto window=rectangularWindow(10./deltat, 150./deltat, 250./deltat, deltat);
+  for(int i=0;i<12;i++){
+    for(int j=0;j<12;j++){
+      double maxdelay=(position[i]-position[j]).Mag()/TUtil::c_light;
+      // cout<<i<<" "<<j<<" "<<maxdelay<<" "<<maxdelay/deltat<<endl;
+      grc[i][j]=TUtil::crossCorrelate(graphs[i], graphs[j], maxdelay);
+      // grc[i][j]=crossCorrelateUseful(graphs[j], graphs[i], graphs[j]->GetN(), (int)((graphs[i]->GetN()/2) -maxdt/deltat), (int)((graphs[i]->GetN()/2) +maxdt/deltat));
+    }
+  }
+  //  setWarmPalette();
+  double maxTot=0;
+  TGraph *outgraphs[12];
+  double coordincr=dx;
+  TVector3 offset(.5, .5, .5);
+  int nbins=16.01/dx;
+  TH2D * gout=new TH2D("outhist", "outhist", nbins, -8, 8, nbins, -8, 8);
+  double dtt = .2;
+  for(double x=-8.01;x<8.01;x+=coordincr){
+
+    source.SetZ((double)x);//z = x
+
+    for(double y=-8.01;y<8.01;y+=coordincr){
+      tot=0;
+      source.SetX((double)y);//x=y
+
+      xx.push_back((double)x);
+
+      yy.push_back((double)y);
+      for(int j=1;j<12;j++){
+	//if(j<11&&j>2)continue;
+	TVector3 surfupdated=position[j];//+offset;
+	d1=source-surfupdated;//[j];
+	//cout<<j<<" "<<i<<" "<<l<<endl;
+	for(int k=j+1;k<12;k++){
+	  //if(k<11&&k>2) continue;
+	  //	  if(j==k)continue;
+	  d2=source-position[k];
+	  dt[j][k]=(abs(d1.Mag())-abs(d2.Mag()))/TUtil::c_light;
+	  // cout<<dt[j][k]<<endl;
+	  //	  tot+=grc[j][k]->Eval(dt[j][k]);
+	  gout->Fill(x, y, grc[j][k]->Eval(dt[j][k])); 
+	  //auto temp=TUtil::getChunkOfGraph(grc[j][k], dt[j][k]-dtt, dt[j][k]+dtt);
+	  //tot+=TMath::MaxElement(temp->GetN(), temp->GetY());
+	  //delete temp;
+
+	}
+      }
+
+      zz.push_back(tot);
+    }
+  }
+
+
+    //  auto gout=new TGraph2D(xx.size(), &xx[0], &yy[0], &zz[0]);
+  gout->SetName("map"+minor);
+  //    if(plot==1){
+  //     auto crap=new TCanvas("map"+minor, "map"+minor, 700,600);
+
+  //gout->SetMarkerStyle(20);
+  gout->SetTitle("");
+
+  gout->GetXaxis()->SetTitle("z (m)");
+  gout->GetYaxis()->SetTitle("x (m)");
+  //gout->GetHistogram()->GetXaxis()->SetTitle("z (m)");
+  //gout->GetHistogram()->GetYaxis()->SetTitle("x (m)");
+
+  if(draw==1){
+    gout->SetMarkerStyle(20);
+    gout->Draw("colz");
+    //gPad->SetTheta(90.01);
+    //gPad->SetPhi(0.01);
+    //gPad->Update();
+
+
+    //hist->Draw("colz");
+    for(int i=0;i<12;i++){
+      surfx[i]=position[i].Z();
+      surfy[i]=position[i].X();
+      //        cout<<surf[i].x<<" "<<surf[i].y<<" "<<surf[i].z<<endl;
+    }
+    auto rxgraph=new TGraph(12, &surfx[0], &surfy[0]);
+    rxgraph->SetMarkerColor(kOrange);
+    rxgraph->SetMarkerStyle(20);
+    rxgraph->Draw("p same");
+
+    //     auto rxtruegraph=new TGraph(12, surftruex, surftruey);
+    //     rxtruegraph->SetMarkerColor(kRed);
+    //     rxtruegraph->SetMarkerStyle(20);
+    //     rxtruegraph->Draw("p same");
+
+    auto txgraph=new TGraph();
+    TVector3 tx(0,0,0);
+    tx=txPos;
+    txgraph->SetPoint(txgraph->GetN(), tx.Z(), tx.X());
+    txgraph->SetMarkerColor(kYellow);
+    txgraph->SetMarkerStyle(21);
+    txgraph->Draw("p same");
+
+    double tgtx[5], tgty[5];
+    tgtx[0] = -2.;
+    tgtx[1]=2.;
+    tgtx[2]=2.;
+    tgtx[3]=-2.;
+    tgtx[4]=-2.;
+
+    tgty[0]=0.3087;
+    tgty[1]=0.3087;
+    tgty[2]=.9087;
+    tgty[3]=.9087;
+    tgty[4]=.3087;
+    auto target=new TPolyLine(5, tgtx, tgty);
+    target->SetLineColor(kGreen);
+    target->Draw("l same");
+
+    double bpx[5], bpy[5];
+    bpx[0] = -8.;
+    bpx[1]=-3.6;
+    bpx[2]=-3.6;
+    bpx[3]=-8;
+
+    bpy[0]=.5;
+    bpy[1]=.5;
+    bpy[2]=.7;
+    bpy[3]=.7;
+    bpy[4]=0;
+    auto bp=new TPolyLine(4, bpx, bpy);
+    bp->SetLineColor(kPink);
+    bp->Draw("l same");
+
+    double bdx[5], bdy[5];
+    bdx[0] = 2;
+    bdx[1]=5.6;
+    bdx[2]=5.6;
+    bdx[3]=2;
+    bdx[4]=2;
+
+    bdy[0]=2.44;
+    bdy[1]=2.44;
+    bdy[2]=-1.24;
+    bdy[3]=-1.24;
+    bdy[4]=2.44;
+    auto bd=new TPolyLine(5, bdx, bdy);
+    bd->SetLineColor(kPink);
+    bd->Draw("l same");
+
+    double wallx[5], wally[5];
+    wallx[0] = 5.6;
+    wallx[1]=5.6;
+
+    wally[0]=8;
+    wally[1]=-8;
+
+    auto wall=new TPolyLine(2, wallx, wally);
+    wall->SetLineColor(kPink);
+    wall->Draw("l same");
+
+    double bd2x[5], bd2y[5];
+    bd2x[0] = 3.83;
+    bd2x[1]=3.83;
+
+    bd2y[0]=-1.24;
+    bd2y[1]=2.44;
+
+    auto bd2=new TPolyLine(2, bd2x, bd2y);
+    bd2->SetLineColor(kPink);
+    bd2->Draw("l same");
+
+    double blockx[5], blocky[5];
+    blockx[0] = -6;
+    blockx[1]=-5;
+    blockx[2]=-5.3;
+    blockx[3]=-6.3;
+    blockx[4]=-6;
+
+    blocky[0]=-3;
+    blocky[1]=-5;
+    blocky[2]=-5.3;
+    blocky[3]=-3.3;
+    blocky[4]=-3.;
+    auto block=new TPolyLine(5, blockx, blocky);
+    block->SetLineColor(kPink);
+    block->Draw("l same");
+
+    double supportx[5], supporty[5];
+    supportx[0] = -7.2075;
+    supportx[1]=2;
+    supportx[2]=2;
+    supportx[3]=-7.2075;
+    supportx[4]=-7.2075;
+
+    supporty[0]=1.517;
+    supporty[1]=1.517;
+    supporty[2]=-.317;
+    supporty[3]=-.317;
+    supporty[4]=1.517;
+    auto support=new TPolyLine(5, supportx, supporty);
+    support->SetLineColor(kPink);
+    support->Draw("l same");
+  }
+  return gout;
+}
+
+
+
+
+TVector3* T576Event::fixPositionsDev(double dx, int maxIter, int hilbert,TVector3 source, TVector3 *positions){
+  double tmin=20;
+  double tmax=150;
+  double dt[12][12]={0};
+  double maxdt[12][12]={0};
+  TGraph *grc[12][12]={new TGraph()};
+  TVector3 d1, d2;
+  vector<double>xx, yy,zz;
+  auto graphs = vector<TGraph*>(12);
+  auto surfx=vector<double>(12);
+  auto surfy=vector<double>(12);
+
+  
+  // for(int i=0;i<12;i++){
+  //   positions=(TVector3)surf->pos[i].Clone();
+  // }
+  double tot=0;
+  auto deltat=1./(3.2*fInterpGSs);
+  for(int i=0;i<12;i++){
+    //graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1)));
+    
+    if(hilbert==1){
+      graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::bandpassFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5)));
+    }
+    else{
+    graphs[i]=TUtil::normalize(TUtil::bandpassFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5));
+    }
+  }
+  //auto window=rectangularWindow(10./deltat, 150./deltat, 250./deltat, deltat);
+  for(int i=0;i<12;i++){
+    for(int j=0;j<12;j++){
+      //to give a larger window of coincidence to move the postions
+      double maxdelay=(positions[i]-positions[j]).Mag()+5./TUtil::c_light;
+      // cout<<i<<" "<<j<<" "<<maxdelay<<" "<<maxdelay/deltat<<endl;
+      grc[i][j]=TUtil::crossCorrelate(graphs[i], graphs[j], maxdelay);
+      // grc[i][j]=crossCorrelateUseful(graphs[j], graphs[i], graphs[j]->GetN(), (int)((graphs[i]->GetN()/2) -maxdt/deltat), (int)((graphs[i]->GetN()/2) +maxdt/deltat));
+    }
+  }
+  //  setWarmPalette();
+  double maxTot=0;
+  TGraph *outgraphs[12];
+  double coordincr=dx;
+  TVector3 offset(.5, .5, .5);
+  int nbins=16.01/dx;
+  TH2D * gout=new TH2D("outhist", "outhist", nbins, -8, 8, nbins, -8, 8);
+  double dtt = .2;
+
+  // double x = .6;
+  // double y = -2.;
+
+  // source.SetZ((double)x);//z = x
+  // source.SetX((double)y);//x=y
+  double lastTot=0;
+  int nIter=0;
+  //  double ddx=.01;
+  TVector3 initPos;
+  while(nIter<maxIter){
+
+    for(int j=1;j<12;j++){
+
+      for(int i=0;i<4;i++){
+	initPos=positions[j];
+	switch(i){
+	case(0):
+	  positions[j].SetMag(positions[j].Mag()+dx);
+	  break;
+	case(1):
+	  positions[j].SetMag(positions[j].Mag()-dx);
+	  break;
+	case(2):
+	  positions[j].SetTheta(positions[j].Theta()+(dx));
+	  break;
+	case(3):
+	  positions[j].SetTheta(positions[j].Theta()-(dx));
+	  break;
+	}
+      
+	//if(j<11&&j>2)continue;
+	d1=source-positions[j];//[j];
+	//cout<<j<<" "<<i<<" "<<l<<endl;
+	for(int k=1;k<12;k++){
+	  //if(k<11&&k>2) continue;
+	  //	  if(j==k)continue;
+	  d2=source-positions[k];
+	  dt[j][k]=(abs(d1.Mag())-abs(d2.Mag()))/TUtil::c_light;
+	  // cout<<dt[j][k]<<endl;
+	  //	  tot+=grc[j][k]->Eval(dt[j][k]);
+	  tot+=grc[j][k]->Eval(dt[j][k]);
+	  //	  gout->Fill(x, y, grc[j][k]->Eval(dt[j][k])); 
+	  //auto temp=TUtil::getChunkOfGraph(grc[j][k], dt[j][k]-dtt, dt[j][k]+dtt);
+	  //tot+=TMath::MaxElement(temp->GetN(), temp->GetY());
+	  //delete temp;
+
+	}
+	positions[j]=tot>lastTot?positions[j]:initPos;
+
+	lastTot=tot;
+	tot=0.;
+      }
+      
+    }
+    //    cout<<positions[1].X()<<endl;
+    nIter++;
+  }
+  
+  
+
+
+  return positions;
+}
