@@ -1374,7 +1374,7 @@ vector<TGraph*> TUtil::alignMultipleAndTruncate(vector<TGraph*> inGr, double max
   vector<TGraph*>outgraphs;
   TGraph *g1=inGr[0];
   //  g1->Draw("al PLC");
-  outgraphs.push_back(g1);
+  outgraphs.push_back(TUtil::getChunkOfGraph(g1, t_min, t_max));
   for(int i=1;i<inGr.size();i++){
     auto gr=align(g1, inGr[i], max_delay);
     outgraphs.push_back(TUtil::getChunkOfGraph(gr, t_min, t_max));
