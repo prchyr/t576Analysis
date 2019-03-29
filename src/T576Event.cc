@@ -1505,7 +1505,7 @@ TVector3* T576Event::fixPositionsDev(double dx, int maxIter, int hilbert,TVector
 }
 
 
-vector<TPolyLine*> T576Event::getTheRoom(){
+vector<TPolyLine*> T576Event::getTheRoom(Color_t lineColor, Color_t tgtColor){
     double tgtx[5], tgty[5];
     tgtx[0] = -2.;
     tgtx[1]=2.;
@@ -1519,7 +1519,7 @@ vector<TPolyLine*> T576Event::getTheRoom(){
     tgty[3]=.9087;
     tgty[4]=.3087;
     auto target=new TPolyLine(5, tgtx, tgty);
-    target->SetLineColor(kGreen);
+    target->SetLineColor(tgtColor);
     target->Draw("l same");
 
     double bpx[5], bpy[5];
@@ -1534,7 +1534,7 @@ vector<TPolyLine*> T576Event::getTheRoom(){
     bpy[3]=.7;
     bpy[4]=0;
     auto bp=new TPolyLine(4, bpx, bpy);
-    bp->SetLineColor(kPink);
+    bp->SetLineColor(lineColor);
     bp->Draw("l same");
 
     double bdx[5], bdy[5];
@@ -1550,7 +1550,7 @@ vector<TPolyLine*> T576Event::getTheRoom(){
     bdy[3]=-1.24;
     bdy[4]=2.44;
     auto bd=new TPolyLine(5, bdx, bdy);
-    bd->SetLineColor(kPink);
+    bd->SetLineColor(lineColor);
     bd->Draw("l same");
 
     double wallx[5], wally[5];
@@ -1561,7 +1561,7 @@ vector<TPolyLine*> T576Event::getTheRoom(){
     wally[1]=-8;
 
     auto wall=new TPolyLine(2, wallx, wally);
-    wall->SetLineColor(kPink);
+    wall->SetLineColor(lineColor);
     wall->Draw("l same");
 
     double bd2x[5], bd2y[5];
@@ -1572,7 +1572,7 @@ vector<TPolyLine*> T576Event::getTheRoom(){
     bd2y[1]=2.44;
 
     auto bd2=new TPolyLine(2, bd2x, bd2y);
-    bd2->SetLineColor(kPink);
+    bd2->SetLineColor(lineColor);
     bd2->Draw("l same");
 
     double blockx[5], blocky[5];
@@ -1588,7 +1588,7 @@ vector<TPolyLine*> T576Event::getTheRoom(){
     blocky[3]=-3.3;
     blocky[4]=-3.;
     auto block=new TPolyLine(5, blockx, blocky);
-    block->SetLineColor(kPink);
+    block->SetLineColor(lineColor);
     block->Draw("l same");
 
     double supportx[5], supporty[5];
@@ -1604,7 +1604,7 @@ vector<TPolyLine*> T576Event::getTheRoom(){
     supporty[3]=-.317;
     supporty[4]=1.517;
     auto support=new TPolyLine(5, supportx, supporty);
-    support->SetLineColor(kPink);
+    support->SetLineColor(lineColor);
     support->Draw("l same");
 
 
@@ -1620,7 +1620,7 @@ vector<TPolyLine*> T576Event::getTheRoom(){
     return lines;
 }
 
-TGraph * T576Event::getAntennas(){
+TGraph * T576Event::getAntennas(Color_t color){
      //hist->Draw("colz");
   auto surfx=vector<double>(12);
   auto surfy=vector<double>(12);
@@ -1630,7 +1630,7 @@ TGraph * T576Event::getAntennas(){
       //        cout<<surf[i].x<<" "<<surf[i].y<<" "<<surf[i].z<<endl;
     }
     auto rxgraph=new TGraph(12, &surfx[0], &surfy[0]);
-    rxgraph->SetMarkerColor(kOrange);
+    rxgraph->SetMarkerColor(color);
     rxgraph->SetMarkerStyle(20);
     rxgraph->Draw("p same");
 

@@ -139,8 +139,8 @@ public:
   TH2D* pointingMap(double dx=.3, int draw=1, int hilbert=1);
   TH2D* pointingMapDev(double dx, int draw, int hilbert, TVector3 *position);
   TVector3 * fixPositionsDev(double dx, int maxIter, int hilbert, TVector3 source, TVector3 *positions);
-  vector<TPolyLine*> getTheRoom();
-  TGraph * getAntennas();
+  vector<TPolyLine*> getTheRoom(Color_t lineColor=kRed, Color_t tgtColor=kGreen);
+  TGraph * getAntennas(Color_t color=kBlue);
 
   
 private:
