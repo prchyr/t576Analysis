@@ -499,6 +499,14 @@ int T576Event::loadSurfEvent(int event){
 
     TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);
 
+    //unsure of the order. here they are ordered in reverse
+    // if(fInterpGSs>0.){
+    //   getInterpolatedGraph(grChunk, surf->ch[11-i], fInterpGSs);
+    // }
+    // else{
+    //   *surf->ch[11-i]=*grChunk;
+    // }
+
     if(fInterpGSs>0.){
       getInterpolatedGraph(grChunk, surf->ch[i], fInterpGSs);
     }
