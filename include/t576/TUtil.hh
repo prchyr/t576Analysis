@@ -275,6 +275,7 @@ namespace TUtil{
   void setCoolPalette();
   //cold palette
   void setColdPalette();
+  void setHotPalette();
   //miscellaneous TGraph things
 
 

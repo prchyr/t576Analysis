@@ -1932,6 +1932,21 @@ void TUtil::setColdPalette(){
 
 }
 
+void TUtil::setHotPalette(){
+
+  const Int_t rgb = 5;
+  const Int_t N = 255;
+  
+  double red[]=   {0.00, 0.50, 0.70, 0.90, 1.00};
+  double green[]= {0.00, 0.00, 0.00, 0.50, 1.00};
+  double blue[]=  {0.00, 0.10, 0.00, 0.00, 1.00};
+  double stops[]={0.00, 0.35, 0.60, 0.85, 1.00};
+
+  TColor::CreateGradientColorTable(rgb, stops, red, green, blue, N);
+  gStyle->SetNumberContours(N);
+
+}
+
 TGraph * TUtil::evenSample(TGraph *inGr, double dt){
   double maxT=inGr->GetX()[inGr->GetN()-1];
   double minT=inGr->GetX()[0];
