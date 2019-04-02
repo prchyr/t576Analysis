@@ -199,9 +199,9 @@ public:
       }
     }
     //these are measured in feet.
-    //double cableLengths[12]={20., 10., 0., 0., 0., 0., 0., 0., 10., 20., 20., 50.};
+    double cableLengths[12]={20., 20., 10., 0., 0., 0., 0., 0., 0., 10.,  20., 50.};
     
-    double cableLengths[12]={50., 20., 20., 10., 0., 0., 0., 0., 0., 0., 10., 20.};
+    //double cableLengths[12]={50., 20., 20., 10., 0., 0., 0., 0., 0., 0., 10., 20.};
     double velocityFactor=-.82;//from Krijn and Kian, negative for math reasons
     
     TVector3 pos[12];
