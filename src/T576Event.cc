@@ -499,12 +499,23 @@ int T576Event::loadSurfEvent(int event){
 
     TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);
 
-    //unsure of the order. here they are ordered in reverse
+    //unsure of the order. here they are ordered as i think they should be
+    
     // if(fInterpGSs>0.){
-    //   getInterpolatedGraph(grChunk, surf->ch[11-i], fInterpGSs);
+    //   if(i==0){
+    // 	getInterpolatedGraph(grChunk, surf->ch[i], fInterpGSs);
+    //   }
+    //   else{
+    // 	getInterpolatedGraph(grChunk, surf->ch[12-i], fInterpGSs);
+    //   }
     // }
     // else{
-    //   *surf->ch[11-i]=*grChunk;
+    //   if(i==0){
+    // 	*surf->ch[i]=*grChunk;
+    //   }
+    //   else{
+    // 	*surf->ch[12-i]=*grChunk;
+    //   }
     // }
 
     if(fInterpGSs>0.){
@@ -964,16 +975,16 @@ TH2D* T576Event::pointingMap(double dx, int draw, int hilbert){
     //graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1)));
     
     if(hilbert==1){
-      graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::brickWallFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5)));
+      graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::bandpassFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5)));
     }
     else{
-    graphs[i]=TUtil::normalize(TUtil::brickWallFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5));
+    graphs[i]=TUtil::normalize(TUtil::bandpassFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5));
     }
   }
   //auto window=rectangularWindow(10./deltat, 150./deltat, 250./deltat, deltat);
   for(int i=0;i<12;i++){
     for(int j=0;j<12;j++){
-      double maxdelay=(surf->pos[i]-surf->pos[j]).Mag()/TUtil::c_light;
+      double maxdelay=2.*(surf->pos[i]-surf->pos[j]).Mag()/TUtil::c_light;
       // cout<<i<<" "<<j<<" "<<maxdelay<<" "<<maxdelay/deltat<<endl;
       grc[i][j]=TUtil::crossCorrelate(graphs[i], graphs[j], maxdelay);
       // grc[i][j]=crossCorrelateUseful(graphs[j], graphs[i], graphs[j]->GetN(), (int)((graphs[i]->GetN()/2) -maxdt/deltat), (int)((graphs[i]->GetN()/2) +maxdt/deltat));
@@ -1007,7 +1018,7 @@ TH2D* T576Event::pointingMap(double dx, int draw, int hilbert){
 	  //if(k<11&&k>2) continue;
 	  //	  if(j==k)continue;
 	  d2=source-surf->pos[k];
-	  dt[j][k]=(abs(d1.Mag())-abs(d2.Mag()))/TUtil::c_light;
+	  dt[j][k]=(abs(d2.Mag())-abs(d1.Mag()))/TUtil::c_light;
 	  // cout<<dt[j][k]<<endl;
 	  //	  tot+=grc[j][k]->Eval(dt[j][k]);
 	  gout->Fill(x, y, grc[j][k]->Eval(dt[j][k])); 
