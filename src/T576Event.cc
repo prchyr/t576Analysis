@@ -85,6 +85,12 @@ int T576Event::checkStatus(){
 
   fSurfData=(short*) calloc(60000000, sizeof(short));
   fSurfTimes=(double*) calloc(20000, sizeof(double));
+
+  beamPipeExit.SetXYZ(.6, 0., -3.6);
+  targetFront.SetXYZ(.6, 0., -2.);
+  targetBack.SetXYZ(.6, 0., 2.);
+  beamDump.SetXYZ(.6, 0., 4.);
+
 }
 
 
@@ -975,10 +981,10 @@ TH2D* T576Event::pointingMap(double dx, int draw, int hilbert){
     //graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1)));
     
     if(hilbert==1){
-      graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::bandpassFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5)));
+      graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope((TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1))));
     }
     else{
-    graphs[i]=TUtil::normalize(TUtil::bandpassFilter(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1), .9, 1.5));
+    graphs[i]=TUtil::normalize((TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1)));
     }
   }
   //auto window=rectangularWindow(10./deltat, 150./deltat, 250./deltat, deltat);
@@ -1021,7 +1027,7 @@ TH2D* T576Event::pointingMap(double dx, int draw, int hilbert){
 	  dt[j][k]=(abs(d2.Mag())-abs(d1.Mag()))/TUtil::c_light;
 	  // cout<<dt[j][k]<<endl;
 	  //	  tot+=grc[j][k]->Eval(dt[j][k]);
-	  gout->Fill(x, y, grc[j][k]->Eval(-dt[j][k])); 
+	  gout->Fill(x, y, grc[j][k]->Eval(dt[j][k])); 
 	  //auto temp=TUtil::getChunkOfGraph(grc[j][k], dt[j][k]-dtt, dt[j][k]+dtt);
 	  //tot+=TMath::MaxElement(temp->GetN(), temp->GetY());
 	  //delete temp;

@@ -283,6 +283,16 @@ namespace TUtil{
   TGraph * evenSample(TGraph *inGr, double dt);
   //zero pad a tgraph. requires an evenly sampled tgraph.
   TGraph * zeroPad(TGraph *inGr, int num, int whichEnd=0);
+  //get the distance between tvectors
+  double distance3(TVector3 one, TVector3 two);
+  //get the distance from one vector to several others
+  double * distance3(int N, TVector3 one, TVector3 * two);
+  //time of flight between two tvectors
+  double timeOfFlight(TVector3 one, TVector3 two, double n=1.);
+  //time of flight from one vector to several others
+  double * timeOfFlight(int N, TVector3 one, TVector3 * two, double n=1.);
+  //delta t's between different antennas for a single source
+  double ** dTimeOfFlight(int N, TVector3 one, TVector3 * two, double n=1.);
   
   namespace FFT{
 

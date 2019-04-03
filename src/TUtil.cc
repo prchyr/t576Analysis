@@ -1974,6 +1974,47 @@ TGraph * TUtil::zeroPad(TGraph *inGr, int num, int whichEnd){
   return outGr;
 }
 
+
+double TUtil::distance3(TVector3 one, TVector3 two){
+  return abs((one-two).Mag());
+}
+
+double * TUtil::distance3(int N, TVector3 one, TVector3 *two){
+  double *out=(double*)malloc(sizeof(double) * N);
+  for(int i=0;i<N;i++){
+    out[i]=TUtil::distance3(one, two[i]);
+  }
+  return out;
+}
+  
+double TUtil::timeOfFlight(TVector3 one, TVector3 two, double n){
+  return TUtil::distance3(one, two)*n/TUtil::c_light;
+}
+
+double * TUtil::timeOfFlight(int N, TVector3 one, TVector3 *two, double n){
+  double *out=(double*)malloc(sizeof(double) * N);
+  for(int i=0;i<N;i++){
+    out[i]=TUtil::timeOfFlight(one, two[i]);
+  }
+  return out;
+}
+
+double ** TUtil::dTimeOfFlight(int N, TVector3 one, TVector3 *two, double n){
+  auto times=TUtil::timeOfFlight(N, one, two, n);
+  double ** out = new double*[N];
+  for(int i=0;i<N;i++){
+    out[i]=new double[N];
+    for(int j=0;j<N;j++){
+      out[i][j]=times[j]-times[i];
+    }
+  }
+  return out;
+}
+
+
+
+
+
 double TUtil::SIM::ss(double x, double E, double x_0, double e_0){
   return (3.*x/x_0)/((x/x_0)+2.*log(E/e_0));
 }

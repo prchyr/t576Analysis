@@ -98,6 +98,14 @@ public:
   TString * scopeFilename=new TString();
   TString * surfFilename=new TString();
 
+  //static coordinates useful for stuff
+
+  TVector3 beamPipeExit;//(.6, 0., -3.6);
+  TVector3 targetFront;//(.6, 0., -2.);
+  TVector3 targetBack;//(.6, 0., 2.);
+  TVector3 beamDump;//(.6, 0., 4.);
+  TVector3 backWall;//(.6, 0., 5.6);
+  
   //useful flags and info
   //run major and minor
   int major=0, minor=0;
@@ -199,9 +207,9 @@ public:
       }
     }
     //these are measured in feet.
-    double cableLengths[12]={20., 20., 10., 0., 0., 0., 0., 0., 0., 10.,  20., 50.};
+    //double cableLengths[12]={20., 20., 10., 0., 0., 0., 0., 0., 0., 10.,  20., 50.};
     
-    //double cableLengths[12]={50., 20., 20., 10., 0., 0., 0., 0., 0., 0., 10., 20.};
+    double cableLengths[12]={50., 20., 20., 10., 0., 0., 0., 0., 0., 0., 10., 20.};
     double velocityFactor=-.82;//from Krijn and Kian, negative for math reasons
     
     TVector3 pos[12];
