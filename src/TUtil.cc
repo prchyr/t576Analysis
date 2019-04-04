@@ -1999,6 +1999,13 @@ double * TUtil::timeOfFlight(int N, TVector3 one, TVector3 *two, double n){
   return out;
 }
 
+double  TUtil::dTimeOfFlight(TVector3 source,TVector3 one, TVector3 two, double n){
+  auto time1=TUtil::timeOfFlight(source,one, n);
+  auto time2=TUtil::timeOfFlight(source,two, n);
+
+  return time2-time1;
+}
+
 double ** TUtil::dTimeOfFlight(int N, TVector3 one, TVector3 *two, double n){
   auto times=TUtil::timeOfFlight(N, one, two, n);
   double ** out = new double*[N];
