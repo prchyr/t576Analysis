@@ -2003,7 +2003,7 @@ double  TUtil::dTimeOfFlight(TVector3 source,TVector3 one, TVector3 two, double 
   auto time1=TUtil::timeOfFlight(source,one, n);
   auto time2=TUtil::timeOfFlight(source,two, n);
 
-  return time2-time1;
+  return time1-time2;
 }
 
 double ** TUtil::dTimeOfFlight(int N, TVector3 one, TVector3 *two, double n){
@@ -2012,7 +2012,7 @@ double ** TUtil::dTimeOfFlight(int N, TVector3 one, TVector3 *two, double n){
   for(int i=0;i<N;i++){
     out[i]=new double[N];
     for(int j=0;j<N;j++){
-      out[i][j]=times[j]-times[i];
+      out[i][j]=times[i]-times[j];
     }
   }
   return out;
