@@ -1976,7 +1976,7 @@ TGraph * TUtil::zeroPad(TGraph *inGr, int num, int whichEnd){
 
 
 double TUtil::distance3(TVector3 one, TVector3 two){
-  return abs((one-two).Mag());
+  return (two-one).Mag();
 }
 
 double * TUtil::distance3(int N, TVector3 one, TVector3 *two){

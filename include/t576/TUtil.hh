@@ -292,7 +292,7 @@ namespace TUtil{
   //time of flight from one vector to several others
   double * timeOfFlight(int N, TVector3 one, TVector3 * two, double n=1.);
   //delta t between 2 antennas for a single source. it is the time a signal hits number 2 minus the time it hits number 1;
-  double  dTimeOfFlight(TVector3 source,TVector3 one, TVector3 two, double n);
+  double  dTimeOfFlight(TVector3 source,TVector3 one, TVector3 two, double n=1.);
   //delta t's between different antennas for a single source
   double ** dTimeOfFlight(int N, TVector3 one, TVector3 * two, double n=1.);
   
