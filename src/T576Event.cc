@@ -505,31 +505,31 @@ int T576Event::loadSurfEvent(int event){
 
     TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);
 
-    //unsure of the order. here they are ordered as i think they should be
+    //surf channel mappings are 0, 11, 10, 9...1 
     
-    // if(fInterpGSs>0.){
-    //   if(i==0){
-    // 	getInterpolatedGraph(grChunk, surf->ch[i], fInterpGSs);
-    //   }
-    //   else{
-    // 	getInterpolatedGraph(grChunk, surf->ch[12-i], fInterpGSs);
-    //   }
-    // }
-    // else{
-    //   if(i==0){
-    // 	*surf->ch[i]=*grChunk;
-    //   }
-    //   else{
-    // 	*surf->ch[12-i]=*grChunk;
-    //   }
-    // }
-
     if(fInterpGSs>0.){
-      getInterpolatedGraph(grChunk, surf->ch[i], fInterpGSs);
+      if(i==0){
+    	getInterpolatedGraph(grChunk, surf->ch[12-i], fInterpGSs);
+      }
+      else{
+    	getInterpolatedGraph(grChunk, surf->ch[12-i], fInterpGSs);
+      }
     }
     else{
-      *surf->ch[i]=*grChunk;
+      if(i==0){
+    	*surf->ch[i]=*grChunk;
+      }
+      else{
+    	*surf->ch[i]=*grChunk;
+      }
     }
+
+    // if(fInterpGSs>0.){
+    //   getInterpolatedGraph(grChunk, surf->ch[i], fInterpGSs);
+    // }
+    // else{
+    //   *surf->ch[i]=*grChunk;
+    // }
 
     surf->ch[i]->SetTitle("");
     surf->ch[i]->SetName("ch"+TString::Itoa(i, 10));
