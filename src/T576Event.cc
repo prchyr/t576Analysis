@@ -505,11 +505,11 @@ int T576Event::loadSurfEvent(int event){
 
     TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);
 
-    //surf channel mappings are 0, 11, 10, 9...1 
+    //surf channel mappings are 0, 11,10, 9,...1
     
     if(fInterpGSs>0.){
       if(i==0){
-    	getInterpolatedGraph(grChunk, surf->ch[12-i], fInterpGSs);
+    	getInterpolatedGraph(grChunk, surf->ch[i], fInterpGSs);
       }
       else{
     	getInterpolatedGraph(grChunk, surf->ch[12-i], fInterpGSs);
@@ -520,7 +520,7 @@ int T576Event::loadSurfEvent(int event){
     	*surf->ch[i]=*grChunk;
       }
       else{
-    	*surf->ch[i]=*grChunk;
+    	*surf->ch[12-i]=*grChunk;
       }
     }
 
