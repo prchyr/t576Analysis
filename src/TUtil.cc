@@ -220,7 +220,7 @@ TGraph * TUtil::FFT::plotPhase(TGraph *inGr){
     // else if((phase-lastPhase)<=-TUtil::pi){
     //   phase+=2.*TUtil::pi;
     // }
-    outGr->SetPoint(i, inGr->GetX()[i], phase);
+    outGr->SetPoint(i, inGr->GetX()[i], phase+TUtil::pi/2.);
     //lastPhase=phase;
   }
   return outGr;
