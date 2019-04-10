@@ -197,8 +197,9 @@ TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq){
       break;
     }
   }
+  cout<<fftGr->GetX()[index]<<endl;
   double mag=sqrt((fftGr->GetY()[index]*fftGr->GetY()[index])+(fftGr->GetZ()[index]*fftGr->GetZ()[index]));
-  fftGr->GetY()[index]=5000.;
+  fftGr->GetY()[index]=mag;
   fftGr->GetZ()[index]=0.;
   auto  outGr=(TGraph*)TUtil::FFT::ifft(fftGr)->Clone();
   return outGr;
