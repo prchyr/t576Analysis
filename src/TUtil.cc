@@ -191,11 +191,15 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
 TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq){
   auto fftGr=TUtil::FFT::fft(inGr);
   int index=0;
-  for(int i=1;i<fftGr->GetN()-1;i++){
-    if(fftGr->GetX()[i-1]<freq&&fftGr->GetX()[i+1]>freq){
+  double thisFreq=0.;
+  double lastFreq=0.;
+  for(int i=0;i<fftGr->GetN();i++){
+    thisFreq=fftGr->GetX()[i];
+    if(thisFreq>=freq&&lastFreq<freq){
       index=i;
       break;
     }
+    lastFreq=thisFreq;
   }
   cout<<fftGr->GetX()[index]<<endl;
   double mag=sqrt((fftGr->GetY()[index]*fftGr->GetY()[index])+(fftGr->GetZ()[index]*fftGr->GetZ()[index]));
