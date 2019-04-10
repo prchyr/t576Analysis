@@ -191,9 +191,9 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
 TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq){
   auto fftGr=TUtil::FFT::fft(inGr);
   int index=0;
-  for(int i=1;i<fftGr->GetN();i++){
-    if(fftGr->GetX()[i-1]<freq&&fftGr->GetX()[i]>=freq){
-      index=i-1;
+  for(int i=1;i<fftGr->GetN()-1;i++){
+    if(fftGr->GetX()[i-1]<freq&&fftGr->GetX()[i+1]>freq){
+      index=i;
       break;
     }
   }
