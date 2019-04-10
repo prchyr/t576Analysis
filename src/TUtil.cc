@@ -146,8 +146,8 @@ TGraph * TUtil::FFT::hilbertTransform(TGraph *inGr){
 
   for(int i=0;i<n;i++){
     double im=infft->GetZ()[i];
-    infft->GetZ()[i]=-infft->GetY()[i];
-    infft->GetY()[i]=im;
+    infft->GetZ()[i]=infft->GetY()[i];
+    infft->GetY()[i]=-im;
   }
   auto outGr=ifft(infft);
   return outGr;
