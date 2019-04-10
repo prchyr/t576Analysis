@@ -202,29 +202,22 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
 //   delete thing;
 //   return outvec;
 
-double TUtil::FFT::phase(TGraph *inGr, double t){
-  auto ht=hilbertTransform(inGr);
-  return TMath::ATan2(ht->Eval(t), inGr->Eval(t));
-}
+// double TUtil::FFT::phase(TGraph *inGr, double f){
+//   auto fftGr=TUtil::FFT::fft(inGr);
+//   return TMath::ATan2(ht->Eval(t), inGr->Eval(t));
+// }
+
 
 TGraph * TUtil::FFT::plotPhase(TGraph *inGr){
-  auto ht=hilbertTransform(inGr);
-  auto outGr=new TGraph(inGr->GetN());
-  double lastPhase=0;
-  for(int i=0;i<inGr->GetN();i++){
-    double phase=TMath::ATan2(ht->GetY()[i], inGr->GetY()[i]);
-    //double phase=lastPhase+TMath::ATan2(ht->GetY()[i], inGr->GetY()[i]);
-    // if((phase-lastPhase)>=TUtil::pi){
-    //   phase-=2.*TUtil::pi;
-    // }
-    // else if((phase-lastPhase)<=-TUtil::pi){
-    //   phase+=2.*TUtil::pi;
-    // }
-    outGr->SetPoint(i, inGr->GetX()[i], phase+TUtil::pi/2.);
-    //lastPhase=phase;
+  auto fftGr=TUtil::FFT::fft(inGr);
+  auto ph=vector<double>();
+  for(int i=0;i<fftGr->GetN();i++){
+    ph.push_back(TMath::ATan2(fftGr->GetZ()[i], fftGr->GetY()[i]));
   }
+  auto outGr=new TGraph(fftGr->GetN()/2, fftGr->GetX(), &ph[0]);
   return outGr;
 }
+
 
 TGraph * TUtil::FFT::phasorTransform(TGraph *inGr){
   auto infft=fft(inGr);
