@@ -188,19 +188,24 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
   return out;//fXfrmGr;
 }
 
-// vector<double> phasorTransform(vector<double> vec,double ph=1.){
-//   int size=vec.size();
-//   auto fftd=FFTtools::doFFT(size, &vec[0]);
-//   for(int i=0;i<size/2+1;i++){
-//     double im=fftd[i].im;
-//     fftd[i].im=(2.-ph)*fftd[i].re;
-//     fftd[i].re=-ph*im;
-//   }
-//   double * thing=FFTtools::doInvFFT(size, fftd);
-//   auto outvec=toVector(thing, size);
-//   delete[] fftd;
-//   delete thing;
-//   return outvec;
+TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq){
+  auto fftGr=TUtil::FFT::fft(inGr);
+  int index=0;
+  for(int i=1;i<fftGr->GetN();i++){
+    if(fftGr->GetX()[i-1]<freq&&fftGr->GetX()[i]>=freq){
+      index=i;
+      break;
+    }
+  }
+  double mag=sqrt((fftGr->GetY()[index]*fftGr->GetY()[index])+(fftGr->GetZ()[index]*fftGr->GetZ()[index]));
+  fftGr->GetY()[index]=mag;
+  fftGr->GetZ()[index]=mag;
+  auto  outGr=(TGraph*)TUtil::FFT::ifft(fftGr)->Clone();
+  return outGr;
+  
+}
+
+
 
 // double TUtil::FFT::phase(TGraph *inGr, double f){
 //   auto fftGr=TUtil::FFT::fft(inGr);
@@ -219,18 +224,18 @@ TGraph * TUtil::FFT::plotPhase(TGraph *inGr){
 }
 
 
-TGraph * TUtil::FFT::phasorTransform(TGraph *inGr){
-  auto infft=fft(inGr);
-  int n=infft->GetN();
+// TGraph * TUtil::FFT::phasorTransform(TGraph *inGr){
+//   auto infft=fft(inGr);
+//   int n=infft->GetN();
 
-  for(int i=0;i<n;i++){
-    double im=infft->GetZ()[i];
-    infft->GetZ()[i]=0;//infft->GetY()[i];
-    infft->GetY()[i]=infft->GetY()[i]+im;
-  }
-  auto outGr=ifft(infft);
-  return outGr;
-}
+//   for(int i=0;i<n;i++){
+//     double im=infft->GetZ()[i];
+//     infft->GetZ()[i]=0;//infft->GetY()[i];
+//     infft->GetY()[i]=infft->GetY()[i]+im;
+//   }
+//   auto outGr=ifft(infft);
+//   return outGr;
+// }
 
 TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, int dbFlag){
   Int_t size = gr->GetN();
