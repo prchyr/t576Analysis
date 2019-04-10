@@ -193,9 +193,11 @@ TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq){
   int index=0;
   double thisFreq=0.;
   double lastFreq=0.;
-  for(index=0;index<fftGr->GetN();index++){
+  for(int i=0;i<fftGr->GetN();i++){
     thisFreq=fftGr->GetX()[index];
-    if(thisFreq>=freq&&lastFreq<freq)break;
+    if(thisFreq>=freq&&lastFreq<freq){
+      index=i;
+    }
     //if(thisFreq==freq)break;
     lastFreq=thisFreq;
   }
