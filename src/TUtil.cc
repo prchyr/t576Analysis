@@ -195,10 +195,11 @@ TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq){
   double lastFreq=0.;
   for(index=0;index<fftGr->GetN();index++){
     thisFreq=fftGr->GetX()[index];
-    if(thisFreq>=freq&&lastFreq<freq)break;
+    //if(thisFreq>=freq&&lastFreq<freq)break;
+    if(thisFreq==freq)break;
     lastFreq=thisFreq;
   }
-  cout<<fftGr->GetX()[index]<<endl;
+  //cout<<fftGr->GetX()[index]<<endl;
   double mag=sqrt((fftGr->GetY()[index]*fftGr->GetY()[index])+(fftGr->GetZ()[index]*fftGr->GetZ()[index]));
   fftGr->GetY()[index]=mag;
   fftGr->GetZ()[index]=0.;
