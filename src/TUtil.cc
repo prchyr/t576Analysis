@@ -198,8 +198,8 @@ TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq){
     }
   }
   double mag=sqrt((fftGr->GetY()[index]*fftGr->GetY()[index])+(fftGr->GetZ()[index]*fftGr->GetZ()[index]));
-  fftGr->GetY()[index]=mag;
-  fftGr->GetZ()[index]=0;
+  fftGr->GetY()[index]=5000.;
+  fftGr->GetZ()[index]=0.;
   auto  outGr=(TGraph*)TUtil::FFT::ifft(fftGr)->Clone();
   return outGr;
   
