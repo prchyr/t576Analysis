@@ -188,16 +188,16 @@ TGraph * TUtil::FFT::plotPhase(TGraph *inGr){
   auto outGr=new TGraph(inGr->GetN());
   double lastPhase=0;
   for(int i=0;i<inGr->GetN();i++){
-    double phase=lastPhase+TMath::ATan2(ht->GetY()[i], inGr->GetY()[i]);
-
-    if((phase-lastPhase)>=TUtil::pi){
-      phase-=2.*TUtil::pi;
-    }
-    else if((phase-lastPhase)<=-TUtil::pi){
-      phase+=2.*TUtil::pi;
-    }
+    double phase=TMath::ATan2(ht->GetY()[i], inGr->GetY()[i]);
+    //double phase=lastPhase+TMath::ATan2(ht->GetY()[i], inGr->GetY()[i]);
+    // if((phase-lastPhase)>=TUtil::pi){
+    //   phase-=2.*TUtil::pi;
+    // }
+    // else if((phase-lastPhase)<=-TUtil::pi){
+    //   phase+=2.*TUtil::pi;
+    // }
     outGr->SetPoint(i, inGr->GetX()[i], phase);
-    lastPhase=phase;
+    //lastPhase=phase;
   }
   return outGr;
 }
