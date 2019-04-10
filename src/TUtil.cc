@@ -144,10 +144,34 @@ TGraph * TUtil::FFT::hilbertTransform(TGraph *inGr){
   auto infft=fft(inGr);
   int n=infft->GetN();
 
-  for(int i=0;i<n;i++){
-    double im=infft->GetZ()[i];
-    infft->GetZ()[i]=infft->GetY()[i];
-    infft->GetY()[i]=-im;
+  // for(int i=0;i<n;i++){
+  //   double im=infft->GetZ()[i];
+  //   infft->GetZ()[i]=infft->GetY()[i];
+  //   infft->GetY()[i]=-im;
+  // }
+
+  for(int i=0;i<n/2;i++){
+    double x=infft->GetY()[i];
+    double y=infft->GetZ()[i];
+    double r=sqrt((x*x)+(y*y));
+    double phi=TMath::ATan2(y,x);
+    phi-=TUtil::pi/2.;
+    x=r*cos(phi);
+    y=r*sin(phi);
+    infft->GetY()[i]=x;
+    infft->GetZ()[i]=y;
+  }
+
+  for(int i=n/2;i<n;i++){
+    double x=infft->GetY()[i];
+    double y=infft->GetZ()[i];
+    double r=sqrt((x*x)+(y*y));
+    double phi=TMath::ATan2(y,x);
+    phi+=TUtil::pi/2.;
+    x=r*cos(phi);
+    y=r*sin(phi);
+    infft->GetY()[i]=x;
+    infft->GetZ()[i]=y;
   }
   auto outGr=ifft(infft);
   return outGr;
