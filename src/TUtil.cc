@@ -198,12 +198,14 @@ probably easy to do, just need to work it out.
 
 TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq){
   auto fftGr=TUtil::FFT::fft(inGr);
+  double binwidth=fftGr->GetX()[10]-fftGr->GetX()[9];
+  double thresh=binwidth/2.5;
   int index=0;
   double thisFreq=0.;
   double lastFreq=0.;
   for(index=0;index<fftGr->GetN();index++){
     thisFreq=fftGr->GetX()[index];
-    if(abs(thisFreq-freq)<.001)break;
+    if(abs(thisFreq-freq)<thresh)break;
     //if(thisFreq==freq)break;
     lastFreq=thisFreq;
   }
