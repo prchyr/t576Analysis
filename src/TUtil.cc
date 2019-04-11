@@ -2014,6 +2014,20 @@ void TUtil::setHotPalette(){
 
 }
 
+void TUtil::set2DPalette(){
+  const Int_t rgb = 5;
+  const Int_t N = 255;
+  
+  double red[]=     {0.90, 0.70, 1.00, 0.00, 0.00};
+  double green[]= {0.00, 0.30, 1.00, 0.40, 0.00};
+  double blue[]=  {0.00, 0.00, 1.00, 0.70, 0.90};
+  double stops[]={0.00, 0.25, 0.50, 0.75, 1.00};
+
+  TColor::CreateGradientColorTable(rgb, stops, red, green, blue, N);
+  gStyle->SetNumberContours(N);
+
+}
+
 TGraph * TUtil::evenSample(TGraph *inGr, double dt){
   double maxT=inGr->GetX()[inGr->GetN()-1];
   double minT=inGr->GetX()[0];
