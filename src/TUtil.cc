@@ -188,6 +188,14 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
   return out;//fXfrmGr;
 }
 
+/*
+not quite working yet. need to be sure that the data is partitioned
+such that the frequency we want is exactly in its own bin. 
+
+probably easy to do, just need to work it out.
+ */
+
+
 TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq){
   auto fftGr=TUtil::FFT::fft(inGr);
   int index=0;
@@ -195,7 +203,7 @@ TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq){
   double lastFreq=0.;
   for(int i=0;i<fftGr->GetN();i++){
     thisFreq=fftGr->GetX()[i];
-    if(thisFreq>=freq&&lastFreq<freq){
+    if(thisFreq==freq&&lastFreq<freq){
       index=i;
     }
     //if(thisFreq==freq)break;
