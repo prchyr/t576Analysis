@@ -1118,7 +1118,7 @@ TGraph * TUtil::getNSamplesFrom(TGraph *ingr, double start, int nSamples, int de
   vector<double> outx, outy;
   int nSamp=0;
   for(int i=0;i<ingr->GetN();i++){
-    if(xx[i]>=start&&nSamp>nSamples){
+    if(xx[i]>=start&&nSamp<nSamples){
       outx.push_back(xx[i]);
       outy.push_back(yy[i]);
       nSamp++;
