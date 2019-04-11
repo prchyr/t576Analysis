@@ -196,7 +196,7 @@ probably easy to do, just need to work it out.
  */
 
 
-TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq){
+TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq, int debug){
   auto fftGr=TUtil::FFT::fft(inGr);
   double binwidth=fftGr->GetX()[10]-fftGr->GetX()[9];
   double thresh=binwidth/2.5;
@@ -209,7 +209,9 @@ TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq){
     //if(thisFreq==freq)break;
     lastFreq=thisFreq;
   }
-  //  cout<<fftGr->GetX()[index]<<endl;
+  if(debug==1){
+    cout<<fftGr->GetX()[index]<<endl;
+  }
   double mag=sqrt((fftGr->GetY()[index]*fftGr->GetY()[index])+(fftGr->GetZ()[index]*fftGr->GetZ()[index]));
   fftGr->GetY()[index]=mag;
   fftGr->GetZ()[index]=0.;
