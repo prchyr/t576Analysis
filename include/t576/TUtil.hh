@@ -314,8 +314,10 @@ namespace TUtil{
     double phase(TGraph *inGr, double t);
     //plot the phase of the full graph (NOT WORKING)
     TGraph * plotPhase(TGraph *inGr);
-    //DON'T USE NOT WORKING return the phasor transform DON'T USE NOT WORKING
+    //zero the phase at the given frequency
     TGraph * zeroPhaseAt(TGraph *inGr, double freq, int debug=0);
+    //set the phase angle at the given frequency
+    TGraph * setPhaseAt(TGraph *inGr, double freq, double phaseAng, int debug=0);
     //return the Hilbert envelope
     TGraph * hilbertEnvelope(TGraph *inGr);
     //return the power spectral density in dBm/Hz, rBW is the resolution bandwith of the system, used to calculate the density. defaults to Nyquist.

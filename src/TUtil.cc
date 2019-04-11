@@ -189,10 +189,12 @@ TGraph * TUtil::FFT::hilbertEnvelope(TGraph * inGr){
 }
 
 /*
-not quite working yet. need to be sure that the data is partitioned
-such that the frequency we want is exactly in its own bin. 
+works well so long as your frequency of interest is an exact bin. 
+e.g. need to have the right number of samples in the graph such that
+there is a bin right at your freq of interest. (usually just an 
+even number of samples)
 
-probably easy to do, just need to work it out.
+
  */
 
 
@@ -215,6 +217,30 @@ TGraph * TUtil::FFT::zeroPhaseAt(TGraph * inGr, double freq, int debug){
   double mag=sqrt((fftGr->GetY()[index]*fftGr->GetY()[index])+(fftGr->GetZ()[index]*fftGr->GetZ()[index]));
   fftGr->GetY()[index]=mag;
   fftGr->GetZ()[index]=0.;
+  auto  outGr=(TGraph*)TUtil::FFT::ifft(fftGr)->Clone();
+  return outGr;
+  
+}
+
+TGraph * TUtil::FFT::setPhaseAt(TGraph * inGr, double freq, double phaseAng, int debug){
+  auto fftGr=TUtil::FFT::fft(inGr);
+  double binwidth=fftGr->GetX()[10]-fftGr->GetX()[9];
+  double thresh=binwidth/2.5;
+  int index=0;
+  double thisFreq=0.;
+  double lastFreq=0.;
+  for(index=0;index<fftGr->GetN();index++){
+    thisFreq=fftGr->GetX()[index];
+    if(abs(thisFreq-freq)<thresh)break;
+    //if(thisFreq==freq)break;
+    lastFreq=thisFreq;
+  }
+  if(debug==1){
+    cout<<fftGr->GetX()[index]<<endl;
+  }
+  double mag=sqrt((fftGr->GetY()[index]*fftGr->GetY()[index])+(fftGr->GetZ()[index]*fftGr->GetZ()[index]));
+  fftGr->GetY()[index]=mag*sin(phaseAng);
+  fftGr->GetZ()[index]=mag*cos(phaseAng);
   auto  outGr=(TGraph*)TUtil::FFT::ifft(fftGr)->Clone();
   return outGr;
   
