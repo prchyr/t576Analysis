@@ -1661,3 +1661,7 @@ TGraph * T576Event::getAntennas(Color_t color){
 
   return rxgraph;
 }
+
+double T576Event::getInterpGSs(){
+  return fInterpGSs;
+}

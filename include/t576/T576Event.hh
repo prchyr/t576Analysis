@@ -149,7 +149,7 @@ public:
   TVector3 * fixPositionsDev(double dx, int maxIter, int hilbert, TVector3 source, TVector3 *positions);
   vector<TPolyLine*> getTheRoom(Color_t lineColor=kRed, Color_t tgtColor=kGreen);
   TGraph * getAntennas(Color_t color=kBlue);
-
+  double getInterpGSs();
   
 private:
   int fNEntriesSurf=0, fNEntriesScope=0;
