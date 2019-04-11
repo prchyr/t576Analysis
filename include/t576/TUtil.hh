@@ -148,7 +148,11 @@ namespace TUtil{
   //if shift_to_zero==1, the time axis is shifted such that it starts at 0.
   //  return the cumulative distribution function of a graph. if normed is 1, the graph is scaled such that x and y axes spread from 0 to 1.
   TGraph *CDF(TGraph *inGr, int normed=0);
+  //get a chunk of a graph from start to end. delay to zero shifts the time so that the returned graph starts at t=0
+  //uses TGraph->Eval() to get a very specific point in the graph. slow.
   TGraph * getChunkOfGraph(TGraph *ingr, double start, double end, int delay_to_zero=0);
+//get a chunk of a graph from start to end. delay to zero shifts the time so that the returned graph starts at t=0
+  TGraph * getChunkOfGraphFast(TGraph *ingr, double start, double end, int delay_to_zero=0);
   //cross correlation of two graphs. returns the cross-correlation graph
   //maxDelay is the maximum starting offset between gr1 and gr2. defaults
   //to the full length of the graphs.

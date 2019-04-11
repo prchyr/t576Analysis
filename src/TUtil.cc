@@ -1088,22 +1088,29 @@ TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end, int dela
 
 }
 
-// TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end){
-//   double *xx=ingr->GetX();
-//   double *yy=ingr->GetY();
-//   vector<double> outx, outy;
-//   double xincr=xx[10]-xx[9];
-//   double time=start;
-//   while(time<end){
-//     outx.push_back(time);
-//     outy.push_back(ingr->Eval(time));
-//     time+=xincr;
-//   }
+TGraph * TUtil::getChunkOfGraphFast(TGraph *ingr, double start, double end, int delay_to_zero){
+  double *xx=ingr->GetX();
+  double *yy=ingr->GetY();
+  vector<double> outx, outy;
   
-//   TGraph * outg=new TGraph(outx.size(), &outx[0], &outy[0]);
-//   return outg;
-// }
+  for(int i=0;i<ingr->GetN();i++){
+    if(xx[i]>=start&&xx[i]<=end){
+      outx.push_back(xx[i]);
+      outy.push_back(yy[i]);
+    }
+  }
 
+  TGraph * outg=new TGraph(outx.size(), &outx[0], &outy[0]);
+  outg->SetTitle(ingr->GetTitle());
+  outg->SetName(ingr->GetName());
+  outg->GetXaxis()->SetTitle(ingr->GetXaxis()->GetTitle());
+  outg->GetYaxis()->SetTitle(ingr->GetYaxis()->GetTitle());
+  if(delay_to_zero==0){
+    return outg;
+  }
+  return delayGraph(outg, -start);
+
+}
 
 
 TGraph * TUtil::delayGraph(TGraph *ingr, double delay){
