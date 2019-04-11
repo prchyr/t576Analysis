@@ -153,6 +153,7 @@ namespace TUtil{
   TGraph * getChunkOfGraph(TGraph *ingr, double start, double end, int delay_to_zero=0);
 //get a chunk of a graph from start to end. delay to zero shifts the time so that the returned graph starts at t=0
   TGraph * getChunkOfGraphFast(TGraph *ingr, double start, double end, int delay_to_zero=0);
+  TGraph * getNSamplesFrom(TGraph *ingr, double start, int nSamples, int delay_to_zero);
   //cross correlation of two graphs. returns the cross-correlation graph
   //maxDelay is the maximum starting offset between gr1 and gr2. defaults
   //to the full length of the graphs.

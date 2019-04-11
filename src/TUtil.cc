@@ -1112,6 +1112,31 @@ TGraph * TUtil::getChunkOfGraphFast(TGraph *ingr, double start, double end, int 
 
 }
 
+TGraph * TUtil::getNSamplesFrom(TGraph *ingr, double start, int nSamples, int delay_to_zero){
+  double *xx=ingr->GetX();
+  double *yy=ingr->GetY();
+  vector<double> outx, outy;
+  int nSamp=0;
+  for(int i=0;i<ingr->GetN();i++){
+    if(xx[i]>=start&&nSamp>nSamples){
+      outx.push_back(xx[i]);
+      outy.push_back(yy[i]);
+      nSamp++;
+    }
+  }
+
+  TGraph * outg=new TGraph(outx.size(), &outx[0], &outy[0]);
+  outg->SetTitle(ingr->GetTitle());
+  outg->SetName(ingr->GetName());
+  outg->GetXaxis()->SetTitle(ingr->GetXaxis()->GetTitle());
+  outg->GetYaxis()->SetTitle(ingr->GetYaxis()->GetTitle());
+  if(delay_to_zero==0){
+    return outg;
+  }
+  return delayGraph(outg, -start);
+
+}
+
 
 TGraph * TUtil::delayGraph(TGraph *ingr, double delay){
   double*xx=ingr->GetX();
