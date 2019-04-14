@@ -317,7 +317,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
 
 
 
-int T576Event::loadSurfEvent(int run_major, int run_minor, int event){
+int T576Event::loadSurfEvent(int run_major, int run_minor, int event, bool remove_dc_offset){
 
   if(fIndexBuilt==0){
     cout<<"event index not built yet. building..."<<endl;
@@ -358,7 +358,7 @@ int T576Event::loadSurfEvent(int run_major, int run_minor, int event){
     return 0;
   }
 
-  if(loadSurfEvent(surfEvNo+event)==1)return 1;
+  if(loadSurfEvent(surfEvNo+event, remove_dc_offset)==1)return 1;
   else return 0;
 //   TString thisSurfFilename=surfFilename->Data();
 //   //open the file
@@ -422,7 +422,7 @@ int T576Event::loadSurfEvent(int run_major, int run_minor, int event){
 
 
 //load an event from the global surf event number index 
-int T576Event::loadSurfEvent(int event){
+int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
 
   if(fIndexBuilt==0){
     cout<<"event index not built yet. building..."<<endl;
@@ -504,6 +504,9 @@ int T576Event::loadSurfEvent(int event){
     TGraph * graph=new TGraph(len, TUtil::makeIndices(len, 1./3.2, surf->delays[i]), surf->dat[i]);
 
     TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);
+    if(remove_dc_offset==true){
+      TUtil::removeMeanInPlace(grChunk, 0., 30.);
+    }
 
     //surf channel mappings are 0, 11,10, 9,...1
     
