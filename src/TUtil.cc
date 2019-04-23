@@ -2077,12 +2077,12 @@ TGraph * TUtil::zeroPad(TGraph *inGr, int num, int whichEnd){
   auto dt=inGr->GetX()[1]-inGr->GetX()[0];
   auto outGr=(TGraph*)inGr->Clone();
   auto lastt=inGr->GetX()[inGr->GetN()-1];
-  if(whichEnd==0){
+  if(whichEnd==1){
     for(int i=0;i<num;i++){
       outGr->SetPoint(outGr->GetN(), lastt+((double)i*dt), 0.);
     }
   }
-  else{
+  else {
     auto tempGr=new TGraph(inGr->GetN()+num);
     for(int i=tempGr->GetN()-1;i>=num;i--){
       tempGr->SetPoint(i, outGr->GetX()[i-num], outGr->GetY()[i-num]);

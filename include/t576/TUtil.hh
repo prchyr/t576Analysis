@@ -288,7 +288,7 @@ namespace TUtil{
   //return a TGraph, evenly sampled along dt
   TGraph * evenSample(TGraph *inGr, double dt);
   //zero pad a tgraph. requires an evenly sampled tgraph.
-  TGraph * zeroPad(TGraph *inGr, int num, int whichEnd=0);
+  TGraph * zeroPad(TGraph *inGr, int num, int whichEnd=1);
   //get the distance between tvectors
   double distance3(TVector3 one, TVector3 two);
   //get the distance from one vector to several others
