@@ -2089,7 +2089,7 @@ TGraph * TUtil::zeroPad(TGraph *inGr, int num, int whichEnd){
       tempGr->SetPoint(i, outGr->GetX()[i-num], outGr->GetY()[i-num]);
     }
     for(int i=num-1;i>=0;i--){
-      tempGr->SetPoint(i, firstt.-((double)i*dt), 0.);
+      tempGr->SetPoint(i, firstt-((double)i*dt), 0.);
     }
     return tempGr;
   }
