@@ -204,6 +204,8 @@ namespace TUtil{
   TGraph *stretch(TGraph *g1, double factor);
   //find the mean of a TGraph. range is optional
   double mean(TGraph *gr, double t_low=0., double t_high=999999.);
+  //get the power (square all values of a graph)
+  TGraph * power(TGraph *gr);
   //remove the mean of a TGraph. range to compute the mean over is optional.
   //the mean computed within a sub-range will be removed from the full graph.
   TGraph * removeMean(TGraph *gr, double t_low=0., double t_high=999999.);
@@ -321,6 +323,7 @@ namespace TUtil{
     //return the Hilbert envelope
     TGraph * hilbertEnvelope(TGraph *inGr);
     //return the power spectral density in dBm/Hz, rBW is the resolution bandwith of the system, used to calculate the density. defaults to Nyquist.
+
     TGraph * psd(TGraph *inGr, double rBW=0., int dbFlag=1);
     /*
       return the spectrogram, with various options:

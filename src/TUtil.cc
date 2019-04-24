@@ -727,6 +727,14 @@ int TUtil::removeMeanInPlace(TGraph *gr, double t_low, double t_high){
   return 1;
 }
 
+TGraph * TUtil::power(TGraph *gr){
+  auto outGr=(TGraph*)gr->Clone();
+  for(int i=0;i<outGr->GetN();i++){
+    outGr->SetPoint(i, outGr->GetX()[i], outGr->GetY()[i]*outGr->GetY()[i]);
+  }
+  return outGr;
+}
+
 
 double TUtil::integrate(TGraph * gr, double t_low, double t_high){
   t_low=t_low>0.?t_low:0.;
