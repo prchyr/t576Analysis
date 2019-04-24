@@ -303,7 +303,8 @@ namespace TUtil{
   double  dTimeOfFlight(TVector3 source,TVector3 one, TVector3 two, double n=1.);
   //delta t's between different antennas for a single source
   double ** dTimeOfFlight(int N, TVector3 one, TVector3 * two, double n=1.);
-  
+  //offset a bunch of antennas for the correct delta t's for single source
+  //  TGraph ** delayGraphs
   namespace FFT{
 
     //returns a tgraph2d, x axis is the freqs, y axis is the real part of the complex fft, z axis is the imaginary part of the fft.

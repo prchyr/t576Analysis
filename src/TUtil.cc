@@ -663,6 +663,17 @@ TGraph * TUtil::normalize(TGraph * inGr){
     return og;
   }
 
+TGraph * TUtil::normToPeak(TGraph * inGr){
+    double length=inGr->GetN();
+    double peak=TMath::MaxElement(inGr->GetN(), inGr->GetY());
+    TGraph *og = (TGraph*)inGr->Clone();
+    for(int i=0;i<length;i++){
+      og->SetPoint(i, inGr->GetX()[i], inGr->GetY()[i]/peak);
+    }
+
+    return og;
+  }
+
 
 TGraph2D * TUtil::normalize(TGraph2D * inGr){
     double length=inGr->GetN();
