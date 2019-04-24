@@ -144,7 +144,11 @@ public:
   //get the charge in this event from the ict trace.
   double getCharge(TGraph * ict);
   int drawGeom(int scopeChan=999, int surfChan=999);
-  TH2D* pointingMap(double dx=.3, int draw=1, int hilbert=1);
+  //make a pointing map from the SURF. several ways:
+  //type==0 is using the raw voltage versus time trace
+  //type==1 uses the hilbert envelope of the voltage versus time trace
+  //type==2 uses the power versus time trace
+  TH2D* pointingMap(double dx=.3, int draw=1, int type=1);
   TH2D* pointingMapDev(double dx, int draw, int hilbert, TVector3 *position);
   TVector3 * fixPositionsDev(double dx, int maxIter, int hilbert, TVector3 source, TVector3 *positions);
   vector<TPolyLine*> getTheRoom(Color_t lineColor=kRed, Color_t tgtColor=kGreen);

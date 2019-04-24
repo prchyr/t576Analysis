@@ -967,7 +967,7 @@ if(scopeChan<4&&scopeChan>=0){
 }
 
 
-TH2D* T576Event::pointingMap(double dx, int draw, int hilbert){
+TH2D* T576Event::pointingMap(double dx, int draw, int type){
   double tmin=20;
   double tmax=150;
   double dt[12][12]={0};
@@ -982,8 +982,11 @@ TH2D* T576Event::pointingMap(double dx, int draw, int hilbert){
   auto deltat=1./(3.2*fInterpGSs);
   for(int i=0;i<12;i++){
     //graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope(TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1)));
-    
-    if(hilbert==1){
+
+    if(type==2){
+ graphs[i]=TUtil::normalize(TUtil::power((TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1))));
+    }
+    if(type==1){
       graphs[i]=TUtil::normalize(TUtil::FFT::hilbertEnvelope((TUtil::getChunkOfGraph(surf->ch[i], tmin, tmax, 1))));
     }
     else{
