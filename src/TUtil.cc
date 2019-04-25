@@ -1023,7 +1023,7 @@ TGraph * TUtil::sincInterpolateGraph(TGraph *inGr, double interpGSs){
 }
 
 
-// TGraph * TUtil::sincInterpolateGraphSimple(TGraph *inGr, double interpGSs){
+// TGraph * TUtil::sincInterpolateGraphFast(TGraph *inGr, double interpGSs, int ){
 //   double T = inGr->GetX()[1]-inGr->GetX()[0];
 //   double dt = 1./interpGSs;
 //   vector<double> xx, yy;
@@ -1050,33 +1050,50 @@ TGraph * TUtil::sincInterpolateGraph(TGraph *inGr, double interpGSs){
 // }
 
 
-int TUtil::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs){
-  ROOT::Math::Interpolator interp(inGraph->GetN(), ROOT::Math::Interpolation::kAKIMA);
-  interp.SetData(inGraph->GetN(), inGraph->GetX(), inGraph->GetY());
+// int TUtil::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs){
+//   ROOT::Math::Interpolator interp(inGraph->GetN(), ROOT::Math::Interpolation::kAKIMA);
+//   interp.SetData(inGraph->GetN(), inGraph->GetX(), inGraph->GetY());
 
-  //get dt, assuming even sampling.
-  double inDt=inGraph->GetX()[50]-inGraph->GetX()[49];
-  double inGSs=1./inDt;
+//   //get dt, assuming even sampling.
+//   double inDt=inGraph->GetX()[50]-inGraph->GetX()[49];
+//   double inGSs=1./inDt;
 
-  double outDt=1./interpGSs;
+//   double outDt=1./interpGSs;
 
-  int samps=(int) (inGraph->GetN()*(interpGSs/inGSs));
+//   int samps=(int) (inGraph->GetN()*(interpGSs/inGSs));
 
-  vector<double> xx, yy;
-  for(int i=0;i<samps;i++){
-    double time = i*outDt;
-    if(time>inGraph->GetX()[inGraph->GetN()-1])continue;
-    xx.push_back(time);
-    yy.push_back(interp.Eval(time));
-  }
+//   vector<double> xx, yy;
+//   for(int i=0;i<samps;i++){
+//     double time = i*outDt;
+//     if(time>inGraph->GetX()[inGraph->GetN()-1])continue;
+//     xx.push_back(time);
+//     yy.push_back(interp.Eval(time));
+//   }
 
-  auto tempGr=new TGraph(xx.size(), &xx[0], &yy[0]);
-  *outGraph=*tempGr;
-  delete(tempGr);
+//   auto tempGr=new TGraph(xx.size(), &xx[0], &yy[0]);
+//   *outGraph=*tempGr;
+//   delete(tempGr);
 			 
+
+//   return 1;
+// }
+
+int TUtil::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs, int type){
+  if(type==0){
+    auto tempGr=sincInterpolateGraph(inGraph, interpGSs);
+    *outGraph=*tempGr;
+    delete(tempGr);
+  }
+  else if (type==1){
+    auto tempGr=interpolateGraph(inGraph, interpGSs);
+    *outGraph=*tempGr;
+    delete(tempGr);
+  }
 
   return 1;
 }
+
+
 
 
 TGraph * TUtil::interpolateGraph(TGraph * inGraph, double interpGSs){

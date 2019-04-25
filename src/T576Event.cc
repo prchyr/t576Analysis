@@ -509,13 +509,13 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
     }
 
     //surf channel mappings are 0, 11,10, 9,...1
-    
+    //use sinc interpolation for sampling near nyquist.
     if(fInterpGSs>0.){
       if(i==0){
-    	getInterpolatedGraph(grChunk, surf->ch[i], fInterpGSs);
+    	getInterpolatedGraph(grChunk, surf->ch[i], fInterpGSs, 0);
       }
       else{
-    	getInterpolatedGraph(grChunk, surf->ch[12-i], fInterpGSs);
+    	getInterpolatedGraph(grChunk, surf->ch[12-i], fInterpGSs, 0);
       }
     }
     else{

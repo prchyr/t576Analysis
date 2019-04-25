@@ -132,10 +132,15 @@ namespace TUtil{
   //return a TGraph interpoltaed using simple sinc interpolation.(slow)
   TGraph * sincInterpolateGraph(TGraph *inGr, double interpGSs);
   //approximated (fast) sinc interpolation.(broken)
-  TGraph * sincInterpolateGraphSimple(TGraph *inGr, double interpGSs);
-  //interpolate a tgraph using the ROOT interpolation functions (no memory use
-  int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs);
-  //return the interpolater graph (memory use)
+  TGraph * sincInterpolateGraphFast(TGraph *inGr, double interpGSs);
+  /*interpolate a tgraph.
+    type 0 is a sinc interpolation
+    type 1 is a ROOT akima interpolation.(default)
+
+    the sinc interpolation is best/most accurate for truly band-limited signals sampled near the nyquist frequency. the akima is better for oversampled signals where the frequency of interest is far below the nyquist frequency.
+  */
+  int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs, int type=1);
+  //return the interpolated graph (memory use) using ROOT's akima method
   TGraph * interpolateGraph(TGraph * inGraph, double interpGSs);
 
   //normalize a graph
