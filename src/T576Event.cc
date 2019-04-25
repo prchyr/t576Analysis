@@ -512,10 +512,10 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
     //use sinc interpolation for sampling near nyquist.
     if(fInterpGSs>0.){
       if(i==0){
-    	getInterpolatedGraph(grChunk, surf->ch[i], fInterpGSs, 0);
+    	getInterpolatedGraph(grChunk, surf->ch[i], fInterpGSs, 2);
       }
       else{
-    	getInterpolatedGraph(grChunk, surf->ch[12-i], fInterpGSs, 0);
+    	getInterpolatedGraph(grChunk, surf->ch[12-i], fInterpGSs, 2);
       }
     }
     else{
