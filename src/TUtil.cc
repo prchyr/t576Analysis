@@ -1512,12 +1512,13 @@ vector<TGraph*> TUtil::alignMultipleToOther(vector<TGraph*> inGr, vector<TGraph*
 TGraph * TUtil::makeCW(double freq,  double amp, double t_min, double t_max, double GSs, double phase){
 
   int n=(t_max-t_min)*GSs;
-  TGraph * oG=new TGraph(n);
+  TGraph * oG=new TGraph();
   double dt=1./GSs;
-  for(int i=0;i<n;i++){
-    double t = (double)i*dt;
+  double t=t_min;
+  while(t<t_max){
     double temp=amp*sin(2.*pi*freq*t + phase);
-    oG->SetPoint(i, t, temp);
+    oG->SetPoint(oG->GetN(), t, temp);
+    t+=dt;
   }
   return oG;
 }
