@@ -277,8 +277,13 @@ namespace TUtil{
   double rad2Deg(double rad);
   //add some noise to a graph
   TGraph * addNoise(TGraph * inGr, double level);
-  //drawing things
+  //find the x values of zero crossings
+  TGraph * getZeroCrossGraph(TGraph * inGr);
 
+
+
+  //drawing things
+ 
   //draw a bunch of graphs
   void draw(vector<TGraph*> inGr, TString option="");
     //draw a bunch of graphs
