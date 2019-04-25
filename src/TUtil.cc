@@ -792,7 +792,7 @@ double TUtil::rms(TGraph * gr, double t_low, double t_high){
 }
 
 
-TGraph * getZeroCrossGraph(TGraph * inGr){
+TGraph * TUtil::getZeroCrossGraph(TGraph * inGr){
   auto outGr=new TGraph();
   double val=0.;
   double lastVal=0.;
