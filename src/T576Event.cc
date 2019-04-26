@@ -496,14 +496,14 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
     int index2=i*len;//i is channel number
     copy(fSurfData+index1+index2, fSurfData+index1+index2+len, surf->dat[i]);
     //feet to meter conversion
-    surf->delays[i]=0.;//(surf->cableLengths[i]*ft)/(c_light*surf->velocityFactor);
+    surf->delays[i]=(surf->cableLengths[i]*ft)/(c_light*surf->velocityFactor);
     //mV to V conversion
     for(int j=0;j<len;j++){
       surf->dat[i][j]*=.001;
     }
     TGraph * graph=new TGraph(len, TUtil::makeIndices(len, 1./3.2, surf->delays[i]), surf->dat[i]);
 
-    TGraph *grChunk=graph;//TUtil::getChunkOfGraph(graph, 0, 250);
+    TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);
     if(remove_dc_offset==true){
       TUtil::removeMeanInPlace(grChunk, 0., 30.);
     }
@@ -541,8 +541,8 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
     surf->ch[i]->GetYaxis()->SetTitleOffset(1.15);
     surf->ch[i]->GetHistogram()->SetName("");
     
-    //delete(grChunk);
-    //    delete(graph);
+    delete(grChunk);
+    delete(graph);
   }
 
   fSurfLoaded=true;
