@@ -503,7 +503,7 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
     }
     TGraph * graph=new TGraph(len, TUtil::makeIndices(len, 1./3.2, surf->delays[i]), surf->dat[i]);
 
-    TGraph *grChunk=TUtil::getChunkOfGraph(graph, 0, 250);
+    TGraph *grChunk=graph;//TUtil::getChunkOfGraph(graph, 0, 250);
     if(remove_dc_offset==true){
       TUtil::removeMeanInPlace(grChunk, 0., 30.);
     }
