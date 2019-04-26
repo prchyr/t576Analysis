@@ -541,8 +541,8 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
     surf->ch[i]->GetYaxis()->SetTitleOffset(1.15);
     surf->ch[i]->GetHistogram()->SetName("");
     
-    delete(grChunk);
-    delete(graph);
+    //delete(grChunk);
+    //    delete(graph);
   }
 
   fSurfLoaded=true;
