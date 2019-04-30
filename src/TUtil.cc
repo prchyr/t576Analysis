@@ -288,7 +288,7 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   Int_t num_zeros=(zero_pad_length-binsize)/2;
   //  Int_t nbins = size/overlap;
   int nbins=size/(binsize-overlap);
-  xmax=((double)nbins*((double)binsize-(double)overlap))/samprate;
+  //xmax=((double)nbins*((double)binsize-(double)overlap))/samprate;
   char*timebuff;
   //double samplerate = size/(xmax-xmin);
   double bandwidth = 1e9*samprate;
