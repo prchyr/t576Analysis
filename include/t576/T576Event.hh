@@ -185,6 +185,10 @@ public:
   public:
     //    Scope(): fTxPos(txPos){};
     //receiver positions
+    double cableLengths[4]={0., 0., 0., 10.};
+    double velocityFactor=-.82;
+    double delays[4];
+    
     TVector3 pos[4];
     double dist[4], ang[4];
     //double arrays for the individual traces

@@ -279,7 +279,12 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
   scope->time[0]=0.;
   scope->time[19999]=scope->time[19998]+.05;
   for(int i=0;i<4;i++){
-    TGraph * graph=new TGraph(length, scope->time, scope->dat[i]);
+
+    scope->delays[i]=(scope->cableLengths[i]*ft)/(c_light*scope->velocityFactor);
+
+    TGraph * tempGr=new TGraph(length, scope->time, scope->dat[i]);
+    TGraph * graph=TUtil::delayGraph(tempGr, scope->delays[i]);
+
     if(remove_dc_offset==true){
       TUtil::removeMeanInPlace(graph, 0., 300.);
     }
@@ -298,6 +303,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
     scope->ch[i]->GetHistogram()->SetName("");
     
    delete(graph);
+   delete(tempGr);
 
   }
   //  cout<<"here"<<endl;
