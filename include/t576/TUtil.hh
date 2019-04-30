@@ -280,7 +280,7 @@ namespace TUtil{
   //find the x values of zero crossings
   TGraph * getZeroCrossGraph(TGraph * inGr);
   //get the time of the first threshold crossing after after
-  double getFirstThresholdCrossing(TGraph *inGr, double thresh, double after);
+  double getFirstThresholdCrossing(TGraph *inGr, double thresh, double after=0.);
 
 
   //drawing things
