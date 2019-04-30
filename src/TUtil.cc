@@ -282,8 +282,8 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   Int_t size = gr->GetN();
   double dt=(gr->GetX()[1]-gr->GetX()[0]); 
   double samprate=1./dt;
-  double xmax = size/samprate;
-  double xmin = 0;
+  double xmax = gr->GetX()[gr->GetN()-1];
+  double xmin = gr->GetX()[0];
   zero_pad_length=zero_pad_length<=binsize?binsize:zero_pad_length;
   Int_t num_zeros=(zero_pad_length-binsize)/2;
   //  Int_t nbins = size/overlap;
