@@ -182,6 +182,9 @@ namespace TUtil{
   TGraph * alignToOther(TGraph * gr1, TGraph * gr2, TGraph* othGr, double max_delay=999999., double t_low=0., double t_high=999999.);
   //align a large number of graphs to the first graph in the set.
   vector<TGraph*> alignMultiple(vector<TGraph*> inGr, double max_delay=999999., double t_low=0., double t_high=999999.);
+
+//return the average of a bunch of aligned graphs
+  TGraph* alignMultipleAndAverage(vector<TGraph*> inGr, double max_delay=999999., double t_low=0., double t_high=999999.);
   //align a large number of graphs to the first, then truncate them all to t_min and t_max
   vector<TGraph*> alignMultipleAndTruncate(vector<TGraph*> inGr, double max_delay, double t_min, double t_max);
   //align a large set to a reference set.
@@ -289,6 +292,7 @@ namespace TUtil{
   void draw(vector<TGraph*> inGr, TString option="");
     //draw a bunch of graphs
   void draw(int nGraphs, TGraph ** inGr, TString option="");
+
   //a pretty warm palette
   void setWarmPalette();
   //a pretty cool palette

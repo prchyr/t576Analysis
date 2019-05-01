@@ -154,6 +154,11 @@ public:
   vector<TPolyLine*> getTheRoom(Color_t lineColor=kRed, Color_t tgtColor=kGreen);
   TGraph * getAntennas(Color_t color=kBlue);
   double getInterpGSs();
+
+    //draw a bunch of graphs from a t576event object
+  vector<TGraph *> draw(int major, int minor, int scopeOrSurf, int channel, int num, double tLow=0., double tHigh=99999., bool align=true, TString drawOption="al PLC");
+   //draw average of a bunch of graphs from a t576event object
+  TGraph * drawAvg(int major, int minor, int scopeOrSurf, int channel, int num, double tLow=0., double tHigh=99999., bool align=true, TString drawOption="al PLC");
   
 private:
   int fNEntriesSurf=0, fNEntriesScope=0;

@@ -559,8 +559,84 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
 
 double T576Event::getCharge(TGraph *ict){
   //TUtil::removeMeanInPlace(ict, 0., 400.)
-  charge = .4*TUtil::integrate(ict, 455, 550);
+  charge = .4*TUtil::integrate(ict, 435, 550);
   return charge;
+}
+
+
+vector<TGraph *> T576Event::draw(int major, int minor, int scopeOrSurf, int channel, int num, double tLow, double tHigh, bool align, TString drawOption){
+  int number=0;
+  auto graphs=vector<TGraph*>();
+  if(scopeOrSurf==0){
+    for(int i=0;i<scopeNEvents;i++){
+      loadScopeEvent(major, minor, i);
+      if(isGood){
+	graphs.push_back(TUtil::getChunkOfGraphFast(scope->ch[channel], tLow, tHigh));
+	number++;
+      }
+      if(number>=num)break;
+    }
+    auto aligned=TUtil::alignMultiple(graphs, 5.);
+    //    graphs.clear();
+    TUtil::draw(aligned);
+    return aligned;
+
+  }
+  else{
+    for(int i=0;i<surfNEvents;i++){
+      loadSurfEvent(major, minor, i);
+      if(isGood){
+	graphs.push_back(TUtil::getChunkOfGraphFast(surf->ch[channel], tLow, tHigh));
+	number++;
+      }
+      if(number>=num)break;
+    }
+    auto aligned=TUtil::alignMultiple(graphs, 5.);
+    //    graphs.clear();
+    TUtil::draw(aligned);
+    return aligned;
+  }
+
+
+  
+}
+
+
+
+TGraph * T576Event::drawAvg(int major, int minor, int scopeOrSurf, int channel, int num, double tLow, double tHigh, bool align, TString drawOption){
+  int number=0;
+  auto graphs=vector<TGraph*>();
+  if(scopeOrSurf==0){
+    for(int i=0;i<scopeNEvents;i++){
+      loadScopeEvent(major, minor, i);
+      if(isGood){
+	graphs.push_back(TUtil::getChunkOfGraphFast(scope->ch[channel], tLow, tHigh));
+	number++;
+      }
+      if(number>=num)break;
+    }
+    auto avg=TUtil::alignMultipleAndAverage(graphs, 5.);
+    graphs.clear();
+    avg->Draw(drawOption);
+    return avg;
+  }
+  else{
+    for(int i=0;i<surfNEvents;i++){
+      loadSurfEvent(major, minor, i);
+      if(isGood){
+	graphs.push_back(TUtil::getChunkOfGraphFast(surf->ch[channel], tLow, tHigh));
+	number++;
+      }
+      if(number>=num)break;
+    }
+    auto avg=TUtil::alignMultipleAndAverage(graphs, 5.);
+    graphs.clear();
+    avg->Draw(drawOption);
+    return avg;
+  }
+
+
+  
 }
 
 
