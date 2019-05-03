@@ -564,10 +564,13 @@ double T576Event::getCharge(TGraph *ict){
 }
 
 
-vector<TGraph *> T576Event::draw(int major, int minor, int scopeOrSurf, int channel, int num, double tLow, double tHigh, double align, TString drawOption){
+vector<TGraph *> T576Event::draw(int major, int minor, int scopeOrSurf, int channel, int num, double align, double tLow, double tHigh, TString drawOption){
+
   int number=0;
   auto graphs=vector<TGraph*>();
   if(scopeOrSurf==0){
+    loadScopeEvent(major, minor, 0);
+    tHigh=tHigh==999999?tHigh=scope->ch[channel]->GetY()[scope->ch[channel]->GetN()-1]:tHigh;
     for(int i=0;i<scopeNEvents;i++){
       loadScopeEvent(major, minor, i);
       if(isGood){
@@ -588,6 +591,8 @@ vector<TGraph *> T576Event::draw(int major, int minor, int scopeOrSurf, int chan
 
   }
   else{
+    loadSurfEvent(major, minor, 0);
+    tHigh=tHigh==999999?tHigh=surf->ch[channel]->GetY()[surf->ch[channel]->GetN()-1]:tHigh;
     for(int i=0;i<surfNEvents;i++){
       loadSurfEvent(major, minor, i*3);
       if(isGood){
@@ -614,7 +619,7 @@ vector<TGraph *> T576Event::draw(int major, int minor, int scopeOrSurf, int chan
 
 
 
-TGraph * T576Event::drawAvg(int major, int minor, int scopeOrSurf, int channel, int num, double tLow, double tHigh, double align, TString drawOption){
+TGraph * T576Event::drawAvg(int major, int minor, int scopeOrSurf, int channel, int num, double align, double tLow, double tHigh, TString drawOption){
   int number=0;
   auto graphs=vector<TGraph*>();
   if(scopeOrSurf==0){

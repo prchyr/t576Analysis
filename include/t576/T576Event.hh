@@ -158,9 +158,9 @@ public:
     //draw a bunch of graphs from a t576event object
   //the align parameter should be 0 for non-alignement, otherwise it is
   //the number of ns of allowed wiggle.
-  vector<TGraph *> draw(int major, int minor, int scopeOrSurf, int channel, int num, double tLow=0., double tHigh=99999., double align=5., TString drawOption="al PLC");
+  vector<TGraph *> draw(int major, int minor, int scopeOrSurf, int channel, int num, double align=5., double tLow=0., double tHigh=999999., TString drawOption="al PLC");
    //draw average of a bunch of graphs from a t576event object
-  TGraph * drawAvg(int major, int minor, int scopeOrSurf, int channel, int num, double tLow=0., double tHigh=99999., double align=5., TString drawOption="al PLC");
+  TGraph * drawAvg(int major, int minor, int scopeOrSurf, int channel, int num, double align=5., double tLow=0., double tHigh=999999.,TString drawOption="al PLC");
   
 private:
   int fNEntriesSurf=0, fNEntriesScope=0;
