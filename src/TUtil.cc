@@ -806,11 +806,12 @@ TGraph * TUtil::getZeroCrossGraph(TGraph * inGr, int relative){
       }
       else{
 	outGr->SetPoint(outGr->GetN(), num, inGr->GetX()[i]-lastX);
+	lastX=inGr->GetX()[i];
       }
       num++;
     }
     lastVal=val;
-    lastX=inGr->GetX()[i];
+
   }
   return outGr;
 }
