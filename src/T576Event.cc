@@ -589,7 +589,7 @@ vector<TGraph *> T576Event::draw(int major, int minor, int scopeOrSurf, int chan
   }
   else{
     for(int i=0;i<surfNEvents;i++){
-      loadSurfEvent(major, minor, i);
+      loadSurfEvent(major, minor, i*3);
       if(isGood){
 	graphs.push_back(TUtil::getChunkOfGraphFast(surf->ch[channel], tLow, tHigh));
 	number++;
