@@ -640,13 +640,15 @@ TGraph * T576Event::drawAvg(int major, int minor, int scopeOrSurf, int channel, 
     for(int i=0;i<surfNEvents;i++){
       loadSurfEvent(major, minor, i*3);
       if(isGood){
-	graphs.push_back(TUtil::getChunkOfGraphFast(surf->ch[channel], tLow, tHigh));
+	graphs.push_back((TGraph*)surf->ch[channel]->Clone());
 	number++;
       }
       if(number>=num)break;
     }
-    auto avg=TUtil::alignMultipleAndAverage(graphs, align);
+    auto temp=TUtil::alignMultipleAndTruncate(graphs, tLow, tHigh);
+    auto avg=TUtil::avgGraphs(temp);
     graphs.clear();
+    temp.clear();
     avg->Draw(drawOption);
     return avg;
   }
