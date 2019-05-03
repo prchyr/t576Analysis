@@ -646,7 +646,7 @@ TGraph * T576Event::drawAvg(int major, int minor, int scopeOrSurf, int channel, 
       if(number>=num)break;
     }
     auto temp=TUtil::alignMultipleAndTruncate(graphs, align, tLow, tHigh);
-    auto avg=TUtil::avgGraphs(temp);
+    auto avg=TUtil::avgGraph(temp);
     graphs.clear();
     temp.clear();
     avg->Draw(drawOption);
