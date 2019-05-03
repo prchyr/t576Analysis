@@ -564,7 +564,7 @@ double T576Event::getCharge(TGraph *ict){
 }
 
 
-vector<TGraph *> T576Event::draw(int major, int minor, int scopeOrSurf, int channel, int num, double tLow, double tHigh, bool align, TString drawOption){
+vector<TGraph *> T576Event::draw(int major, int minor, int scopeOrSurf, int channel, int num, double tLow, double tHigh, double align, TString drawOption){
   int number=0;
   auto graphs=vector<TGraph*>();
   if(scopeOrSurf==0){
@@ -576,10 +576,15 @@ vector<TGraph *> T576Event::draw(int major, int minor, int scopeOrSurf, int chan
       }
       if(number>=num)break;
     }
-    auto aligned=TUtil::alignMultiple(graphs, 5.);
+    if(align>0.){
+      auto aligned=TUtil::alignMultiple(graphs, align);
     //    graphs.clear();
-    TUtil::draw(aligned);
-    return aligned;
+      TUtil::draw(aligned);
+      return aligned;
+    }
+    else{
+      return graphs;
+    }
 
   }
   else{
@@ -591,10 +596,16 @@ vector<TGraph *> T576Event::draw(int major, int minor, int scopeOrSurf, int chan
       }
       if(number>=num)break;
     }
-    auto aligned=TUtil::alignMultiple(graphs, 5.);
+    if(align>0.){
+      auto aligned=TUtil::alignMultiple(graphs, align);
     //    graphs.clear();
-    TUtil::draw(aligned);
-    return aligned;
+      TUtil::draw(aligned);
+      return aligned;
+    }
+    else{
+      return graphs;
+    }
+    
   }
 
 
@@ -603,7 +614,7 @@ vector<TGraph *> T576Event::draw(int major, int minor, int scopeOrSurf, int chan
 
 
 
-TGraph * T576Event::drawAvg(int major, int minor, int scopeOrSurf, int channel, int num, double tLow, double tHigh, bool align, TString drawOption){
+TGraph * T576Event::drawAvg(int major, int minor, int scopeOrSurf, int channel, int num, double tLow, double tHigh, double align, TString drawOption){
   int number=0;
   auto graphs=vector<TGraph*>();
   if(scopeOrSurf==0){
