@@ -792,18 +792,25 @@ double TUtil::rms(TGraph * gr, double t_low, double t_high){
 }
 
 
-TGraph * TUtil::getZeroCrossGraph(TGraph * inGr){
+TGraph * TUtil::getZeroCrossGraph(TGraph * inGr, int relative){
   auto outGr=new TGraph();
   double val=0.;
   double lastVal=0.;
+  double lastX=0.;
   int num=0;
   for(int i=0;i<inGr->GetN();i++){
     val=inGr->GetY()[i];
     if((val>0.&&lastVal<0.)||(val<0.&&lastVal>0.)){
-      outGr->SetPoint(outGr->GetN(), num, inGr->GetX()[i]);
+      if(relative==0){
+	outGr->SetPoint(outGr->GetN(), num, inGr->GetX()[i]);
+      }
+      else{
+	outGr->SetPoint(outGr->GetN(), num, inGr->GetX()[i]-lastX);
+      }
       num++;
     }
     lastVal=val;
+    lastX=inGr->GetX()[i];
   }
   return outGr;
 }

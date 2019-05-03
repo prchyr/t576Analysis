@@ -280,8 +280,8 @@ namespace TUtil{
   double rad2Deg(double rad);
   //add some noise to a graph
   TGraph * addNoise(TGraph * inGr, double level);
-  //find the x values of zero crossings
-  TGraph * getZeroCrossGraph(TGraph * inGr);
+  //find the x values of zero crossings. can also plot the relative time between subsequent zero crossings if relative = 1
+TGraph * getZeroCrossGraph(TGraph * inGr, int relative=0);
   //get the time of the first threshold crossing after after
   double getFirstThresholdCrossing(TGraph *inGr, double thresh, double after=0.);
 
