@@ -631,7 +631,7 @@ TGraph * T576Event::drawAvg(int major, int minor, int scopeOrSurf, int channel, 
       }
       if(number>=num)break;
     }
-    auto avg=TUtil::alignMultipleAndAverage(graphs, 5.);
+    auto avg=TUtil::alignMultipleAndAverage(graphs, align);
     graphs.clear();
     avg->Draw(drawOption);
     return avg;
@@ -645,7 +645,7 @@ TGraph * T576Event::drawAvg(int major, int minor, int scopeOrSurf, int channel, 
       }
       if(number>=num)break;
     }
-    auto avg=TUtil::alignMultipleAndAverage(graphs, 5.);
+    auto avg=TUtil::alignMultipleAndAverage(graphs, align);
     graphs.clear();
     avg->Draw(drawOption);
     return avg;
