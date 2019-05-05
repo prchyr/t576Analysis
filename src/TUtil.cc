@@ -248,6 +248,76 @@ TGraph * TUtil::FFT::setPhaseAt(TGraph * inGr, double freq, double phaseAng, int
 
 
 
+TGraph* TUtil::FFT::peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type){
+  Int_t size = gr->GetN();
+  double dt=(gr->GetX()[1]-gr->GetX()[0]); 
+  double samprate=1./dt;
+  double xmax = gr->GetX()[gr->GetN()-1];
+  double xmin = gr->GetX()[0];
+  zero_pad_length=zero_pad_length<=binsize?binsize:zero_pad_length;
+  Int_t num_zeros=(zero_pad_length-binsize)/2;
+  //  Int_t nbins = size/overlap;
+  int nbins=size/(binsize-overlap);
+  //xmax=((double)nbins*((double)binsize-(double)overlap))/samprate;
+  char*timebuff;
+  //double samplerate = size/(xmax-xmin);
+  double bandwidth = 1e9*samprate;
+  // if(zero_pad_length!=fNSpec){
+  //   fNSpec=zero_pad_length;
+  //   fftr2cSpec=TVirtualFFT::FFT(1, &fNSpec, "R2C P K");
+  // }
+  TGraph * in=new TGraph(zero_pad_length);
+  TGraph * outt=new TGraph(zero_pad_length);
+
+  vector<double> sX, sY, sZ;
+  Int_t start = 0;
+  //  Int_t j=0;
+  //cout<<size<<" "<<nbins<<" "<<zero_pad_length<<" "<<binsize<<" "<<overlap<<" "<<num_zeros<<" "<<xmax*samprate<<endl;
+  TGraph * outGr=new TGraph(nbins);
+  
+  for(int i=0;i<nbins;i++){
+    if(start+binsize-1>0){
+      int sampnum=0;
+      for(int j=0;j<zero_pad_length;j++){
+	if(j<num_zeros||j>=binsize+num_zeros){
+	  in->SetPoint(j, gr->GetX()[j], 0.);
+	}
+	else if(j>=num_zeros&&j<binsize+num_zeros){
+	  if(sampnum+start<size){
+	    in->SetPoint(j, gr->GetX()[j], gr->GetY()[sampnum+start]*window(sampnum, binsize, win_type));
+	  }
+	  else{
+	    in->SetPoint(j, gr->GetX()[j], 0.);
+	  }
+	  sampnum++;
+	}
+      }
+
+      
+      outt=TUtil::FFT::psd(in, samprate/2.);
+
+      outGr->SetPoint(i, in->GetX()[in->GetN()/2], TUtil::locMaxInRange(outt, 0, 3.));
+
+    }
+    start+=(binsize-overlap);
+   
+  }
+
+  outGr->SetTitle("");
+  outGr->SetName("Peak Frequency");
+  outGr->GetXaxis()->SetTitle("Time (ns)");
+  outGr->GetYaxis()->SetTitle("Frequency (GHz)");
+  
+
+  outt->Delete();
+  in->Delete();
+
+  // spectrogramGr->Delevte();
+  return outGr;
+  //return outdat;
+}
+
+
 // double TUtil::FFT::phase(TGraph *inGr, double f){
 //   auto fftGr=TUtil::FFT::fft(inGr);
 //   return TMath::ATan2(ht->Eval(t), inGr->Eval(t));
@@ -894,6 +964,7 @@ double TUtil::integratePower(TGraph * gr, double t_low, double t_high){
   }
   return integral;
 }
+
 
 
 // double * TUtil::flip(int n, double * in){

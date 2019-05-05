@@ -349,7 +349,9 @@ TGraph * getZeroCrossGraph(TGraph * inGr, int relative=0);
     //return the power spectral density in dBm/Hz, rBW is the resolution bandwith of the system, used to calculate the density. defaults to Nyquist.
 
     TGraph * psd(TGraph *inGr, double rBW=0., int dbFlag=1);
-    /*
+
+
+/*
       return the spectrogram, with various options:
 
 binsize is what python calls nfft. it's the number of samples in the chunk over which the FFT is calculated. this is one spectrogram 'bin'
@@ -364,6 +366,9 @@ win_type is an enumeration of window types to be applied to each bin. this helps
     //averages a vector of spectrograms. must be the same size.
     TH2D* avgSpectrograms(vector<TH2D*>  inh);
 
+//plot the peak frequency for each bin, with the options as above
+
+TGraph* peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type);
   }
 
   namespace SVD{
