@@ -296,7 +296,7 @@ TGraph* TUtil::FFT::peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int
 
       
       outt=TUtil::FFT::psd(in, samprate/2.,0);
-      if(gr->GetX()[start+(sampnum/2)]>outGr->GetX()[outGr->GetN()-1]){
+      if(gr->GetX()[start+(sampnum/2)]>1.){
 	outGr->SetPoint(outGr->GetN(), gr->GetX()[start+(sampnum/2)], TUtil::locMaxInRange(outt, 0, 3.));
       }
 
