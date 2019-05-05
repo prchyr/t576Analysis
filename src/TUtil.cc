@@ -725,6 +725,45 @@ double TUtil::mean(TGraph *gr, double t_low, double t_high){
   return m/n;
 }
 
+double TUtil::maxInRange(TGraph *gr, double t_low, double t_high){
+  auto data=gr->GetY();
+  int N=gr->GetN();
+
+  t_low=t_low<gr->GetX()[0]?gr->GetX()[0]:t_low;
+  t_high=t_high>gr->GetX()[N-1]?gr->GetX()[N-1]:t_high;
+  auto graph=TUtil::getChunkOfGraph(gr, t_low, t_high);
+  auto max=TMath::MaxElement(graph->GetN(), graph->GetY());
+  delete graph;
+  return max;
+}
+
+double TUtil::max(TGraph *gr){
+
+  auto max=TMath::MaxElement(gr->GetN(), gr->GetY());
+  
+  return max;
+}
+
+double TUtil::locMax(TGraph *gr){
+
+  auto max=gr->GetX()[TMath::LocMax(gr->GetN(), gr->GetY())];
+  
+  return max;
+}
+double TUtil::locMaxInRange(TGraph *gr, double t_low, double t_high){
+  auto data=gr->GetY();
+  int N=gr->GetN();
+
+  t_low=t_low<gr->GetX()[0]?gr->GetX()[0]:t_low;
+  t_high=t_high>gr->GetX()[N-1]?gr->GetX()[N-1]:t_high;
+  auto graph=TUtil::getChunkOfGraph(gr, t_low, t_high);
+  auto max=graph->GetX()[TMath::LocMax(graph->GetN(), graph->GetY())];
+  delete graph;  
+  return max;
+}
+
+
+
 TGraph * TUtil::removeMean(TGraph *gr, double t_low, double t_high){
   double m=TUtil::mean(gr, t_low, t_high);
   return shiftY(gr, -m);

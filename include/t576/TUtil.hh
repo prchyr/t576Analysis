@@ -213,7 +213,13 @@ namespace TUtil{
   //stretch a TGraph in time by a factor
   TGraph *stretch(TGraph *g1, double factor);
   //find the mean of a TGraph. range is optional
-  double mean(TGraph *gr, double t_low=0., double t_high=999999.);
+double mean(TGraph *gr, double t_low=0., double t_high=999999.);
+//get the max value (wrapper of TMath::max)
+double max(TGraph *gr);
+double maxInRange(TGraph *gr, double t_low=0., double t_high=999999.);
+//get the x-axis location of t max value (wraper of TMath::LocMax)
+double locMax(TGraph *gr);
+double locMaxInRange(TGraph *gr, double t_low=0., double t_high=999999.);
   //get the power (square all values of a graph)
   TGraph * power(TGraph *gr);
   //remove the mean of a TGraph. range to compute the mean over is optional.
