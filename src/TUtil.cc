@@ -248,7 +248,7 @@ TGraph * TUtil::FFT::setPhaseAt(TGraph * inGr, double freq, double phaseAng, int
 
 
 
-TGraph* TUtil::FFT::peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type){
+TGraph* TUtil::FFT::peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, double thresh){
   Int_t size = gr->GetN();
   double dt=(gr->GetX()[1]-gr->GetX()[0]); 
   double samprate=1./dt;
@@ -295,8 +295,11 @@ TGraph* TUtil::FFT::peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int
 	}
       }
       timeH=gr->GetX()[start+(sampnum/2)];
-      outt=TUtil::FFT::psd(in, samprate/2.,1);
-      if(timeH>lasttimeH){
+      
+      outt=TUtil::FFT::psd(in, samprate/2.,0);
+      
+      auto max=TUtil::maxInRange(outt, 0, 3);
+      if(timeH>lasttimeH && max>thresh){
 	outGr->SetPoint(outGr->GetN(), timeH, TUtil::locMaxInRange(outt, 0, 3.));
 	}
       lasttimeH=timeH;

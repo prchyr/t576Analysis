@@ -368,7 +368,7 @@ win_type is an enumeration of window types to be applied to each bin. this helps
 
 //plot the peak frequency for each bin, with the options as above
 
-TGraph* peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type);
+TGraph* peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, double thresh=0.);
   }
 
   namespace SVD{
