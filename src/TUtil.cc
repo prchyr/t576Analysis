@@ -274,9 +274,9 @@ TGraph* TUtil::FFT::peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int
   auto timeH=0.;
   //  Int_t j=0;
   //cout<<size<<" "<<nbins<<" "<<zero_pad_length<<" "<<binsize<<" "<<overlap<<" "<<num_zeros<<" "<<xmax*samprate<<endl;
-  TGraph * outGr=new TGraph(nbins);
+  TGraph * outGr=new TGraph();
   
-  for(int i=0;i<nbins;i++){
+  for(int i=0;i<nbins-1;i++){
     if(start+binsize-1>0){
       int sampnum=0;
       for(int j=0;j<zero_pad_length;j++){
@@ -297,7 +297,7 @@ TGraph* TUtil::FFT::peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int
       
       outt=TUtil::FFT::psd(in, samprate/2.);
 
-      outGr->SetPoint(i, gr->GetY()[start+(sampnum/2)], TUtil::locMaxInRange(outt, 0, 3.));
+      outGr->SetPoint(outGr->GetN(), gr->GetX()[start+(sampnum/2)], TUtil::locMaxInRange(outt, 0, 3.));
 
     }
     start+=(binsize-overlap);
