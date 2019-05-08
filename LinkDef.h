@@ -21,8 +21,10 @@
 #pragma link C++ class TUtil+;
 #pragma link C++ class TUtilGraph+;
 #pragma link C++ class cnpy+;
-#pragma link C++ class vector<TGraph*> +;
-#pragma link C++ class vector<TH2D*> +;
+#pragma link C++ class std::vector<TGraph*> +;
+#pragma link C++ class std::vector<TH2D*> +;
+#pragma link C++ class std::vector<double> +;
+#pragma link C++ class std::vector<std::vector<TGraph*>> +;
 //#pragma link C++ class scope;//nested so found by above
 //#pragma link C++ class surf;//nested so found by above
 
