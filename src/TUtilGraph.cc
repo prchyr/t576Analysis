@@ -44,6 +44,9 @@ TUtilGraph::TUtilGraph(const TGraph *gr)
   memcpy(fY, y, n);
 }
 
+//TUtilGraph::TGraphVector(int n){
+  
+
 double TUtilGraph::sum(){
   double val=0;
   for(int i=0;i<this->GetN();i++)val+=this->GetY()[i];

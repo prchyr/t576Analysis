@@ -21,6 +21,7 @@ class TUtilGraph: public TGraph{
   TUtilGraph(Int_t n);
   TUtilGraph(Int_t n, const Double_t * x, const Double_t * y);
   TUtilGraph(const TGraph *gr);
+  //  TGraphVector(int n);
   
   double sum();
   double sumPower();
