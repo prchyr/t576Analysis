@@ -1071,6 +1071,26 @@ TGraph * TUtil::mult(TGraph *g1, TGraph *g2, double constant){
 }
 
 
+TGraph * TUtil::divide(TGraph *g1, TGraph *g2, double constant){
+
+  int len=g1->GetN()<g2->GetN()?g1->GetN():g2->GetN();
+  TGraph *outGr=new TGraph(len);  
+  for(int i=0;i<len;i++){
+    auto val=g1->GetY()[i]/(constant*g2->Eval(g1->GetX()[i]));
+  if(isfinite(val)){
+    outGr->SetPoint(i, g1->GetX()[i], val);
+  }
+  else{
+    outGr->SetPoint(i, g1->GetX()[i], 0);
+  }
+  }
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
+  return outGr;
+}
+
+
 TGraph * TUtil::scale(TGraph *g1, double factor){
   TGraph *outGr=new TGraph(g1->GetN());
   for(int i=0;i<g1->GetN();i++){

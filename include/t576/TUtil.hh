@@ -204,6 +204,9 @@ namespace TUtil{
   double dot(TGraph *g1, TGraph *g2);
   //multiply two graphs: out(t)=g1(t)*consant*g2(t)
   TGraph * mult(TGraph *g1, TGraph *g2, double constant=1.);
+  //divide 2 graphs: out(t)=g1(t)/constant*g2(t). if there is a divide
+  //by zero, that entry will just be 0.
+  TGraph * divide(TGraph *g1, TGraph *g2, double constant);
   //shift a graph along the y axis by the factor
   TGraph * shiftY(TGraph *g1, double factor);
   //shift a graph along the x axis by the factor
