@@ -837,6 +837,18 @@ double TUtil::locMaxInRange(TGraph *gr, double t_low, double t_high){
   return max;
 }
 
+int TUtil::getIndex(TGraph * gr, double t){
+  int index=0;
+  for(int i=1;i<gr->GetN();i++){
+    if(gr->GetX()[i-1]<t&&gr->GetX()[i]>=t){
+      index=i;
+      return index;
+    }
+  }
+  return 0;
+}
+
+
 
 
 TGraph * TUtil::removeMean(TGraph *gr, double t_low, double t_high){
@@ -2219,6 +2231,22 @@ double TUtil::hannWindow(int i, int n){
 //i have no idea why there are increments in the pi coeff...
 double TUtil::blackmanNuttallWindow(int i, int n){
   return .3635819-.4891775*cos(2.*pi*i/(n)) + .1365995*cos(4.*pi*i/(n)) - .0106411*cos(6.*pi*i/(n));
+}
+
+TGraph * TUtil::applyWindow(TGraph *inGr, double startt, double endt, int type){
+  auto outGr=new TGraph(inGr->GetN());
+  int lowInd=TUtil::getIndex(inGr, startt);
+  int highInd=TUtil::getIndex(inGr, endt);
+  int n=highInd-lowInd;
+  for(int i=0;i<inGr->GetN();i++){
+    if(i<lowInd||i>highInd){
+      outGr->SetPoint(i, inGr->GetX()[i], 0.);
+    }
+    else{
+      outGr->SetPoint(i, inGr->GetX()[i], inGr->GetY()[i]*TUtil::window(i-lowInd, n, type));
+    }
+  }
+  return outGr;
 }
 
 double TUtil::deg2Rad(double deg) {

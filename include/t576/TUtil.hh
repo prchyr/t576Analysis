@@ -216,13 +216,15 @@ namespace TUtil{
   //stretch a TGraph in time by a factor
   TGraph *stretch(TGraph *g1, double factor);
   //find the mean of a TGraph. range is optional
-double mean(TGraph *gr, double t_low=0., double t_high=999999.);
-//get the max value (wrapper of TMath::max)
-double max(TGraph *gr);
-double maxInRange(TGraph *gr, double t_low=0., double t_high=999999.);
-//get the x-axis location of t max value (wraper of TMath::LocMax)
-double locMax(TGraph *gr);
-double locMaxInRange(TGraph *gr, double t_low=0., double t_high=999999.);
+  double mean(TGraph *gr, double t_low=0., double t_high=999999.);
+  //get the max value (wrapper of TMath::max)
+  double max(TGraph *gr);
+  double maxInRange(TGraph *gr, double t_low=0., double t_high=999999.);
+  //get the x-axis location of t max value (wraper of TMath::LocMax)
+  double locMax(TGraph *gr);
+  double locMaxInRange(TGraph *gr, double t_low=0., double t_high=999999.);
+  //get the index of a certain value. will always under-estimate
+  int getIndex(TGraph *gr, double t);
   //get the power (square all values of a graph)
   TGraph * power(TGraph *gr);
   //remove the mean of a TGraph. range to compute the mean over is optional.
@@ -280,6 +282,8 @@ double locMaxInRange(TGraph *gr, double t_low=0., double t_high=999999.);
   double hannWindow(int i, int n);
   //return the value of a blackman-nuttall window
   double blackmanNuttallWindow(int i, int n);
+  //apply a window of the selected type to the graph inGr in time window.
+  TGraph * applyWindow(TGraph* inGr, double startt, double endt, int type=0);
     //and add it to the indicated region of the background graph.
   TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max, double scale=1.);
   double sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0);
