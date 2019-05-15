@@ -780,6 +780,14 @@ TGraph * TUtil::CDF(TGraph * inGr, int normed){
   return outGr;
 }
 
+TGraph * TUtil::absGraph(TGraph * inGr){
+  auto outGr=new TGraph(inGr->GetN());
+  for(int i=0;i<inGr->GetN();i++){
+    outGr->SetPoint(i, inGr->GetX()[i], abs(inGr->GetY()[i]));
+  }
+  return outGr;
+}
+
 double TUtil::mean(TGraph *gr, double t_low, double t_high){
   auto data=gr->GetY();
   int N=gr->GetN();
