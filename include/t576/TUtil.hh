@@ -186,7 +186,7 @@ namespace TUtil{
 //return the average of a bunch of aligned graphs
   TGraph* alignMultipleAndAverage(vector<TGraph*> inGr, double max_delay=999999., double t_low=0., double t_high=999999.);
   //align a large number of graphs to the first, then truncate them all to t_min and t_max
-  vector<TGraph*> alignMultipleAndTruncate(vector<TGraph*> inGr, double max_delay, double t_min, double t_max);
+  vector<TGraph*> alignMultipleAndTruncate(vector<TGraph*> inGr, double max_delay, double t_min, double t_max, double t_low=0., double t_high=999999.);
   //align a large set to a reference set.
   vector<TGraph*> alignMultipleToOther(vector<TGraph*> inGr, vector<TGraph*> othGr, double max_delay=999999., double t_low=0., double t_high=999999.);
   //delay a graph

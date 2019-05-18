@@ -1688,14 +1688,14 @@ TGraph* TUtil::alignMultipleAndAverage(vector<TGraph*> inGr, double max_delay, d
 }
 
 
-vector<TGraph*> TUtil::alignMultipleAndTruncate(vector<TGraph*> inGr, double max_delay, double t_min, double t_max){   
+vector<TGraph*> TUtil::alignMultipleAndTruncate(vector<TGraph*> inGr, double max_delay, double t_min, double t_max, double t_low, double t_high){   
   vector<TGraph*>tempgraphs;
   vector<TGraph*>outgraphs;
   TGraph *g1=inGr[0];
   //  g1->Draw("al PLC");
   tempgraphs.push_back(g1);
   for(int i=1;i<inGr.size();i++){
-    auto gr=align(g1, inGr[i], max_delay);
+    auto gr=align(g1, inGr[i], max_delay, t_low, t_high);
     tempgraphs.push_back(gr);
     //    cout<<i<<endl;
     //    outgraphs[i]->Draw("l same PLC");
