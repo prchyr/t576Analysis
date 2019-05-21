@@ -109,6 +109,8 @@ public:
   //useful flags and info
   //run major and minor
   int major=0, minor=0;
+  //major and minor for the background run associated with this run
+  int backmajor=0, backminor=0;
   //is the tx on
   int txOn=0;
   //is the surf on

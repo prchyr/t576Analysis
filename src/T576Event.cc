@@ -36,6 +36,8 @@ int T576Event::checkStatus(){
   fIndexTree->SetBranchAddress("surfFilename", &surfFilename);
   fIndexTree->SetBranchAddress("major", &major);
   fIndexTree->SetBranchAddress("minor", &minor);
+  //fIndexTree->SetBranchAddress("backmajor", &backmajor);
+  //fIndexTree->SetBranchAddress("backminor", &backminor);
   fIndexTree->SetBranchAddress("surfNEvents", &surfNEvents);
   fIndexTree->SetBranchAddress("scopeNEvents", &scopeNEvents);
   fIndexTree->SetBranchAddress("subEvNo", &subEvNo);
@@ -66,6 +68,8 @@ int T576Event::checkStatus(){
   fRunLogTree=(TTree*)fRunLog->Get("runLogTree");
   fRunLogTree->SetBranchAddress("major", &major);
   fRunLogTree->SetBranchAddress("minor", &minor);
+  fRunLogTree->SetBranchAddress("backmajor", &backmajor);
+  fRunLogTree->SetBranchAddress("backminor", &backminor);
   fRunLogTree->SetBranchAddress("frequency", &frequency);
   fRunLogTree->SetBranchAddress("power", &power);
   fRunLogTree->SetBranchAddress("txOn", &txOn);
