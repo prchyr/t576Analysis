@@ -2262,6 +2262,17 @@ TGraph * TUtil::applyWindow(TGraph *inGr, double startt, double endt, int type){
   return outGr;
 }
 
+TGraph * TUtil::plotWindow(double peakAmplitude, double len, double GSs, double startt, double endt, int type){
+  int N=len*GSs;
+  double dt=1./GSs;
+  auto outGr=new TGraph(N);
+  for(int i=0;i<N;i++){
+    outGr->SetPoint(outGr->GetN(), i*dt, peakAmplitude);
+  }
+  outGr=applyWindow(outGr, startt, endt, type);
+  return outGr;
+}
+
 double TUtil::deg2Rad(double deg) {
   return (deg * pi / 180.);
 }

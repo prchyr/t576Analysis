@@ -285,8 +285,10 @@ namespace TUtil{
   //return the value of a blackman-nuttall window
   double blackmanNuttallWindow(int i, int n);
   //apply a window of the selected type to the graph inGr in time window.
+  //and add it to the indicated region of the background graph.
   TGraph * applyWindow(TGraph* inGr, double startt, double endt, int type=0);
-    //and add it to the indicated region of the background graph.
+  //plot a window with the given parameters.
+  TGraph * plotWindow(double peakAmplitude, double len, double GSs, double startt, double endt, int type);
   TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max, double scale=1.);
   double sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0);
   double sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, int draw=0);
