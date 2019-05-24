@@ -950,7 +950,7 @@ TGraph * TUtil::getZeroCrossGraph(TGraph * inGr, int relative){
   return outGr;
 }
 
-int TUtil::fillZeroCrossHist(TGraph * inGr, TH1D* hist){
+int TUtil::fillZeroCrossHist(TGraph * inGr, TH1D* hist, double weight){
   double val=0., nextVal=0.;
   double lastVal=0.;
   double lastX=0.;
@@ -959,7 +959,7 @@ int TUtil::fillZeroCrossHist(TGraph * inGr, TH1D* hist){
     val=inGr->GetY()[i];
     nextVal=inGr->GetY()[i+1];
     if((val>0.&&nextVal<0.)||(val<0.&&nextVal>0.)){
-      hist->Fill(inGr->GetX()[i]);
+      hist->Fill(inGr->GetX()[i], weight);
       num++;
     }
 
