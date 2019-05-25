@@ -1388,7 +1388,9 @@ TGraph * TUtil::getNSamplesFrom(TGraph *ingr, double start, int nSamples, int de
   if(delay_to_zero==0){
     return outg;
   }
-  return delayGraph(outg, -start);
+  auto outgdelayed=delayGraph(outg, -start);
+  delete outg;
+  return outgdelayed;
 
 }
 
