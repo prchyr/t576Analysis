@@ -530,10 +530,10 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
     }
     else{
       if(i==0){
-    	*surf->ch[i]=*grChunk;
+    	surf->ch[i]=(TGraph*)grChunk->Clone();
       }
       else{
-    	*surf->ch[12-i]=*grChunk;
+    	surf->ch[12-i]=(TGraph*)grChunk->Clone();
       }
     }
 
