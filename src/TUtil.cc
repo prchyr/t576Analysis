@@ -2433,7 +2433,7 @@ TGraph * TUtil::evenSample(TGraph *inGr, double dt){
   double t=minT;
   auto xx=vector<double>();
   auto yy=vector<double>();
-  while(t<maxT){
+  while(t<=maxT){
     xx.push_back(t);
     yy.push_back(inGr->Eval(t));
     t+=dt;
