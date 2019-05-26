@@ -481,8 +481,8 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
 
 
     cnpy::NpyArray  fSurfDataArray = fDataset["data"];
-    //    auto temp=(short*) calloc(60000000, sizeof(short));
-    auto temp=fSurfDataArray.data<short>();
+        auto temp=(short*) calloc(60000000, sizeof(short));
+    //auto temp=fSurfDataArray.data<short>();
     //    fSurfData=fSurfDataArray.data<short>();
     memcpy(fSurfData, temp, fSurfDataArray.num_bytes());
     //    free(temp);
