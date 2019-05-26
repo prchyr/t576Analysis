@@ -64,7 +64,7 @@ public:
     loadScopeEvent(run_major, run_minor,event);
   }
   ~T576Event(){
-    free(fSurfData);
+    delete fSurfData;
   }
   /*************globals for every event*****************/
   //the two DAQs. 
