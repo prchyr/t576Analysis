@@ -1315,6 +1315,7 @@ TGraph * TUtil::interpolateGraph(TGraph * inGraph, double interpGSs){
 }
 
 TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end, int delay_to_zero){
+  ingr->SetBit(TGraph::kIsSortedX);
   double *xx=ingr->GetX();
   double *yy=ingr->GetY();
   vector<double> outx, outy;
@@ -2427,6 +2428,7 @@ void TUtil::set2DPalette(){
 }
 
 TGraph * TUtil::evenSample(TGraph *inGr, double dt){
+  inGr->SetBit(TGraph::kIsSortedX);
   double maxT=inGr->GetX()[inGr->GetN()-1];
   double minT=inGr->GetX()[0];
 
