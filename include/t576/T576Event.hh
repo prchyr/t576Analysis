@@ -63,7 +63,9 @@ public:
     checkStatus();
     loadScopeEvent(run_major, run_minor,event);
   }
-  ~T576Event(){}
+  ~T576Event(){
+    free(fSurfData);
+  }
   /*************globals for every event*****************/
   //the two DAQs. 
   class Scope;
