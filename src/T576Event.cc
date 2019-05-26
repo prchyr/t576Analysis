@@ -481,12 +481,12 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
 
 
     fSurfDataArray = fDataset["data"];
-    auto temp=(short*) calloc(fSurfDataArray.num_bytes(), sizeof(short));
+    //auto temp=(short*) calloc(fSurfDataArray.num_bytes(), sizeof(short));
     //auto temp=fSurfDataArray.data<short>();
-    //    fSurfData=fSurfDataArray.data<short>();
-    memcpy(fSurfData, temp, fSurfDataArray.num_bytes());
+    fSurfData=fSurfDataArray.data<short>();
+    //memcpy(fSurfData, temp, fSurfDataArray.num_bytes());
     //    free(temp);
-    delete temp;
+    //delete temp;
     fTimesArray = fDataset["times"];
     fSurfTimes = fTimesArray.data<double>();
 

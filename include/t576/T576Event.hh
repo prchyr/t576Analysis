@@ -63,7 +63,7 @@ public:
     checkStatus();
     loadScopeEvent(run_major, run_minor,event);
   }
-
+  ~T576Event(){}
   /*************globals for every event*****************/
   //the two DAQs. 
   class Scope;
