@@ -180,9 +180,9 @@ private:
   TTree *fEventTree=new TTree();
   TFile *fEventFile=new TFile();
   cnpy::npz_t fDataset;
-  //  cnpy::NpyArray fSurfDataArray;
+    cnpy::NpyArray fSurfDataArray;
   short * fSurfData;//=(short*) calloc(60000000, sizeof(short));
-  //cnpy::NpyArray fTimesArray;
+  cnpy::NpyArray fTimesArray;
   double * fSurfTimes;//=(double*) malloc(20000);
   TFile * fRunLog= new TFile();
   TTree * fRunLogTree = new TTree();
