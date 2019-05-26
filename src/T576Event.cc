@@ -469,7 +469,7 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
   if(thisSurfFilename!=fSurfFilename){
     //load the event file
     TString openf=directory+thisSurfFilename;
-
+    fDataset.clear();
     fDataset = cnpy::npz_load(openf.Data());
 
     //load the data. it is stored as an array of shorts of length (N events) x (12 channels ) x (1024 samples)
