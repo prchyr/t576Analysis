@@ -182,6 +182,7 @@ private:
   cnpy::npz_t fDataset;
   cnpy::NpyArray fSurfDataArray;
   short * fSurfData;//=(short*) calloc(60000000, sizeof(short));
+  cnpy::NpyArray fTimesArray;
   double * fSurfTimes;//=(double*) malloc(20000);
   TFile * fRunLog= new TFile();
   TTree * fRunLogTree = new TTree();

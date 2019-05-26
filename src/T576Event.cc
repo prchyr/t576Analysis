@@ -478,8 +478,8 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
 
     fSurfData=fSurfDataArray.data<short>();
 
-    cnpy::NpyArray times_arr = fDataset["times"];
-    fSurfTimes = times_arr.data<double>();
+    fTimesArray = fDataset["times"];
+    fSurfTimes = fTimesArray.data<double>();
 
     fSurfFilename=thisSurfFilename;
 }
@@ -530,10 +530,10 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
     }
     else{
       if(i==0){
-    	surf->ch[i]=(TGraph*)grChunk->Clone();
+    	*surf->ch[i]=*grChunk;
       }
       else{
-    	surf->ch[12-i]=(TGraph*)grChunk->Clone();
+    	*surf->ch[12-i]=*grChunk;
       }
     }
 
