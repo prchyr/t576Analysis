@@ -470,10 +470,10 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
     //load the event file
     TString openf=directory+thisSurfFilename;
     fDataset.clear();
-    free(fSurfData);
-    free(fSurfTimes);
-    fSurfData=(short*) calloc(60000000, sizeof(short));
-    fSurfTimes=(double*) calloc(20000, sizeof(double));
+    // free(fSurfData);
+    // free(fSurfTimes);
+    // fSurfData=(short*) calloc(60000000, sizeof(short));
+    // fSurfTimes=(double*) calloc(20000, sizeof(double));
 
     fDataset = cnpy::npz_load(openf.Data());
 
