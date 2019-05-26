@@ -1340,7 +1340,10 @@ TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end, int dela
   if(delay_to_zero==0){
     return outg;
   }
-  return delayGraph(outg, -start);
+  TGraph *outg2=new TGraph();
+  delayGraph(outg, outg2, -start);
+  delete outg;
+  return outg2;
 
 }
 
@@ -1408,7 +1411,7 @@ TGraph * TUtil::delayGraph(TGraph *ingr, double delay){
   dg->SetName(ingr->GetName());
   dg->GetXaxis()->SetTitle(ingr->GetXaxis()->GetTitle());
   dg->GetYaxis()->SetTitle(ingr->GetYaxis()->GetTitle());
-
+  //  delete ingr;
   return dg;
 }
 
