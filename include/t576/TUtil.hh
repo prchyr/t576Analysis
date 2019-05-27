@@ -53,6 +53,7 @@ charge: nC
 #include "Math/Interpolator.h"
 #include "Math/InterpolationTypes.h"
 #include "TVectorD.h"
+#include "TMatrixTBase.h"
 #include "TMatrixD.h"
 #include "TVector3.h"
 #include "TDecompSVD.h"
@@ -71,9 +72,15 @@ using namespace std;
 
 
 
+
+
+
 class TUtilGraph;
+
 namespace TUtil{
 
+  /*****************************************************
+  
   /*some useful units. inspired by the CLHEP global system of units. 
 
     use these to keep your numbers in the global system of units defined above:
@@ -103,6 +110,7 @@ namespace TUtil{
     
     and it would return the correct time in nanoseconds. 
   */
+  
   static constexpr double m = 1.;
   static constexpr double ft = .3047*m;
   static constexpr double cm = .01*m;
@@ -120,8 +128,91 @@ namespace TUtil{
   static constexpr double MHz = .001*GHz;
   static constexpr double kHz = 1e-6*GHz;
   static constexpr double Hz = 1e-9*GHz;
-  
 
+
+  
+/*******************************************************
+
+  
+  useful generic vector class (T can be anything, double, TGraph, TH1D, TH2D, etc) with one addition:
+
+  ****can be simply written to a root file (inherit from TObject).*** 
+
+can be extended to use other 'vector' features in the future. there is certainly a smarter way to do this, but i'm not a programmer.
+
+  */
+
+  
+  //1D version
+  template<class T>
+  class TVec1D: public TObject{
+  private:
+    std::vector<T> vec;
+  public:
+    TVec1D(){
+      vec=std::vector<T>();
+    }
+    TVec1D(int N){
+      vec=std::vector<T>(N);
+    }
+    TVec1D(int N, T const &  init){
+      vec=std::vector<T>(N, init);
+    }
+    void push_back(T const & elem);
+    T  & operator[]( int index);
+    void clear();
+
+    
+  };
+  template <class T> void TVec1D<T>::push_back(T const & elem) {
+    vec.push_back(elem);
+  }
+  template <class T> T & TVec1D<T>::operator[]( int index){
+    return vec[index];
+  }
+  template <class T> void TVec1D<T>::clear(){
+    vec.clear();
+  }
+
+  //2D version
+
+  template<class T>
+  class TVec2D: public TObject{
+  private:
+    std::vector<TUtil::TVec1D<T>> vec;
+  public:
+    TVec2D(){
+      vec=std::vector<TUtil::TVec1D<T>>();
+    }
+     TVec2D(int N){
+       vec=std::vector<TUtil::TVec1D<T>>(N);
+    }
+     TVec2D(int N, int M){
+       vec=std::vector<TUtil::TVec1D<T>>(N, TUtil::TVec1D<T>(M));
+     }
+     TVec2D(int N, int M, T const & init){
+       vec=std::vector<TUtil::TVec1D<T>>(N, TUtil::TVec1D<T>(M, init));
+    }
+     
+    TUtil::TVec1D<T> & operator[](const int index);
+    void clear();
+    
+  };
+
+  template <class T> TUtil::TVec1D<T> & TVec2D<T>::operator[](const int index){
+    return vec[index];
+  }
+  template <class T> void TVec2D<T>::clear(){
+    for(int i=0;i<vec.size();i++){
+      vec[i].clear();
+    }
+  }
+
+  /**********************************************
+
+utilities.
+
+  ***********************************************/
   
   //volts to dbm/hz
   double vToDbmHz(double bandwidthGSs, double re, double im=0);
@@ -342,6 +433,15 @@ namespace TUtil{
   double ** dTimeOfFlight(int N, TVector3 one, TVector3 * two, double n=1.);
   //offset a bunch of antennas for the correct delta t's for single source
   //  TGraph ** delayGraphs
+
+
+  /*******************************************************
+
+The FFT namespace, for everything to do with FFTs.
+
+  *******************************************************/
+
+  
   namespace FFT{
 
     //returns a tgraph2d, x axis is the freqs, y axis is the real part of the complex fft, z axis is the imaginary part of the fft.
@@ -384,6 +484,17 @@ win_type is an enumeration of window types to be applied to each bin. this helps
 
 TGraph* peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, double thresh=0.);
   }
+
+
+
+
+
+
+  /*****************************************************
+
+the SVD namespace, which has useful utilities for SVD filtration methods
+
+  ******************************************************/
 
   namespace SVD{
 
