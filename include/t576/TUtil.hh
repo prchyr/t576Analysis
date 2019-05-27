@@ -31,6 +31,7 @@ charge: nC
 #include "TSystem.h"
 #include "TRandom.h"
 #include "TObject.h"
+#include "TNamed.h"
 #include "TLine.h"
 #include "TFile.h"
 #include "TSystemDirectory.h"
@@ -81,7 +82,7 @@ namespace TUtil{
 
   /*****************************************************
   
-  /*some useful units. inspired by the CLHEP global system of units. 
+  some useful units. inspired by the CLHEP global system of units. 
 
     use these to keep your numbers in the global system of units defined above:
     ns, GHz, m, nC
@@ -145,7 +146,7 @@ can be extended to use other 'vector' features in the future. there is certainly
   
   //1D version
   template<class T>
-  class TVec1D: public TObject{
+  class TVec1D: public TNamed{
   private:
     std::vector<T> vec;
   public:
@@ -177,7 +178,7 @@ can be extended to use other 'vector' features in the future. there is certainly
   //2D version
 
   template<class T>
-  class TVec2D: public TObject{
+  class TVec2D: public TNamed{
   private:
     std::vector<TUtil::TVec1D<T>> vec;
   public:
