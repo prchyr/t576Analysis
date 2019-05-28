@@ -480,20 +480,21 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
 
     //load the data. it is stored as an array of shorts of length (N events) x (12 channels ) x (1024 samples)
 
-
-    fSurfDataArray = (*fDataset)["data"];
+    auto fSurfDataArray = new cnpy::NpyArray();
+    *fSurfDataArray = (*fDataset)["data"];
     //auto temp=(short*) calloc(fSurfDataArray.num_bytes(), sizeof(short));
     //auto temp=fSurfDataArray.data<short>();
-    fSurfData=fSurfDataArray.data<short>();
+    fSurfData=(*fSurfDataArray).data<short>();
     //memcpy(fSurfData, temp, fSurfDataArray.num_bytes());
     //    free(temp);
     //delete temp;
-    fTimesArray = (*fDataset)["times"];
-    fSurfTimes = fTimesArray.data<double>();
+    auto fTimesArray= new cnpy::NpyArray();
+    *fTimesArray = (*fDataset)["times"];
+    fSurfTimes = (*fTimesArray).data<double>();
 
     delete fDataset;
-    // delete fSurfDataArray;
-    // delete fTimesArray;
+    delete fSurfDataArray;
+    delete fTimesArray;
     fSurfFilename=thisSurfFilename;
 
 }
