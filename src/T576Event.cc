@@ -494,6 +494,7 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
     // delete fSurfDataArray;
     // delete fTimesArray;
     fSurfFilename=thisSurfFilename;
+    fDataset.clear();
 }
 
 
