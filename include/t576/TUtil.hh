@@ -162,7 +162,8 @@ can be extended to use other 'vector' features in the future. there is certainly
     void push_back(T const & elem);
     T  & operator[]( int index);
     void clear();
-
+    
+    ClassDefNV(TVec1D, 1);
     
   };
   template <class T> void TVec1D<T>::push_back(T const & elem) {
@@ -197,7 +198,8 @@ can be extended to use other 'vector' features in the future. there is certainly
      
     TUtil::TVec1D<T> & operator[](const int index);
     void clear();
-    
+
+    ClassDef(TVec2D, 1);
   };
 
   template <class T> TUtil::TVec1D<T> & TVec2D<T>::operator[](const int index){
