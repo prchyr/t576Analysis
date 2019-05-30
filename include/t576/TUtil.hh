@@ -393,9 +393,9 @@ utilities.
   //add some noise to a graph
   TGraph * addNoise(TGraph * inGr, double level);
   //find the x values of zero crossings. can also plot the relative time between subsequent zero crossings if relative = 1
-  TGraph * getZeroCrossGraph(TGraph * inGr, int relative=0);
+  TGraph * getZeroCrossGraph(TGraph * inGr, double threshold=0., int relative=0);
   //find the x values of zero crossings and put them in a histogram. returns the number of zero crossings in that graph.
-  int fillZeroCrossHist(TGraph * inGr, TH1D* hist, double weight=1.);
+  int fillZeroCrossHist(TGraph * inGr, TH1D* hist, double threshold=0., double weight=1.);
   //get the time of the first threshold crossing after after
   double getFirstThresholdCrossing(TGraph *inGr, double thresh, double after=0.);
 

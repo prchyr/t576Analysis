@@ -926,7 +926,7 @@ double TUtil::rms(TGraph * gr, double t_low, double t_high){
 }
 
 
-TGraph * TUtil::getZeroCrossGraph(TGraph * inGr, int relative){
+TGraph * TUtil::getZeroCrossGraph(TGraph * inGr, double threshold, int relative){
   auto outGr=new TGraph();
   double val=0.;
   double lastVal=0.;
@@ -934,7 +934,7 @@ TGraph * TUtil::getZeroCrossGraph(TGraph * inGr, int relative){
   int num=0;
   for(int i=0;i<inGr->GetN();i++){
     val=inGr->GetY()[i];
-    if((val>0.&&lastVal<0.)||(val<0.&&lastVal>0.)){
+    if((val>threshold&&lastVal<threshold)||(val<threshold&&lastVal>threshold)){
       if(relative==0){
 	outGr->SetPoint(outGr->GetN(), num, inGr->GetX()[i]);
       }
@@ -950,7 +950,7 @@ TGraph * TUtil::getZeroCrossGraph(TGraph * inGr, int relative){
   return outGr;
 }
 
-int TUtil::fillZeroCrossHist(TGraph * inGr, TH1D* hist, double weight){
+int TUtil::fillZeroCrossHist(TGraph * inGr, TH1D* hist, double threshold, double weight){
   double val=0., nextVal=0.;
   double lastVal=0.;
   double lastX=0.;
@@ -958,7 +958,7 @@ int TUtil::fillZeroCrossHist(TGraph * inGr, TH1D* hist, double weight){
   for(int i=0;i<inGr->GetN()-1;i++){
     val=inGr->GetY()[i];
     nextVal=inGr->GetY()[i+1];
-    if((val>0.&&nextVal<0.)||(val<0.&&nextVal>0.)){
+    if((val>threshold&&nextVal<-threshold)||(val<-threshold&&nextVal>threshold)){
       hist->Fill(inGr->GetX()[i], weight);
       num++;
     }
