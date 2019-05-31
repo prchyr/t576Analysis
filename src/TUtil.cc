@@ -929,7 +929,7 @@ double TUtil::rms(TGraph * gr, double t_low, double t_high){
       if(gr->GetX()[i]<t_low||gr->GetX()[i]>t_high)continue;
     rms+=(gr->GetY()[i]*gr->GetY()[i]);
   }
-  return sqrt(rms);
+  return sqrt(rms/gr->GetN());
 }
 
 
