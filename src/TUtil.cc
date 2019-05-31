@@ -323,8 +323,12 @@ TGraph* TUtil::FFT::peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int
 }
 
 
-double TUtil::FFT::getInstPhase(TGraph *inGr, double t){
-  return asin(inGr->Eval(t));
+double TUtil::FFT::getInstPhase(TGraph *inGr, double t, int deg0rad1){
+  auto val=asin(inGr->Eval(t));
+  if(deg0rad1==0){
+    return val/TUtil::deg;
+  }
+  return val;
 }
 
 
