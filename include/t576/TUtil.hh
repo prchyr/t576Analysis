@@ -319,6 +319,9 @@ utilities.
   //get the x-axis location of t max value (wraper of TMath::LocMax)
   double locMax(TGraph *gr);
   double locMaxInRange(TGraph *gr, double t_low=0., double t_high=999999.);
+    //return the phase at a single point, degrees=0, rad=1
+    double getInstPhase(TGraph *inGr, double t, int deg0rad1=0);
+
   //get the index of a certain value. will always under-estimate
   int getIndex(TGraph *gr, double t);
   //get the power (square all values of a graph)
@@ -453,8 +456,6 @@ The FFT namespace, for everything to do with FFTs.
     TGraph * ifft(TGraph2D *inGr);
     //return the Hilbert transform
     TGraph * hilbertTransform(TGraph *inGr);
-    //return the phase at a single point, degrees=0, rad=1
-    double getInstPhase(TGraph *inGr, double t, int deg0rad1=0);
     //plot the phase of the full graph (NOT WORKING)
     TGraph * plotPhase(TGraph *inGr);
     //zero the phase at the given frequency
