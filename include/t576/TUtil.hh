@@ -454,7 +454,7 @@ The FFT namespace, for everything to do with FFTs.
     //return the Hilbert transform
     TGraph * hilbertTransform(TGraph *inGr);
     //return the phase at a single point
-    double phase(TGraph *inGr, double t);
+    double getInstPhase(TGraph *inGr, double t);
     //plot the phase of the full graph (NOT WORKING)
     TGraph * plotPhase(TGraph *inGr);
     //zero the phase at the given frequency
