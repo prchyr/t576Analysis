@@ -320,7 +320,7 @@ utilities.
   double locMax(TGraph *gr);
   double locMaxInRange(TGraph *gr, double t_low=0., double t_high=999999.);
     //return the phase at a single point, degrees=0, rad=1
-    double getInstPhase(TGraph *inGr, double t, int deg0rad1=0);
+    double getInstPhase(TGraph *inGr, double t, int deg0rad1=1);
 
   //get the index of a certain value. will always under-estimate
   int getIndex(TGraph *gr, double t);
