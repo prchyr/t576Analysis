@@ -2321,6 +2321,24 @@ double TUtil::rad2Deg(double rad) {
 /*************some plotting things****************/
 
 
+void TUtil::titles(TGraph *inGr, TString title, TString xtitle, TString ytitle){
+  inGr->SetTitle(title);
+  inGr->GetXaxis()->SetTitle(xtitle);
+  inGr->GetYaxis()->SetTitle(ytitle);
+}
+
+void TUtil::ranges(TGraph *inGr,double x1, double x2, double y1, double y2){
+  TUtil::yrange(inGr, y1, y2);
+  TUtil::xrange(inGr, x1, x2);
+}
+void TUtil::yrange(TGraph *inGr, double y1, double y2){
+  inGr->GetYaxis()->SetRangeUser(y1, y2);
+}
+
+void TUtil::xrange(TGraph *inGr, double x1, double x2){
+  inGr->GetXaxis()->SetRangeUser(x1, x2);
+}
+
 void TUtil::draw(vector<TGraph*> inGr, TString option){
   if(option=="norm"){
     TUtil::normalize(inGr[0])->Draw("al PLC");
