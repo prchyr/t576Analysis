@@ -1771,7 +1771,7 @@ TGraph * TUtil::makeCW(double freq,  double amp, double t_min, double t_max, dou
   double dt=1./GSs;
   double t=t_min;
   while(t<t_max){
-    double temp=amp*sin(2.*pi*freq*t - phase);
+    double temp=amp*sin(2.*pi*freq*t + phase);
     oG->SetPoint(oG->GetN(), t, temp);
     t+=dt;
   }
