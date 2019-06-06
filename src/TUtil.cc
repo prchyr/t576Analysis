@@ -793,9 +793,9 @@ double TUtil::getInstPhase(TGraph *inGr, double t, int deg0rad1){
   auto amp=norm->Eval(t);
   auto val=asin(amp);
   
-  if(norm->Eval(t+.05)<amp){
-    val=TUtil::pi-val;
-  }
+  // if(norm->Eval(t+.05)<amp){
+  //   val=TUtil::pi-val;
+  // }
   if(deg0rad1==0){
     return val/TUtil::deg;
   }
