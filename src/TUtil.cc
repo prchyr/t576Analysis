@@ -788,7 +788,7 @@ TGraph * TUtil::absGraph(TGraph * inGr){
 
 double TUtil::getInstPhase(TGraph *inGr, double t, int deg0rad1){
   //auto amp=TUtil::rms(inGr, inGr->GetX()[0], inGr->GetX()[inGr->GetN()-1])*sqrt(2);
-  auto norm=TUtil::normalize(inGr);
+  auto norm=TUtil::normToPeak(inGr);
   //  auto tIndex=TUtil::getIndex(norm, t);
   auto amp=norm->Eval(t);
   auto val=asin(amp);
