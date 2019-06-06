@@ -789,10 +789,10 @@ TGraph * TUtil::absGraph(TGraph * inGr){
 double TUtil::getInstPhase(TGraph *inGr, double t, int deg0rad1){
   //auto amp=TUtil::rms(inGr, inGr->GetX()[0], inGr->GetX()[inGr->GetN()-1])*sqrt(2);
   auto norm=TUtil::normalize(inGr);
-  auto tIndex=TUtil::getIndex(inGr, t);
-  auto val=asin(inGr->GetY()[tIndex]);
+  auto tIndex=TUtil::getIndex(norm, t);
+  auto val=asin(norm->GetY()[tIndex]);
   
-  if(inGr->GetY()[tIndex+1]<inGr->GetY()[tIndex]){
+  if(norm->GetY()[tIndex+1]<norm->GetY()[tIndex]){
     val=TUtil::pi-val;
   }
   if(deg0rad1==0){
