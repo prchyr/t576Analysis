@@ -790,7 +790,7 @@ double TUtil::getInstPhase(TGraph *inGr, double t, int deg0rad1){
   //auto amp=TUtil::rms(inGr, inGr->GetX()[0], inGr->GetX()[inGr->GetN()-1])*sqrt(2);
   auto norm=TUtil::normalize(inGr);
   auto tIndex=TUtil::getIndex(norm, t);
-  auto val=asin(norm->GetY()[tIndex]);
+  auto val=asin(norm->Eval(t));
   
   if(norm->GetY()[tIndex+1]<norm->GetY()[tIndex]){
     val=TUtil::pi-val;
