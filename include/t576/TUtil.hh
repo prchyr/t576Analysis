@@ -298,6 +298,7 @@ utilities.
   TGraph2D * add(TGraph2D * g1, TGraph2D * g2, double constant=1.);
   //dot product of 2 graphs
   double dot(TGraph *g1, TGraph *g2);
+  double dot(TGraph *g1, TGraph *g2, double tLow, double tHigh);
   //multiply two graphs: out(t)=g1(t)*consant*g2(t)
   TGraph * mult(TGraph *g1, TGraph *g2, double constant=1.);
   //divide 2 graphs: out(t)=g1(t)/constant*g2(t). if there is a divide

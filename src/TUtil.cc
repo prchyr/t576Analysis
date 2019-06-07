@@ -1113,6 +1113,23 @@ double TUtil::dot(TGraph *g1, TGraph *g2){
   
 }
 
+double TUtil::dot(TGraph *g1, TGraph *g2, double tLow, double tHigh){
+  auto x = g1->GetY();
+  auto y = g2->GetY();
+  double num=0., xdenom=0., ydenom=0.;
+  auto n=g1->GetN()<g2->GetN()?g1->GetN():g2->GetN();
+  for(int i=0;i<n;i++){
+    if(g1->GetX()[i]>tLow&&g1->GetX()[i]<tHigh){
+      num+=(x[i])*(y[i]);
+      xdenom+=pow(x[i], 2);
+      ydenom+=pow(y[i], 2);
+    }
+  }
+  return num/sqrt(xdenom*ydenom);
+  
+}
+
+
 TGraph * TUtil::mult(TGraph *g1, TGraph *g2, double constant){
 
   int len=g1->GetN()<g2->GetN()?g1->GetN():g2->GetN();
