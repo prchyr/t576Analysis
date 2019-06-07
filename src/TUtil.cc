@@ -1629,7 +1629,7 @@ TGraph * TUtil::align(TGraph * gr1, TGraph * gr2, double max_delay, double t_low
       xdenom=0.;
       ydenom=0.;
       for(int i=0;i<length;i++){
-	if((i+n)>0 && (i+n)<length && time[i]>=t_low && time[i]<=t_high){
+	if((i+n)>=0 && (i+n)<length && time[i]>=t_low && time[i]<=t_high){
 	  
 	  num+=(x[i]-mx)*(y[i+n]-my);
 	  xdenom+=pow(x[i]-mx, 2);
