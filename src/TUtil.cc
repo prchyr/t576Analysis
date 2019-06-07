@@ -1588,7 +1588,7 @@ TGraph * TUtil::align(TGraph * gr1, TGraph * gr2, double max_delay, double t_low
   int length=0;
   vector<double> out, outx, outy;
   double num, ynum, xdenom, ydenom, denom;
-  double timescale = time[1]-time[0];
+  double timescale = time[10]-time[9];
 
   length=lengthx<=lengthy?xn:yn;
   length=lengthx<=lengthy?xn:yn;
