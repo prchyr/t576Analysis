@@ -1594,6 +1594,7 @@ TGraph * TUtil::align(TGraph * gr1, TGraph * gr2, double max_delay, double t_low
   length=lengthx<=lengthy?xn:yn;
 
   double throwaway=time[xn-1]/10.;//throw away highest delays, they are unstable
+  throwaway=0;
   max_delay=max_delay>time[xn-1]?time[xn-1]-throwaway:max_delay;
 
   t_high=t_high>=time[xn-1]?time[xn-1]:t_high;
