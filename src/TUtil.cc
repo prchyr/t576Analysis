@@ -1637,7 +1637,7 @@ TGraph * TUtil::align(TGraph * gr1, TGraph * gr2, double max_delay, double t_low
   // TGraph *outt = new TGraph(outx.size(), &outx[0], &outy[0]);
   auto outg=new TGraph();
   delayGraph(gr2, outg, -offset);
-  delete gr2;
+  //delete gr2;
   return outg;
 }
 
