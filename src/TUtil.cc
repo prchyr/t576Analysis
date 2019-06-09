@@ -1358,7 +1358,7 @@ TGraph * TUtil::interpolateGraph(TGraph * inGraph, vector<double> times){
   vector<double> xx, yy;
   for(int i=0;i<times.size();i++){
     xx.push_back(times[i]);
-    yy.push_back(-interp.Eval(times[i]));
+    yy.push_back(interp.Eval(times[i]));
   }
 
   auto outGr=new TGraph(xx.size(), &xx[0], &yy[0]);
