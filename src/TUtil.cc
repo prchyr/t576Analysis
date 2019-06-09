@@ -1838,6 +1838,25 @@ TGraph * TUtil::makeCW(double freq,  double amp, double t_min, double t_max, dou
   return oG;
 }
 
+TGraph * TUtil::sampledCW(double freq,  double amp, int N, double * times, double phase){
+
+  TGraph * oG=new TGraph();
+  for(int i=0;i<N;i++){
+    double temp=amp*sin(2.*pi*freq*times[i] + phase);
+    oG->SetPoint(oG->GetN(), times[i], temp);
+  }
+  return oG;
+}
+
+TGraph * TUtil::sampledCW(double freq,  double amp, vector<double> times, double phase){
+  TGraph * oG=new TGraph();
+  for(int i=0;i<times.size();i++){
+    double temp=amp*sin(2.*pi*freq*times[i] + phase);
+    oG->SetPoint(oG->GetN(), times[i], temp);
+  }
+  return oG;
+}
+
 
 TGraph * TUtil::lowpassFilter(TGraph *ingr, double cutoff, int order){
   double * yy=ingr->GetY();

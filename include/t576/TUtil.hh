@@ -343,6 +343,9 @@ utilities.
   int removeMeanInPlace(TGraph *gr, double t_low=0., double t_high=999999.);
   //make CW with given parameters.
   TGraph * makeCW(double freq,  double amp, double t_min=0., double t_max=1000., double GSs=20., double phase=0.);
+  //sample CW at the given times
+  TGraph * sampledCW(double freq,  double amp, int N, double * times, double phase);
+  TGraph * sampledCW(double freq,  double amp, vector<double> times, double phase);
   //integrate a TGraph. lower and upper bounds are optional.
   double integrate(TGraph * gr, double t_low=0, double t_high=999999.);  
   //get the RMS
