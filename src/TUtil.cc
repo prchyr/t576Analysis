@@ -1348,6 +1348,29 @@ TGraph * TUtil::interpolateGraph(TGraph * inGraph, double interpGSs){
   return outGr;
 }
 
+
+TGraph * TUtil::interpolateGraph(TGraph * inGraph, vector<double> times){
+  ROOT::Math::Interpolator interp(inGraph->GetN(), ROOT::Math::Interpolation::kAKIMA);
+  interp.SetData(inGraph->GetN(), inGraph->GetX(), inGraph->GetY());
+
+  //get dt, assuming even sampling.
+
+  vector<double> xx, yy;
+  for(int i=0;i<times.size();i++){
+    xx.push_back(times[i]);
+    yy.push_back(interp.Eval(times[i]));
+  }
+
+  auto outGr=new TGraph(xx.size(), &xx[0], &yy[0]);
+
+			 
+
+  return outGr;
+}
+
+
+
+
 TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end, int delay_to_zero){
   ingr->SetBit(TGraph::kIsSortedX);
   double *xx=ingr->GetX();
@@ -2273,6 +2296,15 @@ double TUtil::sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, d
 
 //     return outsig
 
+vector<double> TUtil::linspace(double start, double stop, int N){
+  auto dt=(stop-start)/(double)N;
+  auto vec=vector<double>(N);
+  for(int i=0;i<N;i++){
+    vec[i]=(double)i*dt;
+  }
+  return vec;
+}
+
 
 //these are all from wikipedia.
 double TUtil::window(int i, int n, int type){
@@ -2501,6 +2533,8 @@ TGraph * TUtil::evenSample(TGraph *inGr, double dt){
   return outGr;
     
 }
+
+
 
 TGraph * TUtil::zeroPad(TGraph *inGr, int num, int whichEnd){
   auto dt=inGr->GetX()[1]-inGr->GetX()[0];

@@ -238,7 +238,8 @@ utilities.
   int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs, int type=0, int N=10);
   //return the interpolated graph (memory use) using ROOT's akima method
   TGraph * interpolateGraph(TGraph * inGraph, double interpGSs);
-
+  //return the interpolated graph, evaluated at times. the input graph can be unevenly sampled.
+  TGraph * interpolateGraph(TGraph * inGraph, vector<double> times);
   //normalize a graph
   TGraph * normalize(TGraph *inGr);
   //normalize to peak
@@ -365,7 +366,7 @@ utilities.
   //a brick wall frequency domain filter
   TGraph * brickWallFilter(TGraph *ingr, double low, double high);
     //will take the first chunk of the signal graph (equal to to t_high-t_low)
-
+  vector<double> linspace(double start, double stop, int N);
   // return the value of a window over sample numbers n. types are:
   /*
     0=bartlett (triangle) (default)
