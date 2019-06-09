@@ -942,6 +942,20 @@ double TUtil::rms(TGraph * gr, double t_low, double t_high){
   return sqrt(rms/n);
 }
 
+double TUtil::amplitude(TGraph * gr, double t_low, double t_high){
+  t_low=t_low>0.?t_low:0.;
+  t_high=t_high>gr->GetX()[gr->GetN()-1]?gr->GetX()[gr->GetN()-1]:t_high;
+  double n=0.;
+  double rms=0.;
+  for(int i=0;i<gr->GetN();i++){
+    if(gr->GetX()[i]>=t_low||gr->GetX()[i]<=t_high){
+      rms+=(gr->GetY()[i]*gr->GetY()[i]);
+      n+=1.;
+    }
+  }
+  return sqrt(rms/n)*sqrt(2.);
+}
+
 
 TGraph * TUtil::getZeroCrossGraph(TGraph * inGr, int relative){
   auto outGr=new TGraph();

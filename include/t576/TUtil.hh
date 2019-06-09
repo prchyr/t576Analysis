@@ -350,6 +350,8 @@ utilities.
   double integrate(TGraph * gr, double t_low=0, double t_high=999999.);  
   //get the RMS
   double rms(TGraph * gr, double t_low, double t_high);
+  //get the amplitude
+  double amplitude(TGraph * gr, double t_low, double t_high);
 //take the derivative. if direction=-1, takes derivative along other direction of axis.
   TGraph * derivative(TGraph *gr, int direction=1);
   //get the observer graph from a retarded graph. tUnits is the multiplier for ns (eg for ms, tUinits=1e6);
