@@ -1375,7 +1375,7 @@ TGraph * TUtil::interpolateGraph(TGraph * inGraph, int N, double* times){
   //get dt, assuming even sampling.
 
   vector<double> xx, yy;
-  for(int i=0;i<N;i++){
+  for(int i=0;i<N-1;i++){
     xx.push_back(times[i]);
     yy.push_back(interp.Eval(times[i]));
   }
