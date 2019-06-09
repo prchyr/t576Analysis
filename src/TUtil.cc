@@ -1368,6 +1368,25 @@ TGraph * TUtil::interpolateGraph(TGraph * inGraph, vector<double> times){
   return outGr;
 }
 
+TGraph * TUtil::interpolateGraph(TGraph * inGraph, int N, double* times){
+  ROOT::Math::Interpolator interp(inGraph->GetN(), ROOT::Math::Interpolation::kAKIMA);
+  interp.SetData(inGraph->GetN(), inGraph->GetX(), inGraph->GetY());
+
+  //get dt, assuming even sampling.
+
+  vector<double> xx, yy;
+  for(int i=0;i<N;i++){
+    xx.push_back(times[i]);
+    yy.push_back(interp.Eval(times[i]));
+  }
+
+  auto outGr=new TGraph(xx.size(), &xx[0], &yy[0]);
+
+			 
+
+  return outGr;
+}
+
 
 
 

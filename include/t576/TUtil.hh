@@ -240,6 +240,8 @@ utilities.
   TGraph * interpolateGraph(TGraph * inGraph, double interpGSs);
   //return the interpolated graph, evaluated at times. the input graph can be unevenly sampled.
   TGraph * interpolateGraph(TGraph * inGraph, vector<double> times);
+  //same as above but different input types
+  TGraph * interpolateGraph(TGraph * inGraph, int N, double* times);
   //normalize a graph
   TGraph * normalize(TGraph *inGr);
   //normalize to peak
