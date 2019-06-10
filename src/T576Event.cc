@@ -251,7 +251,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
   //cout<<major<<" "<<minor<<endl;
   TString thisScopeFilename=scopeFilename->Data();
   //open the file
-  cout<<thisScopeFilename<<endl<<" "<<fScopeFilename<<endl;
+  cout<<directory+thisScopeFilename<<endl<<" "<<fScopeFilename<<endl;
   if(thisScopeFilename!=fScopeFilename){
 
     fEventFile->Close();
