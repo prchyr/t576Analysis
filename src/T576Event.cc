@@ -227,7 +227,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
     cout<<"T576_DATA_DIR not set. please set this flag so that the data can be found. this should be the top directory inside of which is py/ and root/."<<endl;
     return (0);
   }
-
+  cout<<top_dir<<endl;
   TString directory=top_dir+"/root/";
 
   
