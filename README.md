@@ -191,6 +191,14 @@ export T576_DATA_DIR=/path/to/t576/run2
 ```
 in your .bashrc. this will let the program find the data.
 
+if you want to run over the filtered data (which you'll need to process so this probably isn't applicable), then set T576_FILTERED_DATA_DIR to wherever this data lives (root/ should live under this directory and the filtered data should be in that). to use this, declare a T576Event object like
+
+```c++
+auto ev=new T576Event(GSs, true)
+```
+where the "true" indicates that you want to use filtered data. this will change the behavior of some things, namely, the filtered data is all aligned to the first ICT trace in that run, and the traces themselves are only 100ns long. 
+
+
 #### filenames:
 
 all of the filenames are stored with a timestamp then the run major and the run minor, e.g. 20181031122345run1_999.root where 1 is the major, 999 is the minor. the timestamp just helps to sort the files. the major and minor are used to index in root. 

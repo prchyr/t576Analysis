@@ -215,6 +215,14 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
   
   TString top_dir = getenv("T576_DATA_DIR");
 
+  if(fUSE_FILTERED_DATA==true){
+    top_dir=getenv("T576_FILTERED_DATA_DIR");
+    if(top_dir==""){
+      cout<<"T576_FILTERED_DATA_DIR not set. please set this flag so that the filtered data can be found. "<<endl;
+      return (0);
+    }
+  }
+  
   if(top_dir==""){
     cout<<"T576_DATA_DIR not set. please set this flag so that the data can be found. this should be the top directory inside of which is py/ and root/."<<endl;
     return (0);
@@ -280,17 +288,25 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
   //cout<<major<<" "<<minor<<" "<<subEvNo<<" "<<length<<" "<<fEventTree->GetEntries()<<" "<<scope->dat[1][18]<<endl;
   //fill the event graphs for the scope->
   //fix the first and last values, which were recorded incorrectly
-  scope->time[0]=0.;
-  scope->time[19999]=scope->time[19998]+.05;
+  if(fUSE_FILTERED_DATA==false){
+    scope->time[0]=0.;
+    scope->time[19999]=scope->time[19998]+.05;
+  }
   for(int i=0;i<4;i++){
-
-    scope->delays[i]=(scope->cableLengths[i]*ft)/(c_light*scope->velocityFactor);
+    if(fUSE_FILTERED_DATA==false){
+      scope->delays[i]=(scope->cableLengths[i]*ft)/(c_light*scope->velocityFactor);
+    }
+    else{
+      scope->delays[i]=0.;
+    }
 
     TGraph * tempGr=new TGraph(length, scope->time, scope->dat[i]);
     TGraph * graph=TUtil::delayGraph(tempGr, scope->delays[i]);
 
-    if(remove_dc_offset==true){
-      TUtil::removeMeanInPlace(graph, 0., 300.);
+    if(fUSE_FILTERED_DATA==false){
+      if(remove_dc_offset==true){
+	TUtil::removeMeanInPlace(graph, 0., 300.);
+      }
     }
     
     if(fInterpGSs>0.){
@@ -580,7 +596,12 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
 
 double T576Event::getCharge(TGraph *ict){
   //TUtil::removeMeanInPlace(ict, 0., 400.)
-  charge = .4*TUtil::integrate(ict, 435, 550);
+  if(fUSE_FILTERED_DATA==false){
+    charge = .4*TUtil::integrate(ict, 435, 550);
+  }
+  else{
+    charge = .4*TUtil::integrate(ict, 5, 90);
+  }
   return charge;
 }
 
