@@ -1282,6 +1282,30 @@ TGraph * TUtil::sincInterpolateGraph(TGraph *inGr, double interpGSs){
   TGraph *outGr = new TGraph(xx.size(), &xx[0], &yy[0]);
   return outGr;
 }
+//experimental
+TGraph * TUtil::sincInterpolateGraphDev(TGraph *inGr, double interpGSs){
+
+  double dt = 1./interpGSs;
+  vector<double> xx, yy;
+  double t=0;
+  double num=0.;
+  
+  t=0;    
+  while(t<inGr->GetX()[inGr->GetN()-2]){
+    xx.push_back(t);
+    double temp=0;
+    for(int i=0;i<inGr->GetN()-1;i++){
+      double T = inGr->GetX()[i+1]-inGr->GetX()[i];
+      temp+=inGr->GetY()[i]*TUtil::sinc((t-((double)i*T))/T);
+
+    }
+  
+    yy.push_back(temp);
+    t+=dt;
+  }
+  TGraph *outGr = new TGraph(xx.size(), &xx[0], &yy[0]);
+  return outGr;
+}
 
 
 TGraph * TUtil::sincInterpolateGraphFast(TGraph *inGr, double interpGSs, int N){

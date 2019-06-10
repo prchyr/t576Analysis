@@ -225,6 +225,8 @@ utilities.
   double sinc(double x);
   //return a TGraph interpoltaed using simple sinc interpolation.(slow)
   TGraph * sincInterpolateGraph(TGraph *inGr, double interpGSs);
+  //experimental
+  TGraph * sincInterpolateGraphDev(TGraph *inGr, double interpGSs);
   //approximated (fast) sinc interpolation.(will not be very good for low N.) sacrifice accuracy for speed.
   TGraph * sincInterpolateGraphFast(TGraph *inGr, double interpGSs, int N=10);
   /*interpolate a tgraph.
