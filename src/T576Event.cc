@@ -116,12 +116,22 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event, bool remov
   }
   TString top_dir = getenv("T576_DATA_DIR");
 
+  if(fUSE_FILTERED_DATA==true){
+    top_dir=getenv("T576_FILTERED_DATA_DIR");
+    if(top_dir==""){
+      cout<<"T576_FILTERED_DATA_DIR not set. please set this flag so that the filtered data can be found. "<<endl;
+      return (0);
+    }
+  }
+
+  
   if(top_dir==""){
    cout<<"T576_DATA_DIR not set. please set this flag so that the data can be found. this should be the top directory inside of which is py/ and root/."<<endl;
     return (0);
   }
   
   TString directory=top_dir+"/root/";
+
   
   fIndexTree->SetTreeIndex(fMajorMinorIndex);
   fIndexTree->GetEntry(fIndexTree->GetEntryNumberWithBestIndex(run_major, run_minor));
