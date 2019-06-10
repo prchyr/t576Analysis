@@ -293,9 +293,12 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
   fEventTree->GetEntry(subEvNo);
   //cout<<"hi"<<endl;
   //check the length of the record.
-  auto length=sizeof(scope->time)/sizeof(*scope->time);
-  if(length!=20000)cout<<length;
-  cout<<length;
+  auto length=5000;
+  if(fUSE_FILTERED_DATA==false){
+    sizeof(scope->time)/sizeof(*scope->time);
+    if(length!=20000)cout<<length;
+  }
+  //  cout<<length;
   //cout<<major<<" "<<minor<<" "<<subEvNo<<" "<<length<<" "<<fEventTree->GetEntries()<<" "<<scope->dat[1][18]<<endl;
   //fill the event graphs for the scope->
   //fix the first and last values, which were recorded incorrectly
