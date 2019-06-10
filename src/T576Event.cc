@@ -295,7 +295,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
   //check the length of the record.
   auto length=5000;
   if(fUSE_FILTERED_DATA==false){
-    sizeof(scope->time)/sizeof(*scope->time);
+    length=sizeof(scope->time)/sizeof(*scope->time);
     if(length!=20000)cout<<length;
   }
   //  cout<<length;
