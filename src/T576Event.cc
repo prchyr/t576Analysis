@@ -307,11 +307,16 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
       if(remove_dc_offset==true){
 	TUtil::removeMeanInPlace(graph, 0., 300.);
       }
+      
+      
+      if(fInterpGSs>0.){
+	getInterpolatedGraph(graph, scope->ch[i], fInterpGSs);
+      }
+      else{
+	*scope->ch[i]=*graph;
+      }
     }
-    
-    if(fInterpGSs>0.){
-      getInterpolatedGraph(graph, scope->ch[i], fInterpGSs);
-    }
+
     else{
       *scope->ch[i]=*graph;
     }
