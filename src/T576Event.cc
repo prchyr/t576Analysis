@@ -719,6 +719,47 @@ TGraph * T576Event::drawAvg(int major, int minor, int scopeOrSurf, int channel, 
 }
 
 
+TH2D * T576Event::drawAvgSpectrogram(int major, int minor, int scopeOrSurf, int channel, int num, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, int dbFlag){
+  int number=0;
+  auto specs=vector<TH2D*>();
+  if(scopeOrSurf==0){
+    for(int i=0;i<scopeNEvents;i++){
+      loadScopeEvent(major, minor, i);
+      if(isGood){
+	//graphs.push_back(TUtil::getChunkOfGraphFast(scope->ch[channel], tLow, tHigh));
+	specs.push_back(TUtil::FFT::spectrogram(scope->ch[channel], binsize, overlap, zero_pad_length, win_type, dbFlag));
+	number++;
+      }
+      if(number>=num)break;
+    }
+    auto avg=TUtil::FFT::avgSpectrograms(specs);
+      specs.clear();
+      
+      avg->Draw("colz");
+      return avg;
+  }
+  // else{
+  //   for(int i=0;i<surfNEvents;i++){
+  //     loadSurfEvent(major, minor, i*3);
+  //     if(isGood){
+  // 	graphs.push_back((TGraph*)surf->ch[channel]->Clone());
+  // 	number++;
+  //     }
+  //     if(number>=num)break;
+  //   }
+  //   auto temp=TUtil::alignMultipleAndTruncate(graphs, align, tLow, tHigh);
+  //   auto avg=TUtil::avgGraph(temp);
+  //   graphs.clear();
+  //   temp.clear();
+  //   avg->Draw(drawOption);
+  //   return avg;
+  // }
+
+
+  
+}
+
+
 // int T576Event::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph){
 //   ROOT::Math::Interpolator interp(inGraph->GetN(), ROOT::Math::Interpolation::kAKIMA);
 //   interp.SetData(inGraph->GetN(), inGraph->GetX(), inGraph->GetY());
