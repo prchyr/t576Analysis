@@ -421,6 +421,10 @@ utilities.
   void ranges(TGraph *inGr, double x1, double x2, double y1, double y2);
   void xrange(TGraph *inGr, double x1, double x2);
   void yrange(TGraph *inGr, double y1, double y2);
+  void titles(TH2D *inGr, TString title, TString xtitle, TString ytitle);
+  void ranges(TH2D *inGr, double x1, double x2, double y1, double y2);
+  void xrange(TH2D *inGr, double x1, double x2);
+  void yrange(TH2D *inGr, double y1, double y2);
   //draw a bunch of graphs
   void draw(vector<TGraph*> inGr, TString option="");
     //draw a bunch of graphs
