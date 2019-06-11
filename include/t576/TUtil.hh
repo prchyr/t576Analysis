@@ -429,7 +429,8 @@ utilities.
   void draw(vector<TGraph*> inGr, TString option="");
     //draw a bunch of graphs
   void draw(int nGraphs, TGraph ** inGr, TString option="");
-
+  //draw cursors centered on the peak of a spectrogram.
+  void drawPeakCursorXY(TH2D* inHist, Color_t color);
   //a pretty warm palette
   void setWarmPalette();
   //a pretty cool palette

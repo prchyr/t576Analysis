@@ -2527,6 +2527,22 @@ void TUtil::draw(int nGraphs, TGraph** inGr, TString option){
 }
 
 
+void TUtil::drawPeakCursorXY(TH2D* inHist, Color_t color){
+  auto binx=0, biny=0, binz=0;
+  auto maxbin=inHist->GetMaximumBin(binx, biny, binz);
+  auto x = inHist->GetXaxis()->GetBinCenter(binx);
+  auto y = inHist->GetYaxis()->GetBinCenter(biny);
+  auto maxx=gPad->GetUxmax();
+  auto minx=gPad->GetUxmin();
+  auto maxy=gPad->GetUymax();
+  auto miny=gPad->GetUymin();
+  auto xline=new TLine(x, miny, x, maxy);
+  xline->SetLineColor(color);
+  auto yline=new TLine(minx, y, maxx,y);
+  yline->SetLineColor(color);
+  xline->Draw();
+  yline->Draw();
+}
 
 // void TUtil::draw(TGraph** inGr){
 //   inGr[0]->Draw("al PLC");
