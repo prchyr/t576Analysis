@@ -430,7 +430,9 @@ utilities.
     //draw a bunch of graphs
   void draw(int nGraphs, TGraph ** inGr, TString option="");
   //draw cursors centered on the peak of a spectrogram.
-  void drawPeakCursorXY(TH2D* inHist, Color_t color);
+  //before use, must draw the canvas or update with can->Update()
+  //so that the gPad calls work correctly.
+  vector<TLine*> drawPeakCursorXY(TH2D* inHist, Color_t color);
   //a pretty warm palette
   void setWarmPalette();
   //a pretty cool palette

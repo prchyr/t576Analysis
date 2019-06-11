@@ -2527,7 +2527,7 @@ void TUtil::draw(int nGraphs, TGraph** inGr, TString option){
 }
 
 
-void TUtil::drawPeakCursorXY(TH2D* inHist, Color_t color){
+vector<TLine*> TUtil::drawPeakCursorXY(TH2D* inHist, Color_t color){
   auto binx=0, biny=0, binz=0;
   auto maxbin=inHist->GetMaximumBin(binx, biny, binz);
   auto x = inHist->GetXaxis()->GetBinCenter(binx);
@@ -2542,6 +2542,10 @@ void TUtil::drawPeakCursorXY(TH2D* inHist, Color_t color){
   yline->SetLineColor(color);
   xline->Draw();
   yline->Draw();
+  auto outlines=vector<TLine*>(2);
+  outlines[0]=xline;
+  outlines[1]=yline;
+  return outlines;
 }
 
 // void TUtil::draw(TGraph** inGr){
