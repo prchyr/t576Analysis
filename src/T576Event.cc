@@ -116,13 +116,30 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event, bool remov
   }
   TString top_dir = getenv("T576_DATA_DIR");
 
-  if(fUSE_FILTERED_DATA==true){
+  if(fUSE_FILTERED_DATA==1){
     top_dir=getenv("T576_FILTERED_DATA_DIR");
     if(top_dir==""){
       cout<<"T576_FILTERED_DATA_DIR not set. please set this flag so that the filtered data can be found. "<<endl;
       return (0);
     }
   }
+  
+  if(fUSE_FILTERED_DATA==2){
+    top_dir=getenv("T576_NULL_DATA_DIR");
+    if(top_dir==""){
+      cout<<"T576_FILTERED_DATA_DIR not set. please set this flag so that the filtered data can be found. "<<endl;
+      return (0);
+    }
+  }
+ 
+ if(fUSE_FILTERED_DATA==3){
+    top_dir=getenv("T576_FILTERED_NULL_DATA_DIR");
+    if(top_dir==""){
+      cout<<"T576_FILTERED_DATA_DIR not set. please set this flag so that the filtered data can be found. "<<endl;
+      return (0);
+    }
+  }
+  
 
   
   if(top_dir==""){
@@ -294,7 +311,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
   //cout<<"hi"<<endl;
   //check the length of the record.
   auto length=5000;
-  if(fUSE_FILTERED_DATA==false){
+  if(fUSE_FILTERED_DATA==0){
     length=sizeof(scope->time)/sizeof(*scope->time);
     if(length!=20000)cout<<length;
   }
@@ -302,12 +319,12 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
   //cout<<major<<" "<<minor<<" "<<subEvNo<<" "<<length<<" "<<fEventTree->GetEntries()<<" "<<scope->dat[1][18]<<endl;
   //fill the event graphs for the scope->
   //fix the first and last values, which were recorded incorrectly
-  if(fUSE_FILTERED_DATA==false){
+  if(fUSE_FILTERED_DATA==0){
     scope->time[0]=0.;
     scope->time[19999]=scope->time[19998]+.05;
   }
   for(int i=0;i<4;i++){
-    if(fUSE_FILTERED_DATA==false){
+    if(fUSE_FILTERED_DATA==0){
       scope->delays[i]=(scope->cableLengths[i]*ft)/(c_light*scope->velocityFactor);
     }
     else{
@@ -317,7 +334,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
     TGraph * tempGr=new TGraph(length, scope->time, scope->dat[i]);
     TGraph * graph=TUtil::delayGraph(tempGr, scope->delays[i]);
 
-    if(fUSE_FILTERED_DATA==false){
+    if(fUSE_FILTERED_DATA==0){
       if(remove_dc_offset==true){
 	TUtil::removeMeanInPlace(graph, 0., 300.);
       }

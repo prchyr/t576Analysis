@@ -50,7 +50,7 @@ using namespace TUtil;
 class T576Event : public TObject{
 public:
   /************constructors**********/
-  T576Event(double interpGSs=0., bool useFilteredData=0){
+  T576Event(double interpGSs=0., int useFilteredData=0){
     checkStatus();
     fUSE_FILTERED_DATA=useFilteredData;
     if (interpGSs!=0){
@@ -58,7 +58,7 @@ public:
     }
   }
   //load a T576 event using run major and minor. actual file name not needed.
-  T576Event(int run_major, int run_minor, int event,bool useFilteredData=0){
+  T576Event(int run_major, int run_minor, int event,int useFilteredData=0){
     major=run_major;
     minor=run_minor;
     checkStatus();
@@ -195,7 +195,7 @@ private:
 
   bool fScopeLoaded=false;
   bool fSurfLoaded=false;
-  bool fUSE_FILTERED_DATA=false;
+  int fUSE_FILTERED_DATA=0;
   
 public:
   class Scope  {

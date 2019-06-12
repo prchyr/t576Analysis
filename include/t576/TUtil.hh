@@ -416,7 +416,7 @@ utilities.
 
   //drawing things
 
-  //utilities for common stuff
+  //utilities for common stuff such as titles and axes
   void titles(TGraph *inGr, TString title, TString xtitle, TString ytitle);
   void ranges(TGraph *inGr, double x1, double x2, double y1, double y2);
   void xrange(TGraph *inGr, double x1, double x2);
