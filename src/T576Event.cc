@@ -366,10 +366,10 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
 	*scope->ch[i]=*graph;
       }
     }
-    cout<<"l369"<<endl;
     else{
       *scope->ch[i]=*graph;
     }
+    cout<<"l369"<<endl;
     scope->ch[i]->SetTitle("");
     scope->ch[i]->SetName("ch"+TString::Itoa(i, 10));
     scope->ch[i]->GetXaxis()->SetTitle("Time (ns)");
