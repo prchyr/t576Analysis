@@ -352,7 +352,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
     cout<<"l352"<<endl;
     TGraph * tempGr=new TGraph(length, scope->time, scope->dat[i]);
     TGraph * graph=TUtil::delayGraph(tempGr, scope->delays[i]);
-
+    cout<<"l355"<<endl;
     if(fUSE_FILTERED_DATA==0){
       if(remove_dc_offset==true){
 	TUtil::removeMeanInPlace(graph, 0., 300.);
@@ -367,7 +367,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
       }
     }
     else{
-      *scope->ch[i]=*graph;
+      *scope->ch[i]=*graph;cout<<"l370"<<endl;
     }
     cout<<"l369"<<endl;
     scope->ch[i]->SetTitle("");
