@@ -334,6 +334,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
     if(length!=20000)cout<<length;
   }
   //  cout<<length;
+  cout<<"l337"<<endl;
   //cout<<major<<" "<<minor<<" "<<subEvNo<<" "<<length<<" "<<fEventTree->GetEntries()<<" "<<scope->dat[1][18]<<endl;
   //fill the event graphs for the scope->
   //fix the first and last values, which were recorded incorrectly
@@ -356,7 +357,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
       if(remove_dc_offset==true){
 	TUtil::removeMeanInPlace(graph, 0., 300.);
       }
-      
+      cout<<"l359"<<endl;
       
       if(fInterpGSs>0.){
 	getInterpolatedGraph(graph, scope->ch[i], fInterpGSs);
@@ -365,7 +366,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
 	*scope->ch[i]=*graph;
       }
     }
-
+    cout<<"l369"<<endl;
     else{
       *scope->ch[i]=*graph;
     }
@@ -380,6 +381,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
    delete(tempGr);
 
   }
+  cout<<"l384"<<endl;
   //  cout<<"here"<<endl;
   //  if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
   //delete(file);
