@@ -367,8 +367,8 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
       }
     }
     else{
-      //*scope->ch[i]=*tempGr;cout<<"l370"<<endl;
-      getInterpolatedGraph(graph, scope->ch[i], fInterpGSs);
+      *scope->ch[i]=*tempGr;cout<<"l370"<<endl;
+      //getInterpolatedGraph(graph, scope->ch[i], fInterpGSs);
     }
     cout<<"l372"<<endl;
     scope->ch[i]->SetTitle("");
