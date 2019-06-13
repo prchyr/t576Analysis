@@ -367,7 +367,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
       }
     }
     else{
-      *scope->ch[i]=*graph;cout<<"l370"<<endl;
+      *scope->ch[i]=*tempGr;cout<<"l370"<<endl;
     }
     cout<<"l369"<<endl;
     scope->ch[i]->SetTitle("");
