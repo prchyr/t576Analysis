@@ -367,9 +367,10 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
       }
     }
     else{
-      *scope->ch[i]=*tempGr;cout<<"l370"<<endl;
+      //*scope->ch[i]=*tempGr;cout<<"l370"<<endl;
+      getInterpolatedGraph(graph, scope->ch[i], fInterpGSs);
     }
-    cout<<"l369"<<endl;
+    cout<<"l372"<<endl;
     scope->ch[i]->SetTitle("");
     scope->ch[i]->SetName("ch"+TString::Itoa(i, 10));
     scope->ch[i]->GetXaxis()->SetTitle("Time (ns)");
