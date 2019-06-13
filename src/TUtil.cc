@@ -2030,10 +2030,13 @@ TGraph * TUtil::brickWallFilter(TGraph * inGr, double low, double high){
 
 TGraph * TUtil::addNoise(TGraph * inGr, double level){
   auto outGr=new TGraph();
+  auto rand=new TRandom3();
+  rand->SetSeed();
   for(int i=0;i<inGr->GetN();i++){
-    auto ranN=level*(((double)rand()/(double)RAND_MAX)-.5);
+    auto ranN=rand->Gaus(0, level);
     outGr->SetPoint(outGr->GetN(), inGr->GetX()[i], inGr->GetY()[i]+ranN);
   }
+  delete rand;
   return outGr;
 }
 

@@ -632,7 +632,7 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
 
 double T576Event::getCharge(TGraph *ict){
   //TUtil::removeMeanInPlace(ict, 0., 400.)
-  if(fUSE_FILTERED_DATA==false){
+  if(fUSE_FILTERED_DATA==0){
     charge = .4*TUtil::integrate(ict, 435, 550);
   }
   else{
