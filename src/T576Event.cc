@@ -382,7 +382,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
    delete(tempGr);
 
   }
-  cout<<"l384"<<endl;
+  //cout<<"l384"<<endl;
   //  cout<<"here"<<endl;
   //  if(subEvNo==fEventTree->GetEntries())fEventFile->Close();
   //delete(file);
