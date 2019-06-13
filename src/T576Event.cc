@@ -333,8 +333,8 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
     length=sizeof(scope->time)/sizeof(*scope->time);
     if(length!=20000)cout<<length;
   }
-  cout<<length;
-  cout<<"l337"<<endl;
+  //  cout<<length;
+  //cout<<"l337"<<endl;
   //cout<<major<<" "<<minor<<" "<<subEvNo<<" "<<length<<" "<<fEventTree->GetEntries()<<" "<<scope->dat[1][18]<<endl;
   //fill the event graphs for the scope->
   //fix the first and last values, which were recorded incorrectly
@@ -349,15 +349,15 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
     else{
       scope->delays[i]=0.;
     }
-    cout<<"l352"<<endl;
+    //cout<<"l352"<<endl;
     TGraph * tempGr=new TGraph(length, scope->time, scope->dat[i]);
     TGraph * graph=TUtil::delayGraph(tempGr, scope->delays[i]);
-    cout<<"l355"<<endl;
+    //cout<<"l355"<<endl;
     if(fUSE_FILTERED_DATA==0){
       if(remove_dc_offset==true){
 	TUtil::removeMeanInPlace(graph, 0., 300.);
       }
-      cout<<"l359"<<endl;
+      //cout<<"l359"<<endl;
       
       if(fInterpGSs>0.){
 	getInterpolatedGraph(graph, scope->ch[i], fInterpGSs);
@@ -367,10 +367,10 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
       }
     }
     else{
-      *scope->ch[i]=*tempGr;cout<<"l370"<<endl;
+      *scope->ch[i]=*tempGr;//cout<<"l370"<<endl;
       //getInterpolatedGraph(graph, scope->ch[i], fInterpGSs);
     }
-    cout<<"l372"<<endl;
+    // cout<<"l372"<<endl;
     scope->ch[i]->SetTitle("");
     scope->ch[i]->SetName("ch"+TString::Itoa(i, 10));
     scope->ch[i]->GetXaxis()->SetTitle("Time (ns)");
