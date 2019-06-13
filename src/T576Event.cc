@@ -242,7 +242,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
   
   TString top_dir = getenv("T576_DATA_DIR");
 
-  if(fUSE_FILTERED_DATA==true){
+  if(fUSE_FILTERED_DATA==1){
     top_dir=getenv("T576_FILTERED_DATA_DIR");
     if(top_dir==""){
       cout<<"T576_FILTERED_DATA_DIR not set. please set this flag so that the filtered data can be found. "<<endl;
@@ -250,8 +250,26 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
     }
   }
   
+  if(fUSE_FILTERED_DATA==2){
+    top_dir=getenv("T576_NULL_DATA_DIR");
+    if(top_dir==""){
+      cout<<"T576_FILTERED_DATA_DIR not set. please set this flag so that the filtered data can be found. "<<endl;
+      return (0);
+    }
+  }
+ 
+ if(fUSE_FILTERED_DATA==3){
+    top_dir=getenv("T576_FILTERED_NULL_DATA_DIR");
+    if(top_dir==""){
+      cout<<"T576_FILTERED_DATA_DIR not set. please set this flag so that the filtered data can be found. "<<endl;
+      return (0);
+    }
+  }
+  
+
+  
   if(top_dir==""){
-    cout<<"T576_DATA_DIR not set. please set this flag so that the data can be found. this should be the top directory inside of which is py/ and root/."<<endl;
+   cout<<"T576_DATA_DIR not set. please set this flag so that the data can be found. this should be the top directory inside of which is py/ and root/."<<endl;
     return (0);
   }
 
