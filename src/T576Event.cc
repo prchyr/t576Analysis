@@ -333,7 +333,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
     length=sizeof(scope->time)/sizeof(*scope->time);
     if(length!=20000)cout<<length;
   }
-  //  cout<<length;
+  cout<<length;
   cout<<"l337"<<endl;
   //cout<<major<<" "<<minor<<" "<<subEvNo<<" "<<length<<" "<<fEventTree->GetEntries()<<" "<<scope->dat[1][18]<<endl;
   //fill the event graphs for the scope->
@@ -349,7 +349,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
     else{
       scope->delays[i]=0.;
     }
-
+    cout<<"l352"<<endl;
     TGraph * tempGr=new TGraph(length, scope->time, scope->dat[i]);
     TGraph * graph=TUtil::delayGraph(tempGr, scope->delays[i]);
 
