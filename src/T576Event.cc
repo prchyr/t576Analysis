@@ -1914,6 +1914,7 @@ double T576Event::getInterpGSs(){
 
 
 TNtuple * T576Event::integrateAllWithSideband(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double sbxmin, double sbxmax, double sbymin, double sbymax, double scale){
+  loadScopeEvent(major, minor, 0);
   int number=0;
   TNtuple *tup=new TNtuple("tup", "tup", "sig:sb");
   auto graphs=vector<TGraph*>();
