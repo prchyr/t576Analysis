@@ -1934,3 +1934,25 @@ TNtuple * T576Event::integrateAllWithSideband(int major, int minor, int scopeOrS
   return tup;
 }
 
+TNtuple * T576Event::sidebandSubtractAll(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax){
+  int number=0;
+  TNtuple *tup=new TNtuple("tup", "tup", "sig:err");
+  auto graphs=vector<TGraph*>();
+  if(scopeOrSurf==0){
+    //    loadScopeEvent(major, minor, 0);
+    for(int i=0;i<scopeNEvents;i++){
+      loadScopeEvent(major, minor, i);
+      if(isGood){
+	auto spec = TUtil::FFT::spectrogram(scope->ch[channel], nfft, overlap, zeroPadLength, window, dbFlag);
+	double err=0.;
+	auto sig=TUtil::sidebandSubtraction2DWithErrors(spec, xmin, xmax, ymin, ymax, err);
+	//	auto sb=TUtil::integrate(spec, sbxmin, sbxmax, sbymin, sbymax);
+	tup->Fill(sig, err);
+	number++;
+      }
+      //      if(number>=num)break;
+    }
+  }
+  return tup;
+}
+

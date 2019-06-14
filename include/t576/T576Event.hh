@@ -172,6 +172,8 @@ public:
   TH2D * drawAvgSpectrogram(int major, int minor, int scopeOrSurf, int channel, int num, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, int dbFlag);
 
   TNtuple * integrateAllWithSideband(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double sbxmin, double sbxmax, double sbymin, double sbymax);
+  
+  TNtuple * sidebandSubtractAll(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax);
 
 
   
