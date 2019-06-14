@@ -399,6 +399,7 @@ utilities.
   //plot a window with the given parameters.
   TGraph * plotWindow(double peakAmplitude, double len, double GSs, double startt, double endt, int type);
   TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max, double scale=1.);
+  TGraph * makeNullDataFixedLength(TGraph *sig, TGraph *back, double t_min, int nSamps);
   double sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0);
   double sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, int draw=0);
   //degrees to radians

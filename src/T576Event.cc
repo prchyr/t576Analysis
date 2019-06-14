@@ -328,7 +328,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
   fEventTree->GetEntry(subEvNo);
   //cout<<"hi"<<endl;
   //check the length of the record.
-  auto length=4996;
+  auto length=5000;
   if(fUSE_FILTERED_DATA==0){
     length=sizeof(scope->time)/sizeof(*scope->time);
     if(length!=20000)cout<<length;

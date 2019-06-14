@@ -2046,6 +2046,12 @@ TGraph * TUtil::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_m
   return add(sigchunk, TUtil::scale(backchunk, scale));
 }
 
+TGraph * TUtil::makeNullDataFixedLength(TGraph *sig, TGraph *back, double t_min, int nSamps){
+  auto sigchunk=getNSamplesFrom(sig, 0., nSamps, 0);
+  auto backchunk=getNSamplesFrom(back, t_min, nSamps ,1);
+  return add(sigchunk, backchunk);
+}
+
 
 double TUtil::integrate(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err){
   Int_t xmin_bin = h->GetXaxis()->FindBin(xmin);
