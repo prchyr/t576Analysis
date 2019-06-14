@@ -1938,6 +1938,7 @@ TNtuple * T576Event::integrateAllWithSideband(int major, int minor, int scopeOrS
 }
 
 TNtuple * T576Event::sidebandSubtractAll(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double scale){
+  loadScopeEvent(major, minor, 0);
   int number=0;
   TNtuple *tup=new TNtuple("tup", "tup", "sig:err");
   auto graphs=vector<TGraph*>();
