@@ -1913,7 +1913,7 @@ double T576Event::getInterpGSs(){
 }
 
 
-TNtuple * T576Event::integrateAllWithSideband(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double sbxmin, double sbxmax, double sbymin, double sbymax){
+TNtuple * T576Event::integrateAllWithSideband(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double sbxmin, double sbxmax, double sbymin, double sbymax, double scale){
   int number=0;
   TNtuple *tup=new TNtuple("tup", "tup", "sig:sb");
   auto graphs=vector<TGraph*>();
@@ -1923,9 +1923,11 @@ TNtuple * T576Event::integrateAllWithSideband(int major, int minor, int scopeOrS
       loadScopeEvent(major, minor, i);
       if(isGood){
 	auto spec = TUtil::FFT::spectrogram(scope->ch[channel], nfft, overlap, zeroPadLength, window, dbFlag);
+	spec->Scale(scale);
 	auto sig=TUtil::integrate(spec, xmin, xmax, ymin, ymax);
 	auto sb=TUtil::integrate(spec, sbxmin, sbxmax, sbymin, sbymax);
 	tup->Fill(sig, sb);
+	delete spec;
 	number++;
       }
       //      if(number>=num)break;
