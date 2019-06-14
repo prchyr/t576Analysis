@@ -362,8 +362,8 @@ utilities.
   //integrate a TGraph but square it first to get units of power.
   double integratePower(TGraph * gr, double t_low=0, double t_high=999999.);
   //integrate a histogram
-  double integrate(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err);
-  double integrate2D(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err);
+  double integrate(TH2D *h, double xmin, double xmax, double ymin, double ymax);
+  double integrateWithError(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err);
   //integrate a graph bin-by-bin, putting the result in a tgraph
   //binNS is the desired bin width in nanoseconds
   TGraph * integrateByBin(TGraph *gr, double binNS);

@@ -2053,7 +2053,8 @@ TGraph * TUtil::makeNullDataFixedLength(TGraph *sig, TGraph *back, double t_min,
 }
 
 
-double TUtil::integrate(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err){
+double TUtil::integrate(TH2D *h, double xmin, double xmax, double ymin, double ymax){
+  double err=0.;
   Int_t xmin_bin = h->GetXaxis()->FindBin(xmin);
   Int_t xmax_bin = h->GetXaxis()->FindBin(xmax);
   Int_t ymin_bin = h->GetYaxis()->FindBin(ymin);
@@ -2063,8 +2064,13 @@ double TUtil::integrate(TH2D *h, double xmin, double xmax, double ymin, double y
   
 }
 
-double TUtil::integrate2D(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err){
-  return  TUtil::integrate(h, xmin, xmax, ymin, ymax, err);
+double TUtil::integrateWithError(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err){
+Int_t xmin_bin = h->GetXaxis()->FindBin(xmin);
+  Int_t xmax_bin = h->GetXaxis()->FindBin(xmax);
+  Int_t ymin_bin = h->GetYaxis()->FindBin(ymin);
+  Int_t ymax_bin = h->GetYaxis()->FindBin(ymax);
+
+  return  h->IntegralAndError(xmin_bin, xmax_bin, ymin_bin, ymax_bin, err);//TUtil::integrate(h, xmin, xmax, ymin, ymax, err);
 }
 
 
@@ -2119,25 +2125,25 @@ double TUtil::sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double s
   y1 = y2-bandwidth_y;
   y4 = y3+bandwidth_y;
   //make the background integrals and average
-  ib1 = integrate2D(h, x1, x2, y1, y2, ib1_err);
-  ib2 = integrate2D(h, x3, x4, y1, y2, ib2_err);
-  ib3 = integrate2D(h, x1, x2, y3, y4, ib3_err);
-  ib4 = integrate2D(h, x3, x4, y3, y4, ib4_err);
+  ib1 = integrateWithError(h, x1, x2, y1, y2, ib1_err);
+  ib2 = integrateWithError(h, x3, x4, y1, y2, ib2_err);
+  ib3 = integrateWithError(h, x1, x2, y3, y4, ib3_err);
+  ib4 = integrateWithError(h, x3, x4, y3, y4, ib4_err);
 
   background =(ib1+ib2+ib3+ib4)/4;
 
   //make the signal band backgrounds
-  ix1 = integrate2D(h, x1, x2, y2, y3, ix1_err);
-  ix2 = integrate2D(h, x3, x4, y2, y3, ix2_err);
-  iy1 = integrate2D(h, x2, x3, y1, y2, iy1_err);
-  iy2 = integrate2D(h, x2, x3, y3, y4, iy2_err);
+  ix1 = integrateWithError(h, x1, x2, y2, y3, ix1_err);
+  ix2 = integrateWithError(h, x3, x4, y2, y3, ix2_err);
+  iy1 = integrateWithError(h, x2, x3, y1, y2, iy1_err);
+  iy2 = integrateWithError(h, x2, x3, y3, y4, iy2_err);
 
    bandx = ((ix1-background)+(ix2-background))/2.;
    bandy = ((iy1-background)+(iy2-background))/2.;
  
  
   //make the signal integral
-  isig = integrate2D(h, x2, x3, y2, y3, isig_err);
+  isig = integrateWithError(h, x2, x3, y2, y3, isig_err);
   
 
   //errors. add in quadrature and average.
@@ -2210,25 +2216,25 @@ double TUtil::sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, d
   y1 = y2-bandwidth_y;
   y4 = y3+bandwidth_y;
   //make the background integrals and average
-  ib1 = integrate2D(h, x1, x2, y1, y2, ib1_err);
-  ib2 = integrate2D(h, x3, x4, y1, y2, ib2_err);
-  ib3 = integrate2D(h, x1, x2, y3, y4, ib3_err);
-  ib4 = integrate2D(h, x3, x4, y3, y4, ib4_err);
+  ib1 = integrateWithError(h, x1, x2, y1, y2, ib1_err);
+  ib2 = integrateWithError(h, x3, x4, y1, y2, ib2_err);
+  ib3 = integrateWithError(h, x1, x2, y3, y4, ib3_err);
+  ib4 = integrateWithError(h, x3, x4, y3, y4, ib4_err);
 
   background =(ib1+ib2+ib3+ib4)/4;
 
   //make the signal band backgrounds
-  ix1 = integrate2D(h, x1, x2, y2, y3, ix1_err);
-  ix2 = integrate2D(h, x3, x4, y2, y3, ix2_err);
-  iy1 = integrate2D(h, x2, x3, y1, y2, iy1_err);
-  iy2 = integrate2D(h, x2, x3, y3, y4, iy2_err);
+  ix1 = integrateWithError(h, x1, x2, y2, y3, ix1_err);
+  ix2 = integrateWithError(h, x3, x4, y2, y3, ix2_err);
+  iy1 = integrateWithError(h, x2, x3, y1, y2, iy1_err);
+  iy2 = integrateWithError(h, x2, x3, y3, y4, iy2_err);
 
    bandx = ((ix1-background)+(ix2-background))/2.;
    bandy = ((iy1-background)+(iy2-background))/2.;
  
  
   //make the signal integral
-  isig = integrate2D(h, x2, x3, y2, y3, isig_err);
+  isig = integrateWithError(h, x2, x3, y2, y3, isig_err);
   
 
   //errors. add in quadrature and average.
