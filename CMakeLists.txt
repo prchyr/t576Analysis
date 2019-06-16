@@ -73,7 +73,7 @@ target_link_libraries(alignExample ${ROOT_LIBRARIES} t576)
 
 
 install (FILES ${T576_INCLUDE_DIR}/T576Event.hh ${T576_INCLUDE_DIR}/TUtil.hh ${PROJECT_SOURCE_DIR}/include/cnpy.h ${T576_INCLUDE_DIR}/TUtilGraph.hh DESTINATION ${T576_INSTALL_DIR}/include/t576)
-install (FILES ${PROJECT_SOURCE_DIR}/src/T576Event.cc DESTINATION ${T576_INSTALL_DIR}/src/t576)
+#install (FILES ${PROJECT_SOURCE_DIR}/src/T576Event.cc DESTINATION ${T576_INSTALL_DIR}/src/t576)
 
 install (FILES ${PROJECT_SOURCE_DIR}/share/runLog.root DESTINATION ${T576_INSTALL_DIR}/share/t576)
 
