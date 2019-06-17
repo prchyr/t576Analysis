@@ -759,22 +759,28 @@ TGraph * T576Event::drawAvg(int major, int minor, int scopeOrSurf, int channel, 
 
 TH2D * T576Event::drawAvgSpectrogram(int major, int minor, int scopeOrSurf, int channel, int num, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, int dbFlag){
   int number=0;
-  auto specs=vector<TH2D*>();
+  //  auto specs=vector<TH2D*>();
+  loadScopeEvent(major, minor, 0);
+  auto avg=TUtil::FFT::spectrogram(scope->ch[channel], binsize, overlap, zero_pad_length, win_type, dbFlag);
   if(scopeOrSurf==0){
     for(int i=0;i<scopeNEvents;i++){
       loadScopeEvent(major, minor, i);
       if(isGood){
 	//graphs.push_back(TUtil::getChunkOfGraphFast(scope->ch[channel], tLow, tHigh));
-	specs.push_back(TUtil::FFT::spectrogram(scope->ch[channel], binsize, overlap, zero_pad_length, win_type, dbFlag));
+	auto spec=TUtil::FFT::spectrogram(scope->ch[channel], binsize, overlap, zero_pad_length, win_type, dbFlag);
+	spec->SetDirectory(0);
+	//	specs.push_back(spec);
+	avg->Add(spec);
+	delete spec;
 	number++;
       }
       if(number>=num)break;
     }
-    auto avg=TUtil::FFT::avgSpectrograms(specs);
-      specs.clear();
-      
-      avg->Draw("colz");
-      return avg;
+    //    auto avg=TUtil::FFT::avgSpectrograms(specs);
+    //specs.clear();
+    avg->Scale(1./(double)number);
+    avg->Draw("colz");
+    return avg;
   }
   // else{
   //   for(int i=0;i<surfNEvents;i++){
@@ -1917,7 +1923,7 @@ TNtuple * T576Event::integrateAllWithSideband(int major, int minor, int scopeOrS
   loadScopeEvent(major, minor, 0);
   int number=0;
   TNtuple *tup=new TNtuple("tup", "tup", "sig:sb");
-  auto graphs=vector<TGraph*>();
+  //  auto graphs=vector<TGraph*>();
   if(scopeOrSurf==0){
     //    loadScopeEvent(major, minor, 0);
     for(int i=0;i<scopeNEvents;i++){
@@ -1925,6 +1931,7 @@ TNtuple * T576Event::integrateAllWithSideband(int major, int minor, int scopeOrS
       if(isGood){
 	auto spec = TUtil::FFT::spectrogram(scope->ch[channel], nfft, overlap, zeroPadLength, window, dbFlag);
 	spec->Scale(scale);
+	spec->SetDirectory(0);
 	auto sig=TUtil::integrate(spec, xmin, xmax, ymin, ymax);
 	auto sb=TUtil::integrate(spec, sbxmin, sbxmax, sbymin, sbymax);
 	tup->Fill(sig, sb);

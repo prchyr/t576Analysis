@@ -1,4 +1,5 @@
-#include "t576/T576Event.hh"
+#include <t576/T576Event.hh>
+#include <t576/TUtil.hh>
 
 int main(){
   time_t time_start, time_end;
@@ -11,6 +12,7 @@ int main(){
     if(i==1)time(&time_start);
   
     eventCount+=ev->loadScopeEvent(i);
+    
     cout.flush()<<eventCount<<"     \r";
   
   }

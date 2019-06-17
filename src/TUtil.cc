@@ -368,16 +368,17 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   //   fNSpec=zero_pad_length;
   //   fftr2cSpec=TVirtualFFT::FFT(1, &fNSpec, "R2C P K");
   // }
-  TGraph * in=new TGraph(zero_pad_length);
-  TGraph * outt=new TGraph(zero_pad_length);
+  
+
 
   vector<double> sX, sY, sZ;
   Int_t start = 0;
   //  Int_t j=0;
   //cout<<size<<" "<<nbins<<" "<<zero_pad_length<<" "<<binsize<<" "<<overlap<<" "<<num_zeros<<" "<<xmax*samprate<<endl;
-  TH2D *spectrogramHist=new TH2D("outhist", "spectrogram", nbins-1, xmin, xmax, (zero_pad_length), 0, samprate);
-  
+  TH2D *spectrogramHist=new TH2D("", "spectrogram", nbins-1, xmin, xmax, (zero_pad_length), 0, samprate);
+  spectrogramHist->SetDirectory(0);
   for(int i=0;i<nbins;i++){
+    TGraph * in=new TGraph(zero_pad_length);
     if(start+binsize-1>0){
       int sampnum=0;
       for(int j=0;j<zero_pad_length;j++){
@@ -409,7 +410,7 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
       // 	in->SetPoint(j, gr->GetX()[j], 0);
       // }
       
-      outt=TUtil::FFT::psd(in, samprate/2., dbFlag);
+      auto outt=TUtil::FFT::psd(in, samprate/2., dbFlag);
       
       for(int j = 0;j<outt->GetN();j++){
 	Double_t z = outt->GetY()[j];
@@ -419,6 +420,8 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
 	//sY.push_back(outt->GetX()[j]);
 	//sZ.push_back(z);
       }
+      delete outt;
+      delete in;
       //    cout<<sX.size()<<endl;
     }
       start+=(binsize-overlap);
@@ -436,8 +439,9 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   }
   spectrogramHist->GetZaxis()->SetTitleOffset(1.5);
 
-  outt->Delete();
-  in->Delete();
+  //  delete(in);
+  //  delete(outt);
+
 
   // spectrogramGr->Delevte();
   return spectrogramHist;
@@ -2425,7 +2429,7 @@ double TUtil::welchWindow(int i, int n){
 double TUtil::hannWindow(int i, int n){
   return sin(pi*i/(n))*sin(pi*i/(n));
 }
-//i have no idea why there are increments in the pi coeff...
+
 double TUtil::blackmanNuttallWindow(int i, int n){
   return .3635819-.4891775*cos(2.*pi*i/(n)) + .1365995*cos(4.*pi*i/(n)) - .0106411*cos(6.*pi*i/(n));
 }
