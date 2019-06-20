@@ -328,7 +328,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
   fEventTree->GetEntry(subEvNo);
   //cout<<"hi"<<endl;
   //check the length of the record.
-  auto length=5000;
+  auto length=4998;
   if(fUSE_FILTERED_DATA==0){
     length=sizeof(scope->time)/sizeof(*scope->time);
     if(length!=20000)cout<<length;
@@ -760,14 +760,20 @@ TGraph * T576Event::drawAvg(int major, int minor, int scopeOrSurf, int channel, 
 TH2D * T576Event::drawAvgSpectrogram(int major, int minor, int scopeOrSurf, int channel, int num, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, int dbFlag){
   int number=0;
   //  auto specs=vector<TH2D*>();
+
   loadScopeEvent(major, minor, 0);
-  auto avg=TUtil::FFT::spectrogram(scope->ch[channel], binsize, overlap, zero_pad_length, win_type, dbFlag);
+  auto nsamp=scope->ch[channel]->GetN()-10;
+  auto gr=getNSamplesFrom(scope->ch[channel], 0., nsamp, 0);
+  auto avg=TUtil::FFT::spectrogram(gr, binsize, overlap, zero_pad_length, win_type, dbFlag);
+  delete gr;
   if(scopeOrSurf==0){
     for(int i=0;i<scopeNEvents;i++){
       loadScopeEvent(major, minor, i);
       if(isGood){
 	//graphs.push_back(TUtil::getChunkOfGraphFast(scope->ch[channel], tLow, tHigh));
-	auto spec=TUtil::FFT::spectrogram(scope->ch[channel], binsize, overlap, zero_pad_length, win_type, dbFlag);
+	auto gr=getNSamplesFrom(scope->ch[channel], 0., nsamp, 0);
+	auto spec=TUtil::FFT::spectrogram(gr, binsize, overlap, zero_pad_length, win_type, dbFlag);
+	delete gr;
 	spec->SetDirectory(0);
 	//	specs.push_back(spec);
 	avg->Add(spec);

@@ -1342,19 +1342,19 @@ TGraph * TUtil::sincInterpolateGraphFast(TGraph *inGr, double interpGSs, int N){
 
 int TUtil::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs, int type, int N){
   if(type==0){
-    auto tempGr=interpolateGraph(inGraph, interpGSs);
-    *outGraph=*tempGr;
-    delete(tempGr);
+    auto grTemp=interpolateGraph(inGraph, interpGSs);
+    *outGraph=*grTemp;
+    delete(grTemp);
   }
   else if (type==1){
-    auto tempGr=sincInterpolateGraph(inGraph, interpGSs);
-    *outGraph=*tempGr;
-    delete(tempGr);
+    auto grTemp=sincInterpolateGraph(inGraph, interpGSs);
+    *outGraph=*grTemp;
+    delete(grTemp);
   }
   else if (type==2){
-    auto tempGr=sincInterpolateGraphFast(inGraph, interpGSs, N);
-    *outGraph=*tempGr;
-    delete(tempGr);
+    auto grTemp=sincInterpolateGraphFast(inGraph, interpGSs, N);
+    *outGraph=*grTemp;
+    delete(grTemp);
   }
 
   return 1;
