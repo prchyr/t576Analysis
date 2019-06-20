@@ -180,7 +180,7 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event, bool remov
     fEventTree->SetBranchAddress("time", scope->time);
     fEventTree->SetBranchAddress("timestamp", &timestamp);
 
-  
+    //    scopeNEvents=fEventTree->GetEntries();
   }
   
   if(major!=run_major&&minor!=run_minor){
@@ -315,7 +315,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
     fEventTree->SetBranchAddress("timestamp", &timestamp);
 
     fScopeFilename=thisScopeFilename;
-
+    //    scopeNEvents=fEventTree->GetEntries();
   }
 
   if(event>=fNEntriesScope){
@@ -328,7 +328,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
   fEventTree->GetEntry(subEvNo);
   //cout<<"hi"<<endl;
   //check the length of the record.
-  auto length=4998;
+  auto length=5000;
   if(fUSE_FILTERED_DATA==0){
     length=sizeof(scope->time)/sizeof(*scope->time);
     if(length!=20000)cout<<length;
