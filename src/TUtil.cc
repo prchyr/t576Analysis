@@ -762,6 +762,21 @@ TGraph2D * TUtil::normalize(TGraph2D * inGr){
     return og;
 }
 
+double TUtil::normalize(TH2D * inGr, double ymin, double ymax){
+  //auto oG=(TH2D*)inGr->Clone();
+  auto norm=TUtil::integrate(inGr, inGr->GetXaxis()->GetXmin(), inGr->GetXaxis()->GetXmax(),ymin, ymax);
+  inGr->Scale(1./norm);
+  return norm;
+}
+
+double TUtil::norm(TH2D * inGr, double ymin, double ymax){
+  //auto oG=(TH2D*)inGr->Clone();
+  //  auto norm=TUtil::integrate(inGr, inGr->GetXaxis()->GetXmin(), inGr->GetXaxis()->GetXmax(), inGr->GetYaxis()->GetXmin(), inGr->GetYaxis()->GetXmax());
+  auto norm=TUtil::integrate(inGr, inGr->GetXaxis()->GetXmin(), inGr->GetXaxis()->GetXmax(), ymin, ymax);
+  //  inGr->Scale(1./norm);
+  return norm;
+}
+
 
 TGraph * TUtil::CDF(TGraph * inGr, int normed){
   auto outGr=new TGraph(inGr->GetN());

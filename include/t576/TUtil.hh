@@ -251,6 +251,10 @@ utilities.
   TGraph * normToPeak(TGraph *inGr);
   //normalize a 2d graph
   TGraph2D * normalize(TGraph2D * inGr);
+  //normalize a 2d histo, happens in place! returns the norm.
+  double normalize(TH2D * inGr, double ymin, double ymax);
+  //return the norm of a th2d
+  double norm(TH2D * inGr, double ymin, double ymax);
   //return a chunk of a graph, specified by x-axis values.
   //if shift_to_zero==1, the time axis is shifted such that it starts at 0.
   //  return the cumulative distribution function of a graph. if normed is 1, the graph is scaled such that x and y axes spread from 0 to 1.

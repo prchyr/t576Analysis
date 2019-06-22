@@ -182,7 +182,8 @@ int T576Event::loadScopeEvent(int run_major, int run_minor,int event, bool remov
 
     //    scopeNEvents=fEventTree->GetEntries();
   }
-  
+
+  analogBandwidth=3.;
   if(major!=run_major&&minor!=run_minor){
     cout<<"major/minor combination doesn't exist"<<endl;
     return 0;
@@ -328,7 +329,7 @@ int T576Event::loadScopeEvent(int event, bool remove_dc_offset){
   fEventTree->GetEntry(subEvNo);
   //cout<<"hi"<<endl;
   //check the length of the record.
-  auto length=5000;
+  auto length=4990;
   if(fUSE_FILTERED_DATA==0){
     length=sizeof(scope->time)/sizeof(*scope->time);
     if(length!=20000)cout<<length;
@@ -769,7 +770,7 @@ TH2D * T576Event::drawAvgSpectrogram(int major, int minor, int scopeOrSurf, int 
   if(scopeOrSurf==0){
     for(int i=0;i<scopeNEvents;i++){
       loadScopeEvent(major, minor, i);
-      if(isGood){
+      if(isGood==1){
 	//graphs.push_back(TUtil::getChunkOfGraphFast(scope->ch[channel], tLow, tHigh));
 	auto gr=getNSamplesFrom(scope->ch[channel], 0., nsamp, 0);
 	auto spec=TUtil::FFT::spectrogram(gr, binsize, overlap, zero_pad_length, win_type, dbFlag);
@@ -1027,7 +1028,7 @@ int T576Event::drawGeom(int scopeChan, int surfChan){
   
 
   auto dummy=new TGraph();
-
+  dummy->SetName("geom");
   dummy->SetPoint(dummy->GetN(), -8, -8);
   dummy->SetPoint(dummy->GetN(), 8, -8);
   dummy->SetPoint(dummy->GetN(), 8, 8);

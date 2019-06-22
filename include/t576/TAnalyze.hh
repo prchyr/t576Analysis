@@ -1,0 +1,85 @@
+/*
+  copyright s. prohira and the T576 collaboration 2018
+  released under the GNU General Public License version 3
+*/
+
+/*
+This is a general analysis class for the T576 data. It relies on a dataset comprised of T576Events. The primitive methods are pulled from TUtil.hh.
+
+ */
+
+#ifndef TANALYZE_BASE_H
+#define TANALYZE_BASE_H
+
+
+#include "TROOT.h"
+#include "TRint.h"
+#include "TSystem.h"
+#include "TRandom.h"
+#include "TRandom3.h"
+#include "TObject.h"
+#include "TNamed.h"
+#include "TLine.h"
+#include "TFile.h"
+#include "TSystemDirectory.h"
+#include "TList.h"
+#include "cnpy.h"
+#include "TSystemFile.h"
+#include "TH1F.h"
+#include "TH1D.h"
+#include "TH2F.h"
+#include "TH2D.h"
+#include "TString.h"
+#include "TStyle.h"
+#include "TCanvas.h"
+#include "TTree.h"
+#include "TTreeIndex.h"
+#include "TGraph.h"
+#include "TGraph2D.h"
+#include "TMath.h"
+#include "TVirtualFFT.h"
+#include "Math/Interpolator.h"
+#include "Math/InterpolationTypes.h"
+#include "TVectorD.h"
+#include "TMatrixTBase.h"
+#include "TMatrixD.h"
+#include "TVector3.h"
+#include "TDecompSVD.h"
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+
+
+#include "TUtilGraph.hh"
+#include "TUtil.hh"
+#include "T576Event.hh"
+
+
+using namespace std;
+
+
+namespace TAnalyze{
+  //some drawing functions
+
+  //average spectrogram from a run compared to null data
+  int drawAvgRealNull(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0, int norm=0);
+  
+  int drawAvgRealNullWithGeom(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0);
+
+  int drawAvgRealFull(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0);
+
+  int drawAvgRealFullWithGeom(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0);
+
+  int drawAvg(int ch, int major, int minor);
+  int drawAvgHilbert(int ch, int major, int minor);
+  //utility functions
+
+  TNtuple * integrateAllWithSideband(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double sbxmin, double sbxmax, double sbymin, double sbymax, int norm);
+  TNtuple * sidebandSubtractAll(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
+
+  TH2D * nullSubtractedSpectrogram(int ch, int major, int minor, int event, int nfft, int nOverlap, int padTo, int window, int log);
+  TH2D * avgNullSubtractedSpectrogram(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log);
+  
+}
+#endif

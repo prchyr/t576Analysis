@@ -81,6 +81,7 @@ public:
   ULong64_t timestamp, scopeTime, surfTime;
   double frequency;
   double power;
+  double analogBandwidth;
   /*the type of antenna for:
     antennaType[0] = TX, 
     antennaType[1] = scope ch1
