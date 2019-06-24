@@ -4,6 +4,16 @@
 */
 #include <t576/TAnalyze.hh>
 
+TH2D* TAnalyze::avgSpectrogram(int ch, int dataset, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log, int norm){
+  auto ev=new T576Event(50, dataset);
+  auto hist=ev->drawAvgSpectrogram(major, minor, 0,ch, ev->scopeNEvents, nfft, nOverlap, padTo, window, log);
+  if(norm==1){
+    TUtil::normalize(hist, 0, ev->analogBandwidth);
+  }
+  delete ev;
+  return hist;
+}
+
 int TAnalyze::drawAvgRealNullWithGeom(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log){
     auto can=new TCanvas("", "", 1200, 400);
     can->Divide(3, 0);
@@ -76,8 +86,8 @@ int TAnalyze::drawAvgRealNull(int ch, int major, int minor, int nfft, int nOverl
       // auto normNull=TUtil::integrate(avgSpecN, avgSpecN->GetXaxis()->GetXmin(), avgSpecN->GetXaxis()->GetXmin(), avgSpecN->GetYaxis()->GetXmin(), avgSpecN->GetYaxis()->GetXmin());
       
       //avgSpecN->Scale(normDat/normNull);
-      auto normD=TUtil::norm(avgSpec);
-      auto normN=TUtil::norm(avgSpecN);
+      auto normD=TUtil::norm(avgSpec, 0, ev->analogBandwidth);
+      auto normN=TUtil::norm(avgSpecN, 0, ev->analogBandwidth);
       avgSpecN->Scale(normD/normN);
     }
     avgSpecN->SetTitle("Null CH"+TString::Itoa(ch, 10));
@@ -165,20 +175,20 @@ int TAnalyze::drawAvgRealFull(int ch, int major, int minor, int nfft, int nOverl
     return 1;
 }
 
-TNtuple * TAnalyze::integrateAllWithSideband(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double sbxmin, double sbxmax, double sbymin, double sbymax, int norm){
-  auto ev=new T576Event(50, 0);
+TNtuple * TAnalyze::integrateAllWithSideband(int channel, int dataset, int major, int minor, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double sbxmin, double sbxmax, double sbymin, double sbymax, int norm){
+  auto ev=new T576Event(50, dataset);
   ev->loadScopeEvent(major, minor, 0);
   int number=0;
   TNtuple *tup=new TNtuple("tup", "tup", "sig:sb");
   //  auto graphs=vector<TGraph*>();
-  if(scopeOrSurf==0){
+  //if(scopeOrSurf==0){
     //    loadScopeEvent(major, minor, 0);
     for(int i=0;i<ev->scopeNEvents;i++){
       ev->loadScopeEvent(major, minor, i);
       if(ev->isGood==1){
 	auto spec = TUtil::FFT::spectrogram(ev->scope->ch[channel], nfft, overlap, zeroPadLength, window, dbFlag);
 	if(norm==1){
-	  TUtil::normalize(spec);
+	  TUtil::normalize(spec, 0, ev->analogBandwidth);
 	}
 	//spec->Scale(scale);
 	spec->SetDirectory(0);
@@ -189,18 +199,18 @@ TNtuple * TAnalyze::integrateAllWithSideband(int major, int minor, int scopeOrSu
 	number++;
       }
       //      if(number>=num)break;
-    }
+    
   }
   return tup;
 }
 
-TNtuple * TAnalyze::sidebandSubtractAll(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm){
-  auto ev=new T576Event(50, 1);
+TNtuple * TAnalyze::sidebandSubtractAll(int channel, int dataset,int major, int minor, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm){
+  auto ev=new T576Event(50, dataset);
   ev->loadScopeEvent(major, minor, 0);
   int number=0;
   TNtuple *tup=new TNtuple("tup", "tup", "sig:err");
   auto graphs=vector<TGraph*>();
-  if(scopeOrSurf==0){
+
     //    loadScopeEvent(major, minor, 0);
     for(int i=0;i<ev->scopeNEvents;i++){
       ev->loadScopeEvent(major, minor, i);
@@ -208,7 +218,7 @@ TNtuple * TAnalyze::sidebandSubtractAll(int major, int minor, int scopeOrSurf, i
 	auto spec = TUtil::FFT::spectrogram(ev->scope->ch[channel], nfft, overlap, zeroPadLength, window, dbFlag);
 	double err=0.;
 	if(norm=1){
-	  TUtil::normalize(spec);
+	  TUtil::normalize(spec, 0, ev->analogBandwidth);
 	} //	spec->Scale(scale);
 	auto sig=TUtil::sidebandSubtraction2DWithErrors(spec, xmin, xmax, ymin, ymax, err);
 	//	auto sb=TUtil::integrate(spec, sbxmin, sbxmax, sbymin, sbymax);
@@ -217,7 +227,7 @@ TNtuple * TAnalyze::sidebandSubtractAll(int major, int minor, int scopeOrSurf, i
 	number++;
       }
       //      if(number>=num)break;
-    }
+      
   }
   return tup;
 }

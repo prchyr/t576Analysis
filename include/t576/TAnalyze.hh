@@ -62,6 +62,7 @@ using namespace std;
 namespace TAnalyze{
   //some drawing functions
 
+  TH2D* avgSpectrogram(int ch, int dataset, int major, int minor, int nfft=512, int nOverlap=450, int padTo=800, int window=3, int log=0, int norm=0);
   //average spectrogram from a run compared to null data
   int drawAvgRealNull(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0, int norm=0);
   

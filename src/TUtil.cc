@@ -770,10 +770,9 @@ double TUtil::normalize(TH2D * inGr, double ymin, double ymax){
 }
 
 double TUtil::norm(TH2D * inGr, double ymin, double ymax){
-  //auto oG=(TH2D*)inGr->Clone();
-  //  auto norm=TUtil::integrate(inGr, inGr->GetXaxis()->GetXmin(), inGr->GetXaxis()->GetXmax(), inGr->GetYaxis()->GetXmin(), inGr->GetYaxis()->GetXmax());
+
   auto norm=TUtil::integrate(inGr, inGr->GetXaxis()->GetXmin(), inGr->GetXaxis()->GetXmax(), ymin, ymax);
-  //  inGr->Scale(1./norm);
+
   return norm;
 }
 
@@ -1571,6 +1570,7 @@ int TUtil::delayGraph(TGraph *ingr, TGraph *outgr, double delay){
 TH1F * TUtil::plotResiduals(TGraph *gr1, TGraph *gr2, int nbins, double min, double max){
   TH1F *hist =new TH1F("", "", nbins,min, max);
   for(int i=0;i<gr1->GetN();i++)hist->Fill(gr1->GetY()[i]-gr2->GetY()[i]);
+  hist->SetLineWidth(3);
   return hist;
 }
 
