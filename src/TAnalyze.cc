@@ -14,7 +14,17 @@ TH2D* TAnalyze::avgSpectrogram(int ch, int dataset, int major, int minor, int nf
   return hist;
 }
 
-int TAnalyze::drawAvgRealNullWithGeom(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log){
+TH2D* TAnalyze::avgSpectrogram(int ch, int dataset, int major, int minor, double tLow, double tHigh, int nfft, int nOverlap, int padTo, int window, int log, int norm){
+  auto ev=new T576Event(50, dataset);
+  auto hist=ev->drawAvgSpectrogram(major, minor, 0,ch, ev->scopeNEvents, tLow, tHigh, nfft, nOverlap, padTo, window, log);
+  if(norm==1){
+    TUtil::normalize(hist, 0, ev->analogBandwidth);
+  }
+  delete ev;
+  return hist;
+}
+
+int TAnalyze::drawAvgRealNullWithGeom(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log, int norm){
     auto can=new TCanvas("", "", 1200, 400);
     can->Divide(3, 0);
     can->cd(1)->SetRightMargin(.15);
@@ -43,7 +53,74 @@ int TAnalyze::drawAvgRealNullWithGeom(int ch, int major, int minor, int nfft, in
     auto geom=(TGraph*)gPad->GetPrimitive("geom");
     geom->SetTitle(Form("%.1f GHz", ev->frequency));
     can->cd(3)->SetRightMargin(.15);
+
+
+
     auto avgSpecN=evNull->drawAvgSpectrogram(major, minor, 0,ch,evNull->scopeNEvents, nfft, nOverlap, padTo, window, log);
+    if(norm==1){
+     
+      auto normD=TUtil::norm(avgSpec, 0, ev->analogBandwidth);
+      auto normN=TUtil::norm(avgSpecN, 0, ev->analogBandwidth);
+      avgSpecN->Scale(normD/normN);
+    }
+
+    avgSpecN->SetTitle("Null CH"+TString::Itoa(ch, 10));
+    avgSpecN->GetZaxis()->SetRangeUser(zmin, zmax);
+    TUtil::ranges(avgSpecN, 20, 90, 0, 3);
+    cursors[0]->Draw();
+    cursors[1]->Draw();
+    can->Draw();
+    return 1;
+}
+
+
+int TAnalyze::drawAvgRealNullFull(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log, int norm){
+    auto can=new TCanvas("", "", 1200, 400);
+    can->Divide(3, 0);
+    can->cd(1)->SetRightMargin(.15);
+
+    auto ev=new T576Event(50, 1);
+    auto evNull=new T576Event(50, 3);
+    auto evFull=new T576Event(50, 2);
+    //    TUtil::setColdPalette();
+    ev->scope->ch[0]->Draw("al PLC");
+
+    auto avgSpec=ev->drawAvgSpectrogram(major, minor, 0,ch,ev->scopeNEvents, nfft, nOverlap, padTo, window, log);
+    avgSpec->SetTitle("Data CH"+TString::Itoa(ch, 10));
+
+    TUtil::ranges(avgSpec, 20, 90, 0, 3);
+
+    auto zmax=avgSpec->GetMaximum();
+    auto zmin=avgSpec->GetMinimum();
+    can->Draw();
+    auto cursors=TUtil::drawPeakCursorXY(avgSpec, kRed);
+    auto minx=38;
+    auto maxx=50.;
+    auto miny=1.9;
+    auto maxy=2.25;
+    can->cd(2)->SetRightMargin(.15);
+    auto avgSpecFull=evFull->drawAvgSpectrogram(major, minor, 0,ch,evFull->scopeNEvents, nfft, nOverlap, padTo, window, log);
+    avgSpecFull->SetTitle("Full CH"+TString::Itoa(ch, 10));
+    //avgSpecN->GetZaxis()->SetRangeUser(zmin, zmax);
+    TUtil::ranges(avgSpecFull, 20, 90, 0, 3);
+    cursors[0]->Draw();
+    cursors[1]->Draw();
+    // ev->drawGeom(ch);
+    // auto geom=(TGraph*)gPad->GetPrimitive("geom");
+    // geom->SetTitle(Form("%.1f GHz", ev->frequency));
+
+    can->cd(3)->SetRightMargin(.15);
+
+
+
+    auto avgSpecN=evNull->drawAvgSpectrogram(major, minor, 0,ch,evNull->scopeNEvents, nfft, nOverlap, padTo, window, log);
+    if(norm==1){
+     
+      auto normD=TUtil::norm(avgSpec, 0, ev->analogBandwidth);
+      auto normN=TUtil::norm(avgSpecN, 0, ev->analogBandwidth);
+      avgSpecN->Scale(normD/normN);
+    }
+
     avgSpecN->SetTitle("Null CH"+TString::Itoa(ch, 10));
     avgSpecN->GetZaxis()->SetRangeUser(zmin, zmax);
     TUtil::ranges(avgSpecN, 20, 90, 0, 3);

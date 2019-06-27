@@ -810,6 +810,128 @@ TH2D * T576Event::drawAvgSpectrogram(int major, int minor, int scopeOrSurf, int 
   
 }
 
+TH2D * T576Event::drawAvgSpectrogram(int major, int minor, int scopeOrSurf,int channel, int num, double tLow, double tHigh, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, int dbFlag){
+  int number=0;
+  //  auto specs=vector<TH2D*>();
+  loadScopeEvent(major, minor, 0);
+  auto gr=getChunkOfGraph(scope->ch[channel], tLow, tHigh, 1);
+  auto avg=TUtil::FFT::spectrogram(gr, binsize, overlap, zero_pad_length, win_type, dbFlag);
+  delete gr;
+  if(scopeOrSurf==0){
+    for(int i=0;i<scopeNEvents;i++){
+      loadScopeEvent(major, minor, i);
+      if(isGood==1){
+	//graphs.push_back(TUtil::getChunkOfGraphFast(scope->ch[channel], tLow, tHigh));
+	  auto gr=getChunkOfGraph(scope->ch[channel], tLow, tHigh, 1);
+	  //	auto gr=getNSamplesFrom(scope->ch[channel], 0., nsamp, 0);
+	auto spec=TUtil::FFT::spectrogram(gr, binsize, overlap, zero_pad_length, win_type, dbFlag);
+	delete gr;
+	spec->SetDirectory(0);
+	//	specs.push_back(spec);
+	avg->Add(spec);
+	delete spec;
+	number++;
+      }
+      if(number>=num)break;
+    }
+    //    auto avg=TUtil::FFT::avgSpectrograms(specs);
+    //specs.clear();
+    avg->Scale(1./(double)number);
+    avg->Draw("colz");
+    return avg;
+  }
+  // else{
+  //   for(int i=0;i<surfNEvents;i++){
+  //     loadSurfEvent(major, minor, i*3);
+  //     if(isGood){
+  // 	graphs.push_back((TGraph*)surf->ch[channel]->Clone());
+  // 	number++;
+  //     }
+  //     if(number>=num)break;
+  //   }
+  //   auto temp=TUtil::alignMultipleAndTruncate(graphs, align, tLow, tHigh);
+  //   auto avg=TUtil::avgGraph(temp);
+  //   graphs.clear();
+  //   temp.clear();
+  //   avg->Draw(drawOption);
+  //   return avg;
+  // }
+
+
+  
+}
+
+TGraph * T576Event::drawAvgPSD(int major, int minor, int scopeOrSurf,int channel, int num, double tLow, double tHigh, int dbFlag){
+  int number=0;
+  auto psds=vector<TGraph*>();
+  loadScopeEvent(major, minor, 0);
+  auto gr=getChunkOfGraph(scope->ch[channel], tLow, tHigh, 1);
+  auto avg=TUtil::FFT::psd(gr);
+  psds.push_back(avg);
+  delete gr;
+  if(scopeOrSurf==0){
+    for(int i=0;i<scopeNEvents;i++){
+      loadScopeEvent(major, minor, i);
+      if(isGood==1){
+	//graphs.push_back(TUtil::getChunkOfGraphFast(scope->ch[channel], tLow, tHigh));
+	  auto gr=getChunkOfGraph(scope->ch[channel], tLow, tHigh, 1);
+	  //	auto gr=getNSamplesFrom(scope->ch[channel], 0., nsamp, 0);
+	  auto spec=TUtil::FFT::psd(gr);
+	  psds.push_back(spec);
+	  delete gr;
+	  //	  spec->SetDirectory(0);
+	  //	specs.push_back(spec);
+	  
+	  //delete spec;
+	  number++;
+      }
+      if(number>=num)break;
+    }
+    auto avg=TUtil::avgGraph(psds);
+    //specs.clear();
+    //avg->Scale(1./(double)number);
+    avg->Draw("al");
+    return avg;
+  }
+
+}
+
+TGraph * T576Event::drawAvgPSD(int major, int minor, int scopeOrSurf,int channel, int num, int dbFlag){
+  int number=0;
+  auto psds=vector<TGraph*>();
+  loadScopeEvent(major, minor, 0);
+  auto nsamp=scope->ch[channel]->GetN()-10;
+  auto gr=getNSamplesFrom(scope->ch[channel], 0., nsamp, 1);
+  auto avg=TUtil::FFT::psd(gr);
+  psds.push_back(avg);
+  delete gr;
+  if(scopeOrSurf==0){
+    for(int i=0;i<scopeNEvents;i++){
+      loadScopeEvent(major, minor, i);
+      if(isGood==1){
+	//graphs.push_back(TUtil::getChunkOfGraphFast(scope->ch[channel], tLow, tHigh));
+	//auto gr=getChunkOfGraph(scope->ch[channel], tLow, tHigh, 1);
+	auto gr=getNSamplesFrom(scope->ch[channel], 0., nsamp, 1);
+	  auto spec=TUtil::FFT::psd(gr);
+	  psds.push_back(spec);
+	  delete gr;
+	  //	  spec->SetDirectory(0);
+	  //	specs.push_back(spec);
+	  
+	  //delete spec;
+	  number++;
+      }
+      if(number>=num)break;
+    }
+    auto avg=TUtil::avgGraph(psds);
+    //specs.clear();
+    //avg->Scale(1./(double)number);
+    avg->Draw("al");
+    return avg;
+  }
+
+}
+
 
 // int T576Event::getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph){
 //   ROOT::Math::Interpolator interp(inGraph->GetN(), ROOT::Math::Interpolation::kAKIMA);
