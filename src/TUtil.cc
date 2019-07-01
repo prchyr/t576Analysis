@@ -2505,6 +2505,24 @@ void TUtil::xrange(TGraph *inGr, double x1, double x2){
   inGr->GetXaxis()->SetRangeUser(x1, x2);
 }
 
+void TUtil::titles(TProfile *inGr, TString title, TString xtitle, TString ytitle){
+  inGr->SetTitle(title);
+  inGr->GetXaxis()->SetTitle(xtitle);
+  inGr->GetYaxis()->SetTitle(ytitle);
+}
+
+void TUtil::ranges(TProfile *inGr,double x1, double x2, double y1, double y2){
+  TUtil::yrange(inGr, y1, y2);
+  TUtil::xrange(inGr, x1, x2);
+}
+void TUtil::yrange(TProfile *inGr, double y1, double y2){
+  inGr->GetYaxis()->SetRangeUser(y1, y2);
+}
+
+void TUtil::xrange(TProfile *inGr, double x1, double x2){
+  inGr->GetXaxis()->SetRangeUser(x1, x2);
+}
+
 void TUtil::titles(TH1F *inGr, TString title, TString xtitle, TString ytitle){
   inGr->SetTitle(title);
   inGr->GetXaxis()->SetTitle(xtitle);

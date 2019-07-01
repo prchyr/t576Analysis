@@ -43,6 +43,7 @@ charge: nC
 #include "TH1D.h"
 #include "TH2F.h"
 #include "TH2D.h"
+#include "TProfile.h"
 #include "TString.h"
 #include "TStyle.h"
 #include "TCanvas.h"
@@ -427,6 +428,10 @@ utilities.
   void ranges(TGraph *inGr, double x1, double x2, double y1, double y2);
   void xrange(TGraph *inGr, double x1, double x2);
   void yrange(TGraph *inGr, double y1, double y2);
+  void titles(TProfile *inGr, TString title, TString xtitle, TString ytitle);
+  void ranges(TProfile *inGr, double x1, double x2, double y1, double y2);
+  void xrange(TProfile *inGr, double x1, double x2);
+  void yrange(TProfile *inGr, double y1, double y2);
   void titles(TH1F *inGr, TString title, TString xtitle, TString ytitle);
   void ranges(TH1F *inGr, double x1, double x2, double y1, double y2);
   void xrange(TH1F *inGr, double x1, double x2);

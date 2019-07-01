@@ -2051,19 +2051,19 @@ double T576Event::getInterpGSs(){
 TNtuple * T576Event::integrateAllWithSideband(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double sbxmin, double sbxmax, double sbymin, double sbymax, double scale){
   loadScopeEvent(major, minor, 0);
   int number=0;
-  TNtuple *tup=new TNtuple("tup", "tup", "sig:sb");
+  TNtuple *tup=new TNtuple("tup", "tup", "sig:sb:power:freq");
   //  auto graphs=vector<TGraph*>();
   if(scopeOrSurf==0){
     //    loadScopeEvent(major, minor, 0);
     for(int i=0;i<scopeNEvents;i++){
       loadScopeEvent(major, minor, i);
-      if(isGood){
+      if(isGood==1){
 	auto spec = TUtil::FFT::spectrogram(scope->ch[channel], nfft, overlap, zeroPadLength, window, dbFlag);
 	spec->Scale(scale);
 	spec->SetDirectory(0);
 	auto sig=TUtil::integrate(spec, xmin, xmax, ymin, ymax);
 	auto sb=TUtil::integrate(spec, sbxmin, sbxmax, sbymin, sbymax);
-	tup->Fill(sig, sb);
+	tup->Fill(sig, sb, power, frequency);
 	delete spec;
 	number++;
       }
