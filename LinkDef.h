@@ -20,6 +20,7 @@
 #pragma link C++ class T576Event+;
 #pragma link C++ class TUtil+;
 #pragma link C++ class TUtilGraph+;
+#pragma link C++ class TEventSummary+;
 //#pragma link C++ class TUtil::TVec1D+;
 #pragma link C++ class cnpy+;
 #pragma link C++ class std::vector<TGraph*> +;
