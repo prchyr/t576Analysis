@@ -159,6 +159,11 @@ public:
   double peakV[3]={0.,0.,0.};
   double tOfPeakV[3]={0.,0.,0.};
 
+  TVector3 pos[3];
+  //unused currently
+  double cableLengths[3]={0.,0.,0.};
+  double velocityFactor=.82;
+  
 private:
   int fNEntriesSurf=0, fNEntriesScope=0;
   double fInterpGSs=0.;
