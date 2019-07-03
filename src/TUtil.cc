@@ -1252,6 +1252,8 @@ TGraph * TUtil::shiftX(TGraph *g1, double factor){
   
 }
 
+// TUtil::dedisperse(TGraph2D * one, TGraph2D * two){
+//   auto re1=
 
 double TUtil::getFirstThresholdCrossing(TGraph *inGr, double thresh, double after){
   double thisVal;

@@ -158,6 +158,8 @@ public:
   double peakPower[3]={0.,0.,0.};
   double peakV[3]={0.,0.,0.};
   double tOfPeakV[3]={0.,0.,0.};
+  double peakHilbert[3]={0.,0.,0.};
+  double tOfPeakHilbert[3]={0.,0.,0.};
 
   TVector3 pos[3];
   //unused currently
