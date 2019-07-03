@@ -70,6 +70,15 @@ public:
     //delete []fSurfData;
   }
 
+  /*
+    which dataset:
+    0-raw data
+    1-SVD filtered
+    2-null data
+    3-null SVD filtered
+
+  */
+  int dataset;
   TVector3 txPos;
   double txAng, txDist;
   ULong64_t timestamp, scopeTime, surfTime;
