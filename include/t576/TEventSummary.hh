@@ -148,6 +148,7 @@ public:
 
   double peakPower[3]={0.,0.,0.};
   double peakV[3]={0.,0.,0.};
+  double tOfPeakV[3]={0.,0.,0.};
 
 private:
   int fNEntriesSurf=0, fNEntriesScope=0;
