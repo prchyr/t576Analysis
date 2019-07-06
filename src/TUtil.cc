@@ -952,7 +952,7 @@ double TUtil::rms(TGraph * gr, double t_low, double t_high){
   double n=0.;
   double rms=0.;
   for(int i=0;i<gr->GetN();i++){
-    if(gr->GetX()[i]>=t_low||gr->GetX()[i]<=t_high){
+    if(gr->GetX()[i]>t_low&&gr->GetX()[i]<t_high){
       rms+=(gr->GetY()[i]*gr->GetY()[i]);
       n+=1.;
     }
