@@ -190,7 +190,8 @@ public:
   double rawTOfPeakV[3]={0.,0.,0.};
   double rawPeakHilbert[3]={0.,0.,0.};
   double rawTOfPeakHilbert[3]={0.,0.,0.};
-  
+  //the tx-rx direct path
+  double txrx[3]={0.,0.,0.};
   
   TVector3 pos[3];
   //unused currently
