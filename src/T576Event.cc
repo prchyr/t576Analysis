@@ -92,6 +92,7 @@ int T576Event::checkStatus(){
 
   beamPipeExit.SetXYZ(.6, 0., -3.6);
   targetFront.SetXYZ(.6, 0., -2.);
+  targetCenter.SetXYZ(.6, 0., 0.);
   targetBack.SetXYZ(.6, 0., 2.);
   beamDump.SetXYZ(.6, 0., 4.);
 

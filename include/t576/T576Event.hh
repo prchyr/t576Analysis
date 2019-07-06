@@ -108,6 +108,7 @@ public:
 
   TVector3 beamPipeExit;//(.6, 0., -3.6);
   TVector3 targetFront;//(.6, 0., -2.);
+  TVector3 targetCenter;//(.6, 0., 0.);
   TVector3 targetBack;//(.6, 0., 2.);
   TVector3 beamDump;//(.6, 0., 4.);
   TVector3 backWall;//(.6, 0., 5.6);

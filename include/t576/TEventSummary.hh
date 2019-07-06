@@ -131,7 +131,7 @@ public:
 
   double charge=0;
 
-  /* some useful power and field quantities */
+  /* some useful power and field quantities for this particular dataset*/
 
   double pow_0_10[3]={0.,0.,0.};
   double pow_10_20[3]={0.,0.,0.};
@@ -161,6 +161,37 @@ public:
   double peakHilbert[3]={0.,0.,0.};
   double tOfPeakHilbert[3]={0.,0.,0.};
 
+  /* the same things for the raw data for every one */
+
+  double rawPow_0_10[3]={0.,0.,0.};
+  double rawPow_10_20[3]={0.,0.,0.};
+  double rawPow_20_30[3]={0.,0.,0.};
+  double rawPow_30_40[3]={0.,0.,0.};
+  double rawPow_40_50[3]={0.,0.,0.};
+  double rawPow_50_60[3]={0.,0.,0.};
+  double rawPow_60_70[3]={0.,0.,0.};
+  double rawPow_70_80[3]={0.,0.,0.};
+  double rawPow_80_90[3]={0.,0.,0.};
+  double rawPow_90_100[3]={0.,0.,0.};
+
+  double rawRms_0_10[3]={0.,0.,0.};
+  double rawRms_10_20[3]={0.,0.,0.};
+  double rawRms_20_30[3]={0.,0.,0.};
+  double rawRms_30_40[3]={0.,0.,0.};
+  double rawRms_40_50[3]={0.,0.,0.};
+  double rawRms_50_60[3]={0.,0.,0.};
+  double rawRms_60_70[3]={0.,0.,0.};
+  double rawRms_70_80[3]={0.,0.,0.};
+  double rawRms_80_90[3]={0.,0.,0.};
+  double rawRms_90_100[3]={0.,0.,0.};
+
+  double rawPeakPower[3]={0.,0.,0.};
+  double rawPeakV[3]={0.,0.,0.};
+  double rawTOfPeakV[3]={0.,0.,0.};
+  double rawPeakHilbert[3]={0.,0.,0.};
+  double rawTOfPeakHilbert[3]={0.,0.,0.};
+  
+  
   TVector3 pos[3];
   //unused currently
   double cableLengths[3]={0.,0.,0.};
