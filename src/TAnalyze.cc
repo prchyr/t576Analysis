@@ -37,7 +37,7 @@ int TAnalyze::drawAvgRealNullWithGeom(int ch, int major, int minor, int nfft, in
     auto avgSpec=ev->drawAvgSpectrogram(major, minor, 0,ch,ev->scopeNEvents, nfft, nOverlap, padTo, window, log);
     avgSpec->SetTitle("Data CH"+TString::Itoa(ch, 10));
 
-    TUtil::ranges(avgSpec, 20, 90, 0, 3);
+    TUtil::ranges(avgSpec, 0, 90, 0, 3);
 
     auto zmax=avgSpec->GetMaximum();
     auto zmin=avgSpec->GetMinimum();
@@ -66,7 +66,7 @@ int TAnalyze::drawAvgRealNullWithGeom(int ch, int major, int minor, int nfft, in
 
     avgSpecN->SetTitle("Null CH"+TString::Itoa(ch, 10));
     avgSpecN->GetZaxis()->SetRangeUser(zmin, zmax);
-    TUtil::ranges(avgSpecN, 20, 90, 0, 3);
+    TUtil::ranges(avgSpecN, 0, 90, 0, 3);
     cursors[0]->Draw();
     cursors[1]->Draw();
     can->Draw();
@@ -88,7 +88,7 @@ int TAnalyze::drawAvgRealNullFull(int ch, int major, int minor, int nfft, int nO
     auto avgSpec=ev->drawAvgSpectrogram(major, minor, 0,ch,ev->scopeNEvents, nfft, nOverlap, padTo, window, log);
     avgSpec->SetTitle("Data CH"+TString::Itoa(ch, 10));
 
-    TUtil::ranges(avgSpec, 20, 90, 0, 3);
+    TUtil::ranges(avgSpec, 0, 90, 0, 3);
 
     auto zmax=avgSpec->GetMaximum();
     auto zmin=avgSpec->GetMinimum();
@@ -102,7 +102,7 @@ int TAnalyze::drawAvgRealNullFull(int ch, int major, int minor, int nfft, int nO
     auto avgSpecFull=evFull->drawAvgSpectrogram(major, minor, 0,ch,evFull->scopeNEvents, nfft, nOverlap, padTo, window, log);
     avgSpecFull->SetTitle("Full CH"+TString::Itoa(ch, 10));
     //avgSpecN->GetZaxis()->SetRangeUser(zmin, zmax);
-    TUtil::ranges(avgSpecFull, 20, 90, 0, 3);
+    TUtil::ranges(avgSpecFull, 0, 90, 0, 3);
     cursors[0]->Draw();
     cursors[1]->Draw();
     // ev->drawGeom(ch);
@@ -123,7 +123,7 @@ int TAnalyze::drawAvgRealNullFull(int ch, int major, int minor, int nfft, int nO
 
     avgSpecN->SetTitle("Null CH"+TString::Itoa(ch, 10));
     avgSpecN->GetZaxis()->SetRangeUser(zmin, zmax);
-    TUtil::ranges(avgSpecN, 20, 90, 0, 3);
+    TUtil::ranges(avgSpecN, 0, 90, 0, 3);
     cursors[0]->Draw();
     cursors[1]->Draw();
     can->Draw();
@@ -144,7 +144,7 @@ int TAnalyze::drawAvgRealNull(int ch, int major, int minor, int nfft, int nOverl
     auto avgSpec=ev->drawAvgSpectrogram(major, minor, 0,ch,ev->scopeNEvents, nfft, nOverlap, padTo, window, log);
     avgSpec->SetTitle("Data CH"+TString::Itoa(ch, 10));
 
-    TUtil::ranges(avgSpec, 20, 90, 0, 3);
+    TUtil::ranges(avgSpec, 0, 90, 0, 3);
 
     auto zmax=avgSpec->GetMaximum();
     auto zmin=avgSpec->GetMinimum();
@@ -169,7 +169,7 @@ int TAnalyze::drawAvgRealNull(int ch, int major, int minor, int nfft, int nOverl
     }
     avgSpecN->SetTitle("Null CH"+TString::Itoa(ch, 10));
     avgSpecN->GetZaxis()->SetRangeUser(zmin, zmax);
-    TUtil::ranges(avgSpecN, 20, 90, 0, 3);
+    TUtil::ranges(avgSpecN, 0, 90, 0, 3);
     cursors[0]->Draw();
     cursors[1]->Draw();
     can->Draw();
@@ -188,9 +188,9 @@ int TAnalyze::drawAvgRealFullWithGeom(int ch, int major, int minor, int nfft, in
     ev->scope->ch[0]->Draw("al PLC");
 
     auto avgSpec=ev->drawAvgSpectrogram(major, minor, 0,ch,ev->scopeNEvents, nfft, nOverlap, padTo, window, log);
-    avgSpec->SetTitle("Data CH"+TString::Itoa(ch, 10));
+    avgSpec->SetTitle("Filtered CH"+TString::Itoa(ch, 10));
 
-    TUtil::ranges(avgSpec, 20, 90, 0, 3);
+    TUtil::ranges(avgSpec, 0, 90, 0, 3);
 
     auto zmax=avgSpec->GetMaximum();
     auto zmin=avgSpec->GetMinimum();
@@ -207,9 +207,9 @@ int TAnalyze::drawAvgRealFullWithGeom(int ch, int major, int minor, int nfft, in
     geom->SetTitle(Form("%.1f GHz", ev->frequency));
     can->cd(3)->SetRightMargin(.15);
     auto avgSpecN=evNull->drawAvgSpectrogram(major, minor, 0,ch,evNull->scopeNEvents, nfft, nOverlap, padTo, window, log);
-    avgSpecN->SetTitle("Null CH"+TString::Itoa(ch, 10));
+    avgSpecN->SetTitle("Full CH"+TString::Itoa(ch, 10));
     //avgSpecN->GetZaxis()->SetRangeUser(zmin, zmax);
-    TUtil::ranges(avgSpecN, 20, 90, 0, 3);
+    TUtil::ranges(avgSpecN, 0, 90, 0, 3);
     cursors[0]->Draw();
     cursors[1]->Draw();
     can->Draw();
@@ -228,9 +228,9 @@ int TAnalyze::drawAvgRealFull(int ch, int major, int minor, int nfft, int nOverl
     ev->scope->ch[0]->Draw("al PLC");
 
     auto avgSpec=ev->drawAvgSpectrogram(major, minor, 0,ch,ev->scopeNEvents, nfft, nOverlap, padTo, window, log);
-    avgSpec->SetTitle("Data CH"+TString::Itoa(ch, 10));
+    avgSpec->SetTitle("Filtered CH"+TString::Itoa(ch, 10));
 
-    TUtil::ranges(avgSpec, 20, 90, 0, 3);
+    TUtil::ranges(avgSpec, 0, 90, 0, 3);
 
     auto zmax=avgSpec->GetMaximum();
     auto zmin=avgSpec->GetMinimum();
@@ -243,9 +243,9 @@ int TAnalyze::drawAvgRealFull(int ch, int major, int minor, int nfft, int nOverl
 
     can->cd(2)->SetRightMargin(.15);
     auto avgSpecN=evNull->drawAvgSpectrogram(major, minor, 0,ch,evNull->scopeNEvents, nfft, nOverlap, padTo, window, log);
-    avgSpecN->SetTitle("Null CH"+TString::Itoa(ch, 10));
+    avgSpecN->SetTitle("Full CH"+TString::Itoa(ch, 10));
     //    avgSpecN->GetZaxis()->SetRangeUser(zmin, zmax);
-    TUtil::ranges(avgSpecN, 20, 90, 0, 3);
+    TUtil::ranges(avgSpecN, 0, 90, 0, 3);
     cursors[0]->Draw();
     cursors[1]->Draw();
     can->Draw();
@@ -363,3 +363,46 @@ TH2D * TAnalyze::nullSubtractedSpectrogram(int ch, int major, int minor, int eve
 //   delete ev;
 //   return avgg;  
 // }
+
+
+double TAnalyze::getSignalTOA(int ch, int major, int minor, int dataset){
+  auto ev=new T576Event(50, dataset);
+  ev->loadScopeEvent(major, minor, 0);
+  auto t_0=TUtil::getFirstThresholdCrossing(ev->scope->ch[3], .01);
+  //distance from beam pipe to center of target. assume that the
+  //charges travel at c through the material.
+  auto t_1=TUtil::timeOfFlight(ev->beamPipeExit, ev->targetCenter);
+  auto compTheta=abs((TUtil::pi/2)-ev->scope->pos[ch].Theta());
+  //time of RF propagation through material
+  //get the hypotneuse of triangle in direction of tx.
+  auto d_2=sqrt((.6*.6)+((.6*tan(compTheta))*(.6*tan(compTheta))));
+  //multiply by index of refraction. divide by c.
+  //TODO actually solve for the refracted path
+  auto t_2=d_2*1.51/TUtil::c_light;
+
+  auto t_3=((ev->targetCenter-ev->scope->pos[ch]).Mag()-d_2)/TUtil::c_light;
+  return t_0+t_1+t_2+t_3;
+
+
+}
+
+double TAnalyze::getSignalDTOA(int ch, int major, int minor, int dataset){
+  auto ev=new T576Event(50, dataset);
+  ev->loadScopeEvent(major, minor, 0);
+  auto t_0=TUtil::timeOfFlight(ev->beamPipeExit, ev->scope->pos[ch]);
+  //distance from beam pipe to center of target. assume that the
+  //charges travel at c through the material.
+  auto t_1=TUtil::timeOfFlight(ev->beamPipeExit, ev->targetCenter);
+  auto compTheta=abs((TUtil::pi/2)-ev->scope->pos[ch].Theta());
+  //time of RF propagation through material
+  //get the hypotneuse of triangle in direction of tx.
+  auto d_2=sqrt((.6*.6)+((.6*tan(compTheta))*(.6*tan(compTheta))));
+  //multiply by index of refraction. divide by c.
+  //TODO actually solve for the refracted path
+  auto t_2=d_2*1.51/TUtil::c_light;
+
+  auto t_3=((ev->targetCenter-ev->scope->pos[ch]).Mag()-d_2)/TUtil::c_light;
+  return t_1+t_2+t_3-t_0;
+
+
+}

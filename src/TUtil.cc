@@ -878,6 +878,45 @@ double TUtil::locMaxInRange(TGraph *gr, double t_low, double t_high){
   return max;
 }
 
+
+double TUtil::minInRange(TGraph *gr, double t_low, double t_high){
+  auto data=gr->GetY();
+  int N=gr->GetN();
+
+  t_low=t_low<gr->GetX()[0]?gr->GetX()[0]:t_low;
+  t_high=t_high>gr->GetX()[N-1]?gr->GetX()[N-1]:t_high;
+  auto graph=TUtil::getChunkOfGraph(gr, t_low, t_high);
+  auto min=TMath::MinElement(graph->GetN(), graph->GetY());
+  delete graph;
+  return min;
+}
+
+double TUtil::min(TGraph *gr){
+
+  auto min=TMath::MinElement(gr->GetN(), gr->GetY());
+  
+  return min;
+}
+
+double TUtil::locMin(TGraph *gr){
+
+  auto min=gr->GetX()[TMath::LocMin(gr->GetN(), gr->GetY())];
+  
+  return min;
+}
+double TUtil::locMinInRange(TGraph *gr, double t_low, double t_high){
+  auto data=gr->GetY();
+  int N=gr->GetN();
+
+  t_low=t_low<gr->GetX()[0]?gr->GetX()[0]:t_low;
+  t_high=t_high>gr->GetX()[N-1]?gr->GetX()[N-1]:t_high;
+  auto graph=TUtil::getChunkOfGraph(gr, t_low, t_high);
+  auto min=graph->GetX()[TMath::LocMin(graph->GetN(), graph->GetY())];
+  delete graph;  
+  return min;
+}
+
+
 int TUtil::getIndex(TGraph * gr, double t){
   int index=0;
   for(int i=1;i<gr->GetN();i++){
@@ -997,6 +1036,19 @@ TGraph * TUtil::getZeroCrossGraph(TGraph * inGr, int relative){
 
   }
   return outGr;
+}
+
+TH1F * TUtil::hist(TGraph *gr, int nbins, TString title, TString name){
+  //auto len=sizeof(vals)/sizeof(vals[0]);
+  auto vals=gr->GetY();
+  auto len=gr->GetN();
+  auto xlow=TUtil::min(gr);
+  auto xhigh=TUtil::max(gr);
+  auto hh=new TH1F(name, title, nbins, xlow, xhigh);
+  for(int i=0;i<len;i++){
+    hh->Fill(vals[i]);
+  }
+  return hh;
 }
 
 int TUtil::fillZeroCrossHist(TGraph * inGr, TH1D* hist, double threshold, double weight){
@@ -2806,4 +2858,56 @@ double TUtil::SIM::n(double x, double E, double x_0, double e_0){
 
   
 
+//unevenly sampled (in time) dft
+TGraph2D * TUtil::DFT::udft(TGraph * inGr, double fSampMean){
+  int N=inGr->GetN();
+  double fStep=(fSampMean/(double)N);
+  auto sinT=vector<vector<double>>(N, vector<double>(N, 0.));
+  auto cosT=vector<vector<double>>(N, vector<double>(N, 0.)); 
 
+  //auto S=vector<double>(N, 0.);
+  //auto C=vector<double>(N, 0.);
+
+  
+  for(int f=0;f<N;f++){
+    for(int t=0;t<N;t++){
+      sinT[f][t]=2*sin(fStep*2.*TUtil::pi*inGr->GetX()[t]*f)/N;
+      cosT[f][t]=2*cos(fStep*2.*TUtil::pi*inGr->GetX()[t]*f)/N;
+    }
+  }
+
+  
+
+  TGraph2D *out=new TGraph2D(N);
+
+  for(int f=0;f<N;f++){
+    double S=0.;
+    double C=0.;
+    for(int t=0;t<N;t++){
+      S+=4.*TUtil::pi*sinT[f][t]*inGr->GetY()[t];
+      C+=4.*TUtil::pi*cosT[f][t]*inGr->GetY()[t];
+    }
+    out->SetPoint(f, fStep*f, S, C);
+  }
+  
+  return out;
+}
+
+TGraph * TUtil::DFT::idft(TGraph2D * inGr, double GSs){
+  int N=inGr->GetN();
+  int Nt=N*(GSs/inGr->GetX()[N-1]);
+  double dt=1./GSs;
+
+  double prefactor=1./(4.*TUtil::pi);
+  auto  vals=vector<double>(Nt);
+  for(int f=0;f<N/2+1;f++){
+    for(int t=0;t<Nt;t++){
+      double T=(double)t*dt;
+      vals[t]+=prefactor*inGr->GetY()[f]*sin(2.*TUtil::pi*inGr->GetX()[f]*T);
+      vals[t]+=prefactor*inGr->GetZ()[f]*cos(2.*TUtil::pi*inGr->GetX()[f]*T);
+    }
+  }
+
+  TGraph *out=new TGraph(Nt, TUtil::makeIndices(Nt, dt), &vals[0]);  
+  return out;
+}

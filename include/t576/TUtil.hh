@@ -331,6 +331,11 @@ utilities.
   //get the x-axis location of t max value (wraper of TMath::LocMax)
   double locMax(TGraph *gr);
   double locMaxInRange(TGraph *gr, double t_low=0., double t_high=999999.);
+    double min(TGraph *gr);
+  double minInRange(TGraph *gr, double t_low=0., double t_high=999999.);
+  //get the x-axis location of t min value (wraper of TMath::LocMin)
+  double locMin(TGraph *gr);
+  double locMinInRange(TGraph *gr, double t_low=0., double t_high=999999.);
     //return the phase at a single point, degrees=0, rad=1
     double getInstPhase(TGraph *inGr, double t, int deg0rad1=1);
 
@@ -417,6 +422,9 @@ utilities.
   TGraph * getZeroCrossGraph(TGraph * inGr, int relative=0);
   //find the x values of zero crossings and put them in a histogram. returns the number of zero crossings in that graph.
   int fillZeroCrossHist(TGraph * inGr, TH1D* hist, double threshold=0., double weight=1.);
+  //fill a histogram with an array
+  TH1F * hist(TGraph *gr, int nbins=20, TString title="hist", TString name="hist");
+
   //get the time of the first threshold crossing after after
   double getFirstThresholdCrossing(TGraph *inGr, double thresh, double after=0.);
 
@@ -596,6 +604,11 @@ the SVD namespace, which has useful utilities for SVD filtration methods
     double n(double x, double E, double x_0, double e_0);
   }
 
+
+  namespace DFT{
+    TGraph2D * udft(TGraph * inGr, double fSampMean=1.);
+    TGraph * idft(TGraph2D * inGr, double GSs);
+  }
 }
 
 

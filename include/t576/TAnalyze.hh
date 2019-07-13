@@ -75,7 +75,7 @@ namespace TAnalyze{
   int drawAvgRealFullWithGeom(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0);
 
   int drawAvg(int ch, int major, int minor);
-  int drawAvgHilbert(int ch, int major, int minor);
+  int drawAvgHilbert(int ch, int major, int minor, int datset=0);
   //utility functions
 
   TNtuple * integrateAllWithSideband(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double sbxmin, double sbxmax, double sbymin, double sbymax, int norm);
@@ -83,6 +83,8 @@ namespace TAnalyze{
 
   TH2D * nullSubtractedSpectrogram(int ch, int major, int minor, int event, int nfft, int nOverlap, int padTo, int window, int log);
   TH2D * avgNullSubtractedSpectrogram(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log);
-  
+
+  double getSignalTOA(int ch, int major, int minor, int dataset=1);
+  double getSignalDTOA(int ch, int major, int minor, int dataset);
 }
 #endif
