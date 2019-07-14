@@ -198,6 +198,12 @@ public:
   //unused currently
   double cableLengths[3]={0.,0.,0.};
   double velocityFactor=.82;
+
+  double peak[3]={0.,0.,0.};
+  double ss[3]={0.,0.,0.};
+  double sig[3]={0.,0.,0.};
+  double sb[3]={0.,0.,0.};
+
   
 private:
   int fNEntriesSurf=0, fNEntriesScope=0;

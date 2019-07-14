@@ -171,6 +171,7 @@ public:
    //draw average of a bunch of graphs from a t576event object
   TGraph * drawAvg(int major, int minor, int scopeOrSurf, int channel, int num, double align=5., double tLow=0., double tHigh=999999.,TString drawOption="al PLC");
   TGraph * drawAvgHilbert(int major, int minor, int scopeOrSurf, int channel, int num, double align=5., double tLow=0., double tHigh=999999.,TString drawOption="al PLC");
+    TGraph * avgHilbert(int major, int minor, int scopeOrSurf, int channel, int num, double align=5., double tLow=0., double tHigh=999999.);
   //draw an average of a bunch of spectrograms of t576event object
   TH2D * drawAvgSpectrogram(int major, int minor, int scopeOrSurf, int channel, int num, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, int dbFlag);
   TH2D * drawAvgSpectrogram(int major, int minor, int scopeOrSurf,int channel, int num, double tLow, double tHigh, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, int dbFlag);
