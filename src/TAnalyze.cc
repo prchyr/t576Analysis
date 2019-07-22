@@ -131,11 +131,12 @@ int TAnalyze::drawAvgRealNullFull(int ch, int major, int minor, int nfft, int nO
 }
 
 
-int TAnalyze::drawAvgRealNull(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log, int norm){
-    auto can=new TCanvas("", "", 1200, 600);
+TCanvas * TAnalyze::avgRealNull(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log, int norm, int cursorType){
+    auto can=new TCanvas("", "", 1300, 600);
     can->Divide(2, 0);
-    can->cd(1)->SetRightMargin(.15);
-
+    can->cd(1)->SetRightMargin(.17);
+    can->cd(1)->SetLeftMargin(.12);
+ 
     auto ev=new T576Event(50, 1);
     auto evNull=new T576Event(50, 3);
     //TUtil::setColdPalette();
@@ -143,26 +144,27 @@ int TAnalyze::drawAvgRealNull(int ch, int major, int minor, int nfft, int nOverl
 
     auto avgSpec=ev->drawAvgSpectrogram(major, minor, 0,ch,ev->scopeNEvents, nfft, nOverlap, padTo, window, log);
     avgSpec->SetTitle("Data CH"+TString::Itoa(ch, 10));
-
+    avgSpec->SetName("data");
     TUtil::ranges(avgSpec, 0, 90, 0, 3);
 
     auto zmax=avgSpec->GetMaximum();
     auto zmin=avgSpec->GetMinimum();
     can->Draw();
-    auto cursors=TUtil::drawPeakCursorXY(avgSpec, kRed);
+    auto cursors=vector<TLine*>();
+    if(cursorType==1){
+      cursors=TUtil::drawPeakCursorXY(avgSpec, kRed);
+    }
     auto minx=38;
     auto maxx=50.;
     auto miny=1.9;
     auto maxy=2.25;
 
-    can->cd(2)->SetRightMargin(.15);
+    can->cd(2)->SetRightMargin(.17);
+    can->cd(2)->SetLeftMargin(.12);
     auto avgSpecN=evNull->drawAvgSpectrogram(major, minor, 0,ch,evNull->scopeNEvents, nfft, nOverlap, padTo, window, log);
-
+    avgSpecN->SetName("null");
     if(norm==1){
-      // auto normDat=TUtil::integrate(avgSpec, avgSpec->GetXaxis()->GetXmin(), avgSpec->GetXaxis()->GetXmin(), avgSpec->GetYaxis()->GetXmin(), avgSpec->GetYaxis()->GetXmin());
-      // auto normNull=TUtil::integrate(avgSpecN, avgSpecN->GetXaxis()->GetXmin(), avgSpecN->GetXaxis()->GetXmin(), avgSpecN->GetYaxis()->GetXmin(), avgSpecN->GetYaxis()->GetXmin());
-      
-      //avgSpecN->Scale(normDat/normNull);
+     
       auto normD=TUtil::norm(avgSpec, 0, ev->analogBandwidth);
       auto normN=TUtil::norm(avgSpecN, 0, ev->analogBandwidth);
       avgSpecN->Scale(normD/normN);
@@ -170,10 +172,12 @@ int TAnalyze::drawAvgRealNull(int ch, int major, int minor, int nfft, int nOverl
     avgSpecN->SetTitle("Null CH"+TString::Itoa(ch, 10));
     avgSpecN->GetZaxis()->SetRangeUser(zmin, zmax);
     TUtil::ranges(avgSpecN, 0, 90, 0, 3);
-    cursors[0]->Draw();
-    cursors[1]->Draw();
+    if(cursorType==1){
+      cursors[0]->Draw();
+      cursors[1]->Draw();
+    }
     can->Draw();
-    return 1;
+    return can;
 }
 
 

@@ -350,7 +350,7 @@ TGraph * TUtil::FFT::plotPhase(TGraph *inGr){
 //   return outGr;
 // }
 
-TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, int dbFlag){
+TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, int dbFlag, double ymin, double ymax){
   Int_t size = gr->GetN();
   double dt=(gr->GetX()[1]-gr->GetX()[0]); 
   double samprate=1./dt;
@@ -438,7 +438,12 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
     spectrogramHist->GetZaxis()->SetTitle("W");
   }
   spectrogramHist->GetZaxis()->SetTitleOffset(1.5);
-
+  spectrogramHist->GetXaxis()->SetTitleSize(.05);
+  spectrogramHist->GetYaxis()->SetTitleSize(.05);
+  spectrogramHist->GetXaxis()->SetLabelSize(.05);
+  spectrogramHist->GetYaxis()->SetLabelSize(.05);
+  spectrogramHist->GetYaxis()->SetTitleOffset(1.1);
+  spectrogramHist->GetYaxis()->SetRangeUser(ymin, ymax);
   //  delete(in);
   //  delete(outt);
 
@@ -2620,13 +2625,24 @@ void TUtil::draw(vector<TGraph*> inGr, TString option){
   else{
     inGr[0]->Draw("al PLC");
   }
-  for(int i=0;i<inGr.size();i++){
+  for(int i=1;i<inGr.size();i++){
+    inGr[i]->SetLineStyle(fmod(i, 9)+1);
     if(option=="norm"){
       TUtil::normalize(inGr[i])->Draw("l same PLC");
     }
     else{
       inGr[i]->Draw("l same PLC");
     }
+    
+  }
+}
+
+
+void TUtil::draw(vector<TH1D*> inGr, TString drawOption1){
+  inGr[0]->Draw(drawOption1);
+
+  for(int i=0;i<inGr.size();i++){
+    inGr[i]->Draw(drawOption1+" same");
     
   }
 }
@@ -2650,6 +2666,34 @@ void TUtil::draw(int nGraphs, TGraph** inGr, TString option){
   }
 }
 
+TGraph * TUtil::toGraph(TH1D * hist){
+  auto   outGr=new TGraph();
+  for(int i=0;i<hist->GetNbinsX();i++){
+    outGr->SetPoint(outGr->GetN(), hist->GetBinCenter(i), hist->GetBinContent(i));
+  }
+  return outGr;
+}
+
+TGraph * TUtil::getSliceY(TH2D* hist, double ylow, double yhigh){
+  int binx, binylow, binyhigh, binz;
+  hist->GetBinXYZ(hist->FindBin(0, ylow), binx, binylow, binz);
+  hist->GetBinXYZ(hist->FindBin(0, yhigh), binx, binyhigh, binz);
+  return TUtil::toGraph(hist->ProjectionX(TString::Itoa(ylow, 10), binylow, binyhigh));
+}
+
+vector<TGraph*> TUtil::getSlicesY(TH2D * hist, int nSlices, double ylow, double yhigh, TString name, TString title){
+  double dy=(yhigh-ylow)/(double)nSlices;
+  auto out=vector<TGraph*>();
+  for(int i=0;i<nSlices;i++){
+    auto y1=ylow+(double)i*dy;
+    auto y2=y1+dy;
+    auto gr=TUtil::getSliceY(hist,y1, y2);
+    gr->SetName(Form("%.2f", (y2+y1)/2.));
+    gr->SetTitle(Form("%.2f", (y2+y1)/2.));
+    out.push_back(gr);
+  }
+  return out;
+}
 
 vector<TLine*> TUtil::drawPeakCursorXY(TH2D* inHist, Color_t color){
   auto binx=0, biny=0, binz=0;

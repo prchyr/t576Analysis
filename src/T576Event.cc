@@ -594,6 +594,10 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
     copy(fSurfData+index1+index2, fSurfData+index1+index2+len, surf->dat[i]);
     //feet to meter conversion
     surf->delays[i]=(surf->cableLengths[i]*ft)/(c_light*surf->velocityFactor);
+
+    //debug
+
+    //    surf->delays[i]=0;
     //mV to V conversion
     for(int j=0;j<len;j++){
       surf->dat[i][j]*=.001;

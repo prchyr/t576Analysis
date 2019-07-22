@@ -43,6 +43,7 @@ charge: nC
 #include "TH1D.h"
 #include "TH2F.h"
 #include "TH2D.h"
+#include "THStack.h"
 #include "TProfile.h"
 #include "TString.h"
 #include "TStyle.h"
@@ -452,10 +453,18 @@ utilities.
   void draw(vector<TGraph*> inGr, TString option="");
     //draw a bunch of graphs
   void draw(int nGraphs, TGraph ** inGr, TString option="");
+  //draw a bunch of hists
+  void draw(vector<TH1D*> inGr, TString drawOption1);
+  //cast a th1d to a tgraph
+  TGraph * toGraph(TH1D * hist);
   //draw cursors centered on the peak of a spectrogram.
   //before use, must draw the canvas or update with can->Update()
   //so that the gPad calls work correctly.
   vector<TLine*> drawPeakCursorXY(TH2D* inHist, Color_t color);
+  //get a slice of a spectrogram from ylow to yhigh
+  TGraph * getSliceY(TH2D* hist, double ylow, double yhigh);
+  //get many slices
+  vector<TGraph*> getSlicesY(TH2D * hist, int nSlices, double ylow, double yhigh, TString name="name", TString title="title");
   //a pretty warm palette
   void setWarmPalette();
   //a pretty cool palette
@@ -526,7 +535,7 @@ zero pad length is the length to which the chunk is symmetrically zero-padded.
 
 win_type is an enumeration of window types to be applied to each bin. this helps avoid discontinuities and noise in the spectrogram. see the window function for the window types.
      */
-    TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128, int win_type=0, int dbFlag=1);
+    TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128, int win_type=0, int dbFlag=1, double ymin=0, double ymax=3.);
     //averages a vector of spectrograms. must be the same size.
     TH2D* avgSpectrograms(vector<TH2D*>  inh);
 

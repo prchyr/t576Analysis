@@ -66,6 +66,8 @@ namespace TAnalyze{
   TH2D* avgSpectrogram(int ch, int dataset, int major, int minor, double tLow, double tHigh, int nfft, int nOverlap, int padTo, int window, int log, int norm);
   //average spectrogram from a run compared to null data
   int drawAvgRealNull(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0, int norm=0);
+
+  TCanvas * avgRealNull(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0, int norm=0, int cursorType=0);
   
   int drawAvgRealNullWithGeom(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0, int norm=0);
   int drawAvgRealNullFull(int ch, int major, int minor, int nfft=512, int nOverlap=450, int padTo=800, int window=2, int log=0, int norm=0);
