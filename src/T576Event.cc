@@ -596,7 +596,7 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
     surf->delays[i]=(surf->cableLengths[i]*ft)/(c_light*surf->velocityFactor);
 
     //debug
-    cout<<surf->delays[i]<<endl;
+    //    cout<<surf->delays[i]<<endl;
     //surf->delays[i]=0;
     //mV to V conversion
     for(int j=0;j<len;j++){

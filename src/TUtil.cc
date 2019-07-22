@@ -329,11 +329,20 @@ TGraph* TUtil::FFT::peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int
 TGraph * TUtil::FFT::plotPhase(TGraph *inGr){
   auto fftGr=TUtil::FFT::fft(inGr);
   auto ph=vector<double>();
-  for(int i=0;i<fftGr->GetN();i++){
+  for(int i=0;i<fftGr->GetN()/2;i++){
     ph.push_back(TMath::ATan2(fftGr->GetZ()[i], fftGr->GetY()[i]));
   }
-  auto outGr=new TGraph(fftGr->GetN()/2, fftGr->GetX(), &ph[0]);
+  auto outGr=new TGraph(ph.size(), fftGr->GetX(), &ph[0]);
   return outGr;
+}
+
+double TUtil::FFT::getPhaseAt(TGraph *inGr, double freq){
+
+  auto fftGr=TUtil::FFT::fft(inGr);
+  int index=freq/(fftGr->GetX()[1]-fftGr->GetX()[0]);
+  auto ph=TMath::ATan2(fftGr->GetZ()[index], fftGr->GetY()[index]);
+  //  cout<<index<<" "<<fftGr->GetX()[index]<<endl;
+  return ph;
 }
 
 
@@ -1010,7 +1019,7 @@ double TUtil::amplitude(TGraph * gr, double t_low, double t_high){
   double n=0.;
   double rms=0.;
   for(int i=0;i<gr->GetN();i++){
-    if(gr->GetX()[i]>=t_low||gr->GetX()[i]<=t_high){
+    if(gr->GetX()[i]>=t_low&&gr->GetX()[i]<=t_high){
       rms+=(gr->GetY()[i]*gr->GetY()[i]);
       n+=1.;
     }

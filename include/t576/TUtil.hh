@@ -513,8 +513,10 @@ The FFT namespace, for everything to do with FFTs.
     TGraph * ifft(TGraph2D *inGr);
     //return the Hilbert transform
     TGraph * hilbertTransform(TGraph *inGr);
-    //plot the phase of the full graph (NOT WORKING)
+    //plot the phase of the full graph 
     TGraph * plotPhase(TGraph *inGr);
+    //get the phase at one frequency
+    double getPhaseAt(TGraph *inGr, double freq);
     //zero the phase at the given frequency
     TGraph * zeroPhaseAt(TGraph *inGr, double freq, int debug=0);
     //set the phase angle at the given frequency
