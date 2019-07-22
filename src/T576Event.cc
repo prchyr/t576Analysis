@@ -597,7 +597,7 @@ int T576Event::loadSurfEvent(int event, bool remove_dc_offset){
 
     //debug
 
-    surf->delays[i]=0;
+    //surf->delays[i]=0;
     //mV to V conversion
     for(int j=0;j<len;j++){
       surf->dat[i][j]*=.001;
