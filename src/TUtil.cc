@@ -112,7 +112,7 @@ psd, returns a tgraph in dbm/hz from an input tgraph
 
 */
 
-TGraph * TUtil::FFT::psd(TGraph * inGr, double rBW, int dbFlag){
+TGraph * TUtil::FFT::psd(TGraph * inGr, int dbFlag, double rBW ){
   auto xfrm=fft(inGr);
   int n=xfrm->GetN();
   //  double norm=1./(double)sqrt(n);
@@ -338,10 +338,11 @@ TGraph * TUtil::FFT::plotPhase(TGraph *inGr){
 
 double TUtil::FFT::getPhaseAt(TGraph *inGr, double freq){
 
-  auto fftGr=TUtil::FFT::fft(inGr);
-  int index=freq/(fftGr->GetX()[1]-fftGr->GetX()[0]);
+  TGraph2D * fftGr=(TGraph2D*)TUtil::FFT::fft(inGr)->Clone();
+  int index=TUtil::getIndex(fftGr);
   auto ph=TMath::ATan2(fftGr->GetZ()[index], fftGr->GetY()[index]);
-  //  cout<<index<<" "<<fftGr->GetX()[index]<<endl;
+  cout<<index<<" "<<fftGr->GetX()[index]<<endl;
+  delete fftGr;
   return ph;
 }
 
@@ -932,6 +933,17 @@ double TUtil::locMinInRange(TGraph *gr, double t_low, double t_high){
 
 
 int TUtil::getIndex(TGraph * gr, double t){
+  int index=0;
+  for(int i=1;i<gr->GetN();i++){
+    if(gr->GetX()[i-1]<t&&gr->GetX()[i]>=t){
+      index=i;
+      return index;
+    }
+  }
+  return 0;
+}
+
+int TUtil::getIndex(TGraph2D * gr, double t){
   int index=0;
   for(int i=1;i<gr->GetN();i++){
     if(gr->GetX()[i-1]<t&&gr->GetX()[i]>=t){

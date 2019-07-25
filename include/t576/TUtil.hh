@@ -344,6 +344,9 @@ utilities.
 
   //get the index of a certain value. will always under-estimate
   int getIndex(TGraph *gr, double t);
+  int getIndex(TGraph2D * gr, double t);
+
+
   //get the power (square all values of a graph)
   TGraph * power(TGraph *gr);
   //remove the mean of a TGraph. range to compute the mean over is optional.
@@ -525,7 +528,7 @@ The FFT namespace, for everything to do with FFTs.
     TGraph * hilbertEnvelope(TGraph *inGr);
     //return the power spectral density in dBm/Hz, rBW is the resolution bandwith of the system, used to calculate the density. defaults to Nyquist.
 
-    TGraph * psd(TGraph *inGr, double rBW=0., int dbFlag=1);
+    TGraph * psd(TGraph *inGr, int dbFlag=1, double rBW=0.);
 
 
 /*
