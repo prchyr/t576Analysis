@@ -1567,7 +1567,7 @@ TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end, int dela
 
   TGraph * outg=new TGraph(outx.size(), &outx[0], &outy[0]);
   //outg->SetTitle(ingr->GetTitle());
-  outg->SetName(ingr->GetName());
+  outg->SetName("chunk");
   outg->GetXaxis()->SetTitle(ingr->GetXaxis()->GetTitle());
   outg->GetYaxis()->SetTitle(ingr->GetYaxis()->GetTitle());
   if(delay_to_zero==0){
