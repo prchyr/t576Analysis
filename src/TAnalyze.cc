@@ -131,10 +131,10 @@ int TAnalyze::drawAvgRealNullFull(int ch, int major, int minor, int nfft, int nO
 }
 
 
-TCanvas * TAnalyze::avgRealNull(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log, int norm, int cursorType){
+TCanvas * TAnalyze::avgRealNull(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int dbFlag, int norm, int cursorType){
     auto can=new TCanvas("", "", 1300, 600);
     can->Divide(2, 0);
-    can->cd(1)->SetRightMargin(.17);
+    can->cd(1)->SetRightMargin(.15);
     can->cd(1)->SetLeftMargin(.12);
  
     auto ev=new T576Event(50, 1);
@@ -142,7 +142,7 @@ TCanvas * TAnalyze::avgRealNull(int ch, int major, int minor, int nfft, int nOve
     //TUtil::setColdPalette();
     ev->scope->ch[0]->Draw("al PLC");
 
-    auto avgSpec=ev->drawAvgSpectrogram(major, minor, 0,ch,ev->scopeNEvents, nfft, nOverlap, padTo, window, log);
+    auto avgSpec=ev->drawAvgSpectrogram(major, minor, 0,ch,ev->scopeNEvents, nfft, nOverlap, padTo, window, dbFlag);
     avgSpec->SetTitle("Data CH"+TString::Itoa(ch, 10));
     avgSpec->SetName("data");
     TUtil::ranges(avgSpec, 0, 90, 0, 3);
@@ -159,9 +159,9 @@ TCanvas * TAnalyze::avgRealNull(int ch, int major, int minor, int nfft, int nOve
     auto miny=1.9;
     auto maxy=2.25;
 
-    can->cd(2)->SetRightMargin(.17);
+    can->cd(2)->SetRightMargin(.15);
     can->cd(2)->SetLeftMargin(.12);
-    auto avgSpecN=evNull->drawAvgSpectrogram(major, minor, 0,ch,evNull->scopeNEvents, nfft, nOverlap, padTo, window, log);
+    auto avgSpecN=evNull->drawAvgSpectrogram(major, minor, 0,ch,evNull->scopeNEvents, nfft, nOverlap, padTo, window, dbFlag);
     avgSpecN->SetName("null");
     if(norm==1){
      
@@ -179,6 +179,49 @@ TCanvas * TAnalyze::avgRealNull(int ch, int major, int minor, int nfft, int nOve
     can->Draw();
     return can;
 }
+
+TCanvas * TAnalyze::avgRealFull(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log, int cursorType){
+    auto can=new TCanvas("", "", 1200, 600);
+    can->Divide(2, 0);
+    can->cd(1)->SetRightMargin(.15);
+    can->cd(1)->SetLeftMargin(.12);
+    auto ev=new T576Event(50, 1);
+    auto evNull=new T576Event(50, 2);
+    //TUtil::setColdPalette();
+    ev->scope->ch[0]->Draw("al PLC");
+
+    auto avgSpec=ev->drawAvgSpectrogram(major, minor, 0,ch,ev->scopeNEvents, nfft, nOverlap, padTo, window, log);
+    avgSpec->SetTitle("Filtered CH"+TString::Itoa(ch, 10));
+
+    TUtil::ranges(avgSpec, 0, 90, 0, 3);
+
+    auto zmax=avgSpec->GetMaximum();
+    auto zmin=avgSpec->GetMinimum();
+    can->Draw();
+    auto cursors=vector<TLine*>();
+    if(cursorType==1){
+      cursors=TUtil::drawPeakCursorXY(avgSpec, kRed);
+    }
+    auto minx=38;
+    auto maxx=50.;
+    auto miny=1.9;
+    auto maxy=2.25;
+
+    can->cd(2)->SetRightMargin(.15);
+    can->cd(2)->SetLeftMargin(.12);
+    auto avgSpecN=evNull->drawAvgSpectrogram(major, minor, 0,ch,evNull->scopeNEvents, nfft, nOverlap, padTo, window, log);
+    avgSpecN->SetTitle("Full CH"+TString::Itoa(ch, 10));
+    //    avgSpecN->GetZaxis()->SetRangeUser(zmin, zmax);
+    TUtil::ranges(avgSpecN, 0, 90, 0, 3);
+    if(cursorType==1){
+      cursors[0]->Draw();
+      cursors[1]->Draw();
+    }
+    
+    
+    return can;
+}
+
 
 
 int TAnalyze::drawAvgRealFullWithGeom(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log){
@@ -225,7 +268,7 @@ int TAnalyze::drawAvgRealFull(int ch, int major, int minor, int nfft, int nOverl
     auto can=new TCanvas("", "", 1200, 600);
     can->Divide(2, 0);
     can->cd(1)->SetRightMargin(.15);
-
+    can->cd(1)->SetLeftMargin(.12);
     auto ev=new T576Event(50, 1);
     auto evNull=new T576Event(50, 2);
     //TUtil::setColdPalette();
@@ -246,6 +289,7 @@ int TAnalyze::drawAvgRealFull(int ch, int major, int minor, int nfft, int nOverl
     auto maxy=2.25;
 
     can->cd(2)->SetRightMargin(.15);
+    can->cd(2)->SetLeftMargin(.12);
     auto avgSpecN=evNull->drawAvgSpectrogram(major, minor, 0,ch,evNull->scopeNEvents, nfft, nOverlap, padTo, window, log);
     avgSpecN->SetTitle("Full CH"+TString::Itoa(ch, 10));
     //    avgSpecN->GetZaxis()->SetRangeUser(zmin, zmax);
@@ -284,8 +328,37 @@ TNtuple * TAnalyze::integrateAllWithSideband(int channel, int dataset, int major
   }
   return tup;
 }
+vector<vector<double>> TAnalyze::sidebandSubtractAll(int channel, int dataset,int major, int minor, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm){
+  auto ev=new T576Event(50, dataset);
+  ev->loadScopeEvent(major, minor, 0);
+  int number=0;
+  //  TNtuple *tup=new TNtuple("tup", "tup", "sig:err");
+  auto graphs=vector<TGraph*>();
+  auto tup=vector<vector<double>>(ev->scopeNEvents, vector<double>(2));
+    //    loadScopeEvent(major, minor, 0);
+    for(int i=0;i<ev->scopeNEvents;i++){
+      ev->loadScopeEvent(major, minor, i);
+      if(ev->isGood==1){
+	auto spec = TUtil::FFT::spectrogram(ev->scope->ch[channel], nfft, overlap, zeroPadLength, window, dbFlag);
+	double err=0.;
+	if(norm=1){
+	  TUtil::normalize(spec, 0, ev->analogBandwidth);
+	} //	spec->Scale(scale);
+	auto sig=TUtil::sidebandSubtraction2DWithErrors(spec, xmin, xmax, ymin, ymax, err);
+	//	auto sb=TUtil::integrate(spec, sbxmin, sbxmax, sbymin, sbymax);
+	delete spec;
+	//	tup->Fill(sig, err);
+	tup[i][0]=sig;
+	tup[i][1]=err;
+	number++;
+      }
+      //      if(number>=num)break;
+      
+  }
+  return tup;
+}
 
-TNtuple * TAnalyze::sidebandSubtractAll(int channel, int dataset,int major, int minor, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm){
+TNtuple * TAnalyze::sidebandSubtractAllTuple(int channel, int dataset,int major, int minor, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm){
   auto ev=new T576Event(50, dataset);
   ev->loadScopeEvent(major, minor, 0);
   int number=0;

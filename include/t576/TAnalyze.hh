@@ -68,6 +68,8 @@ namespace TAnalyze{
   int drawAvgRealNull(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0, int norm=0);
 
   TCanvas * avgRealNull(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0, int norm=0, int cursorType=0);
+
+  TCanvas* avgRealFull(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0, int cursorType=0);
   
   int drawAvgRealNullWithGeom(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0, int norm=0);
   int drawAvgRealNullFull(int ch, int major, int minor, int nfft=512, int nOverlap=450, int padTo=800, int window=2, int log=0, int norm=0);
@@ -81,7 +83,8 @@ namespace TAnalyze{
   //utility functions
 
   TNtuple * integrateAllWithSideband(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double sbxmin, double sbxmax, double sbymin, double sbymax, int norm);
-  TNtuple * sidebandSubtractAll(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
+  vector<vector<double>> sidebandSubtractAll(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
+  TNtuple * sidebandSubtractAllTuple(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
 
   TH2D * nullSubtractedSpectrogram(int ch, int major, int minor, int event, int nfft, int nOverlap, int padTo, int window, int log);
   TH2D * avgNullSubtractedSpectrogram(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log);

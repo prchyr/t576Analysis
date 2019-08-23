@@ -416,8 +416,8 @@ utilities.
   TGraph * plotWindow(double peakAmplitude, double len, double GSs, double startt, double endt, int type);
   TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max, double scale=1.);
   TGraph * makeNullDataFixedLength(TGraph *sig, TGraph *back, double t_min, int nSamps);
-  double sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0);
-  double sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, int draw=0);
+  double sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0, Color_t color=kRed);
+  double sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, int draw=0, Color_t color=kRed);
   //degrees to radians
   double deg2Rad(double deg);
   //radians to degrees
@@ -450,10 +450,18 @@ utilities.
   void ranges(TH1F *inGr, double x1, double x2, double y1, double y2);
   void xrange(TH1F *inGr, double x1, double x2);
   void yrange(TH1F *inGr, double y1, double y2);
-  void titles(TH2D *inGr, TString title, TString xtitle, TString ytitle);
-  void ranges(TH2D *inGr, double x1, double x2, double y1, double y2);
+
+  void titles(TH2D *inGr, TString title, TString xtitle, TString ytitle, TString ztitle);
+  void ranges(TH2D *inGr, double x1, double x2, double y1, double y2, double z1=0, double z2=0);
   void xrange(TH2D *inGr, double x1, double x2);
   void yrange(TH2D *inGr, double y1, double y2);
+  void zrange(TH2D *inGr, double z1, double z2);
+
+  void titles(TH2F *inGr, TString title, TString xtitle, TString ytitle, TString ztitle);
+  void ranges(TH2F *inGr, double x1, double x2, double y1, double y2);
+
+  void xrange(TH2F *inGr, double x1, double x2);
+  void yrange(TH2F *inGr, double y1, double y2);
   //draw a bunch of graphs
   void draw(vector<TGraph*> inGr, TString option="");
     //draw a bunch of graphs
@@ -524,6 +532,8 @@ The FFT namespace, for everything to do with FFTs.
     TGraph * zeroPhaseAt(TGraph *inGr, double freq, int debug=0);
     //set the phase angle at the given frequency
     TGraph * setPhaseAt(TGraph *inGr, double freq, double phaseAng, int debug=0);
+    //get the power magnitude at some frequency
+    double getMagAt(TGraph *inGr, double freq);
     //return the Hilbert envelope
     TGraph * hilbertEnvelope(TGraph *inGr);
     //return the power spectral density in dBm/Hz, rBW is the resolution bandwith of the system, used to calculate the density. defaults to Nyquist.

@@ -127,12 +127,13 @@ TGraph * TUtil::FFT::psd(TGraph * inGr, int dbFlag, double rBW ){
   yy[0]=dbFlag==1?vToDbmHz(rBW,re[0]):re[0];
   for(int i=1;i<(n+1)/2;i++){
     yy[i]=vToDbmHz(rBW, re[i], im[i]);
-    yy[i]=dbFlag==1?vToDbmHz(rBW,re[i], im[i]):re[i]*re[i]+im[i]*im[i];
+    yy[i]=dbFlag==1?vToDbmHz(rBW,re[i], im[i]):(re[i]*re[i]+im[i]*im[i]);
   }
-  yy[n/2]=dbFlag==1?vToDbmHz(rBW,re[n/2], im[n/2]):re[n/2]*re[n/2]+im[n/2]*im[n/2];
+  yy[n/2]=dbFlag==1?vToDbmHz(rBW,re[n/2], im[n/2]):(re[n/2]*re[n/2]+im[n/2]*im[n/2]);
 
   TGraph * outGr=new TGraph((n/2), xx, yy);
-
+  outGr->SetTitle("psd");
+  outGr->SetName("psd");
   *fPSDGr=*outGr;
   //delete outGr;
   return outGr;//fPSDGr;
@@ -296,7 +297,7 @@ TGraph* TUtil::FFT::peakFreqGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int
       }
       timeH=gr->GetX()[start+(sampnum/2)];
       
-      outt=TUtil::FFT::psd(in, samprate/2.,0);
+      outt=TUtil::FFT::psd(in,0, samprate/2.);
       
       auto max=TUtil::maxInRange(outt, 0, 3);
       if(timeH>lasttimeH && max>thresh){
@@ -338,13 +339,23 @@ TGraph * TUtil::FFT::plotPhase(TGraph *inGr){
 
 double TUtil::FFT::getPhaseAt(TGraph *inGr, double freq){
 
-  TGraph2D * fftGr=(TGraph2D*)TUtil::FFT::fft(inGr)->Clone();
-  int index=TUtil::getIndex(fftGr);
+  auto fftGr=TUtil::FFT::fft(inGr);
+  int index=TUtil::getIndex(fftGr, freq);
   auto ph=TMath::ATan2(fftGr->GetZ()[index], fftGr->GetY()[index]);
-  cout<<index<<" "<<fftGr->GetX()[index]<<endl;
-  delete fftGr;
+  //  cout<<index<<" "<<fftGr->GetX()[index]<<endl;
+  //  delete fftGr;
   return ph;
 }
+
+double TUtil::FFT::getMagAt(TGraph *inGr, double freq){
+  auto fftGr=TUtil::FFT::fft(inGr);
+  int index=TUtil::getIndex(fftGr, freq);
+  auto mag=sqrt(fftGr->GetY()[index]*fftGr->GetY()[index] + fftGr->GetZ()[index]*fftGr->GetZ()[index]);
+  //  cout<<index<<" "<<fftGr->GetX()[index]<<endl;
+  //  delete fftGr;
+  return mag;
+}
+
 
 
 // TGraph * TUtil::FFT::phasorTransform(TGraph *inGr){
@@ -385,7 +396,7 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   Int_t start = 0;
   //  Int_t j=0;
   //cout<<size<<" "<<nbins<<" "<<zero_pad_length<<" "<<binsize<<" "<<overlap<<" "<<num_zeros<<" "<<xmax*samprate<<endl;
-  TH2D *spectrogramHist=new TH2D("", "spectrogram", nbins-1, xmin, xmax, (zero_pad_length), 0, samprate);
+  TH2D *spectrogramHist=new TH2D("", "", nbins-1, xmin, xmax, (zero_pad_length), 0, samprate);
   spectrogramHist->SetDirectory(0);
   for(int i=0;i<nbins;i++){
     TGraph * in=new TGraph(zero_pad_length);
@@ -420,7 +431,7 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
       // 	in->SetPoint(j, gr->GetX()[j], 0);
       // }
       
-      auto outt=TUtil::FFT::psd(in, samprate/2., dbFlag);
+      auto outt=TUtil::FFT::psd(in, dbFlag,samprate/2.);
       
       for(int j = 0;j<outt->GetN();j++){
 	Double_t z = outt->GetY()[j];
@@ -436,11 +447,11 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
     }
       start+=(binsize-overlap);
     }
-
+  //  cout<<dbFlag<<endl;
 
   spectrogramHist->GetYaxis()->SetRangeUser(0, spectrogramHist->GetYaxis()->GetXmax()/2.1);
-  spectrogramHist->GetXaxis()->SetTitle("Time (ns)");
-  spectrogramHist->GetYaxis()->SetTitle("Frequency (GHz)");
+  spectrogramHist->GetXaxis()->SetTitle("Time [ns]");
+  spectrogramHist->GetYaxis()->SetTitle("Frequency [GHz]");
   if(dbFlag){
     spectrogramHist->GetZaxis()->SetTitle("dBm/Hz");
   }
@@ -450,8 +461,10 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   spectrogramHist->GetZaxis()->SetTitleOffset(1.5);
   spectrogramHist->GetXaxis()->SetTitleSize(.05);
   spectrogramHist->GetYaxis()->SetTitleSize(.05);
+  spectrogramHist->GetZaxis()->SetTitleSize(.05);
   spectrogramHist->GetXaxis()->SetLabelSize(.05);
   spectrogramHist->GetYaxis()->SetLabelSize(.05);
+  spectrogramHist->GetZaxis()->SetLabelSize(.05);
   spectrogramHist->GetYaxis()->SetTitleOffset(1.1);
   spectrogramHist->GetYaxis()->SetRangeUser(ymin, ymax);
   //  delete(in);
@@ -934,8 +947,8 @@ double TUtil::locMinInRange(TGraph *gr, double t_low, double t_high){
 
 int TUtil::getIndex(TGraph * gr, double t){
   int index=0;
-  for(int i=1;i<gr->GetN();i++){
-    if(gr->GetX()[i-1]<t&&gr->GetX()[i]>=t){
+  for(int i=0;i<gr->GetN()-1;i++){
+    if(gr->GetX()[i+1]>t){
       index=i;
       return index;
     }
@@ -945,13 +958,21 @@ int TUtil::getIndex(TGraph * gr, double t){
 
 int TUtil::getIndex(TGraph2D * gr, double t){
   int index=0;
-  for(int i=1;i<gr->GetN();i++){
-    if(gr->GetX()[i-1]<t&&gr->GetX()[i]>=t){
+  double minVal=999999.;
+  for(int i=0;i<gr->GetN()-1;i++){
+    auto val=abs(gr->GetX()[i]-t);
+    if(val<minVal){
+      minVal=val;
       index=i;
-      return index;
     }
+    //if(gr->GetX()[i]==t||gr->GetX()[i+1]>t){
+    // cout<<gr->GetX()[i]<<" "<<gr->GetX()[i+1]<<endl;
+    // index=i;
+    // return index;
+    //}
   }
-  return 0;
+  
+  return index;
 }
 
 
@@ -2188,11 +2209,11 @@ double TUtil::integrate(TH2D *h, double xmin, double xmax, double ymin, double y
 }
 
 double TUtil::integrateWithError(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err){
-Int_t xmin_bin = h->GetXaxis()->FindBin(xmin);
+  Int_t xmin_bin = h->GetXaxis()->FindBin(xmin);
   Int_t xmax_bin = h->GetXaxis()->FindBin(xmax);
   Int_t ymin_bin = h->GetYaxis()->FindBin(ymin);
   Int_t ymax_bin = h->GetYaxis()->FindBin(ymax);
-
+  //  cout<<xmin_bin<<" "<<xmax_bin<<" "<<ymin_bin<<" "<<ymax_bin<<endl;
   return  h->IntegralAndError(xmin_bin, xmax_bin, ymin_bin, ymax_bin, err);//TUtil::integrate(h, xmin, xmax, ymin, ymax, err);
 }
 
@@ -2232,7 +2253,7 @@ signal band backgrounds are subtracted from the signal quadrant to get signal.
  */
 
 
-double TUtil::sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw){
+double TUtil::sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw, Color_t color){
 
   double x1, x2, x3, x4, y1, y2, y3, y4, bandwidth_x, bandwidth_y,ix1, ix2, iy1, iy2, isig, ib1, ib2, ib3, ib4, background, bandy, bandx, avg_x, avg_y, sig;
   double ix1_err, ix2_err, iy1_err, iy2_err, isig_err, ib1_err, ib2_err, ib3_err, ib4_err, background_err, bandy_err, bandx_err, avg_x_err, avg_y_err, sig_err;
@@ -2268,11 +2289,18 @@ double TUtil::sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double s
   //make the signal integral
   isig = integrateWithError(h, x2, x3, y2, y3, isig_err);
   
-
+  //cout<<isig<<" "<<isig_err<<endl;
+  //cout<<ix1<<" "<<ix1_err<<endl;
+  //cout<<iy1<<" "<<iy1_err<<endl;
   //errors. add in quadrature and average.
-  background_err = sqrt(pow(ib1_err, 2)+pow(ib2_err, 2)+pow(ib3_err, 2)+pow(ib4_err, 2))/2;
-  bandx_err = sqrt(pow(ix1_err, 2)+pow(ix2_err, 2))/sqrt(2);
-  bandy_err = sqrt(pow(iy1_err, 2)+pow(iy2_err, 2))/sqrt(2);
+  background_err = sqrt(pow(ib1_err, 2)+pow(ib2_err, 2)+pow(ib3_err, 2)+pow(ib4_err, 2))/4.;
+  bandx_err = sqrt(pow(ix1_err, 2)+pow(ix2_err, 2))/2.;
+  bandy_err = sqrt(pow(iy1_err, 2)+pow(iy2_err, 2))/2.;
+
+
+  // background_err = (ib1_err+ib2_err+ib3_err+ib4_err)/4.;
+  // bandx_err = (ix1_err+ix2_err)/2.;
+  // bandy_err = (iy1_err+iy2_err)/2.;
 
   sig_err = sqrt(pow(background_err, 2)+pow(bandx_err, 2)+pow(bandy_err, 2));
   err=sig_err;
@@ -2284,7 +2312,7 @@ double TUtil::sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double s
   //  TString tit = std::to_string(sig);
 
   if(draw==1){
-    h->Draw("colz");
+    h->Draw("colz0");
     double ymin = gPad->GetUymin();//h->GetYaxis()->GetXmin();
     double ymax = gPad->GetUymax();//h->GetYaxis()->GetXmax();
     double xmin = gPad->GetUxmin();//h->GetXaxis()->GetXmin();
@@ -2298,11 +2326,20 @@ double TUtil::sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double s
     TLine *l6 = new TLine(x4, ymin, x4, ymax);
     TLine *l7 = new TLine(xmin, y1, xmax, y1);
     TLine *l8 = new TLine(xmin, y4, xmax, y4);
-    l1->SetLineColor(kRed);
-    l2->SetLineColor(kRed);
-    l3->SetLineColor(kRed);
-    l4->SetLineColor(kRed);
+    l1->SetLineColor(color);
+    l2->SetLineColor(color);
+    l3->SetLineColor(color);
+    l4->SetLineColor(color);
 
+    l5->SetLineColor(color);
+    l6->SetLineColor(color);
+    l7->SetLineColor(color);
+    l8->SetLineColor(color);
+    l5->SetLineStyle(7);
+    l6->SetLineStyle(7);
+    l7->SetLineStyle(7);
+    l8->SetLineStyle(7);
+    
     l1->Draw();
     l2->Draw();
     l3->Draw();
@@ -2323,7 +2360,7 @@ double TUtil::sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double s
 } 
 
 
-double TUtil::sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, int draw){
+double TUtil::sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, int draw, Color_t color){
 
   double x1, x2, x3, x4, y1, y2, y3, y4, bandwidth_x, bandwidth_y,ix1, ix2, iy1, iy2, isig, ib1, ib2, ib3, ib4, background, bandy, bandx, avg_x, avg_y, sig;
   double ix1_err, ix2_err, iy1_err, iy2_err, isig_err, ib1_err, ib2_err, ib3_err, ib4_err, background_err, bandy_err, bandx_err, avg_x_err, avg_y_err, sig_err;
@@ -2375,7 +2412,7 @@ double TUtil::sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, d
   //  TString tit = std::to_string(sig);
 
   if(draw==1){
-    h->Draw("colz");
+    h->Draw("colz0");
     double ymin = gPad->GetUymin();//h->GetYaxis()->GetXmin();
     double ymax = gPad->GetUymax();//h->GetYaxis()->GetXmax();
     double xmin = gPad->GetUxmin();//h->GetXaxis()->GetXmin();
@@ -2389,10 +2426,19 @@ double TUtil::sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, d
     TLine *l6 = new TLine(x4, ymin, x4, ymax);
     TLine *l7 = new TLine(xmin, y1, xmax, y1);
     TLine *l8 = new TLine(xmin, y4, xmax, y4);
-    l1->SetLineColor(kRed);
-    l2->SetLineColor(kRed);
-    l3->SetLineColor(kRed);
-    l4->SetLineColor(kRed);
+    l1->SetLineColor(color);
+    l2->SetLineColor(color);
+    l3->SetLineColor(color);
+    l4->SetLineColor(color);
+
+    l5->SetLineColor(color);
+    l6->SetLineColor(color);
+    l7->SetLineColor(color);
+    l8->SetLineColor(color);
+    l5->SetLineStyle(7);
+    l6->SetLineStyle(7);
+    l7->SetLineStyle(7);
+    l8->SetLineStyle(7);
 
     l1->Draw();
     l2->Draw();
@@ -2645,21 +2691,48 @@ void TUtil::xrange(TH1F *inGr, double x1, double x2){
   inGr->GetXaxis()->SetRangeUser(x1, x2);
 }
 
-void TUtil::titles(TH2D *inGr, TString title, TString xtitle, TString ytitle){
+void TUtil::titles(TH2D *inGr, TString title, TString xtitle, TString ytitle, TString ztitle){
   inGr->SetTitle(title);
   inGr->GetXaxis()->SetTitle(xtitle);
   inGr->GetYaxis()->SetTitle(ytitle);
+  inGr->GetZaxis()->SetTitle(ztitle);
 }
 
-void TUtil::ranges(TH2D *inGr,double x1, double x2, double y1, double y2){
+void TUtil::ranges(TH2D *inGr,double x1, double x2, double y1, double y2, double z1, double z2){
   TUtil::yrange(inGr, y1, y2);
   TUtil::xrange(inGr, x1, x2);
+  if(z1!=0&&z2!=0){
+    TUtil::zrange(inGr, z1, z2);
+  }
+
 }
 void TUtil::yrange(TH2D *inGr, double y1, double y2){
   inGr->GetYaxis()->SetRangeUser(y1, y2);
 }
 
 void TUtil::xrange(TH2D *inGr, double x1, double x2){
+  inGr->GetXaxis()->SetRangeUser(x1, x2);
+}
+void TUtil::zrange(TH2D *inGr, double z1, double z2){
+  inGr->GetZaxis()->SetRangeUser(z1, z2);
+}
+
+
+void TUtil::titles(TH2F *inGr, TString title, TString xtitle, TString ytitle, TString ztitle){
+  inGr->SetTitle(title);
+  inGr->GetXaxis()->SetTitle(xtitle);
+  inGr->GetYaxis()->SetTitle(ytitle);
+  inGr->GetZaxis()->SetTitle(ztitle);
+}
+void TUtil::ranges(TH2F *inGr,double x1, double x2, double y1, double y2){
+  TUtil::yrange(inGr, y1, y2);
+  TUtil::xrange(inGr, x1, x2);
+}
+void TUtil::yrange(TH2F *inGr, double y1, double y2){
+  inGr->GetYaxis()->SetRangeUser(y1, y2);
+}
+
+void TUtil::xrange(TH2F *inGr, double x1, double x2){
   inGr->GetXaxis()->SetRangeUser(x1, x2);
 }
 
