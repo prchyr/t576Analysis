@@ -1566,8 +1566,8 @@ TGraph * TUtil::getChunkOfGraph(TGraph *ingr, double start, double end, int dela
   }
 
   TGraph * outg=new TGraph(outx.size(), &outx[0], &outy[0]);
-  outg->SetTitle(ingr->GetTitle());
-  outg->SetName(ingr->GetName());
+  //outg->SetTitle(ingr->GetTitle());
+  //outg->SetName(ingr->GetName());
   outg->GetXaxis()->SetTitle(ingr->GetXaxis()->GetTitle());
   outg->GetYaxis()->SetTitle(ingr->GetYaxis()->GetTitle());
   if(delay_to_zero==0){
@@ -2190,7 +2190,7 @@ TGraph * TUtil::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_m
   auto outg=add(sigchunk, TUtil::scale(backchunk, scale));
   delete sigchunk;
   delete backchunk;
-  return 
+  return outg;
 }
 
 TGraph * TUtil::makeNullDataFixedLength(TGraph *sig, TGraph *back, double t_min, int nSamps){
