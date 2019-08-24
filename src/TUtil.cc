@@ -1680,15 +1680,15 @@ int TUtil::delayGraph(TGraph *ingr, TGraph *outgr, double delay){
   for(int i=0;i<ingr->GetN();i++){
     xxout[i]=(double)xx[i]+delay;
   }
-  outgr=new TGraph(ingr->GetN(), xxout, yy);
-  // TGraph *dg=new TGraph(ingr->GetN(), xxout, yy);
-  // dg->SetTitle(ingr->GetTitle());
-  // dg->SetName(ingr->GetName());
-  // dg->GetXaxis()->SetTitle(ingr->GetXaxis()->GetTitle());
-  // dg->GetYaxis()->SetTitle(ingr->GetYaxis()->GetTitle());
+  
+  TGraph *dg=new TGraph(ingr->GetN(), xxout, yy);
+  //dg->SetTitle(ingr->GetTitle());
+  //dg->SetName(ingr->GetName());
+  //dg->GetXaxis()->SetTitle(ingr->GetXaxis()->GetTitle());
+  //dg->GetYaxis()->SetTitle(ingr->GetYaxis()->GetTitle());
 
-  // *outgr=*dg;
-  //  delete dg;
+  *outgr=*dg;
+  delete dg;
   return 1;
 }
 
