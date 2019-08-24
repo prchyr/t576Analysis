@@ -2187,6 +2187,8 @@ TGraph * TUtil::addNoise(TGraph * inGr, double level){
 TGraph * TUtil::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_max, double scale){
   auto sigchunk=getChunkOfGraph(sig, 0., (t_max-t_min));
   auto backchunk=getChunkOfGraph(back, t_min, t_max ,1);
+  sigchunk->SetBit(kCanDelete);
+  backchunk->SetBit(kCanDelete);
   auto outg=add(sigchunk, TUtil::scale(backchunk, scale));
   delete sigchunk;
   delete backchunk;
