@@ -2190,7 +2190,8 @@ TGraph * TUtil::makeNullData(TGraph *sig, TGraph *back, double t_min, double t_m
   auto backchunk=getChunkOfGraph(back, t_min, t_max ,1);
   sigchunk->SetBit(kCanDelete);
   backchunk->SetBit(kCanDelete);
-  auto outg=add(sigchunk, TUtil::scale(backchunk, scale));
+  //auto outg=add(sigchunk, TUtil::scale(backchunk, scale));
+  auto outg=add(sigchunk, backchunk);
   delete sigchunk;
   delete backchunk;
   return outg;
