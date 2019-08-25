@@ -417,6 +417,7 @@ utilities.
   TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max, double scale=1.);
   TGraph * makeNullDataFixedLength(TGraph *sig, TGraph *back, double t_min, int nSamps);
   double sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0, Color_t color=kRed);
+  double sidebandSubtraction2DDev(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0, Color_t color=kRed);
   double sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, int draw=0, Color_t color=kRed);
   //degrees to radians
   double deg2Rad(double deg);

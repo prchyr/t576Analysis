@@ -341,7 +341,7 @@ vector<vector<double>> TAnalyze::sidebandSubtractAll(int channel, int dataset,in
       if(ev->isGood==1){
 	auto spec = TUtil::FFT::spectrogram(ev->scope->ch[channel], nfft, overlap, zeroPadLength, window, dbFlag);
 	double err=0.;
-	if(norm=1){
+	if(norm==1){
 	  TUtil::normalize(spec, 0, ev->analogBandwidth);
 	} //	spec->Scale(scale);
 	auto sig=TUtil::sidebandSubtraction2DWithErrors(spec, xmin, xmax, ymin, ymax, err);
@@ -371,7 +371,7 @@ TNtuple * TAnalyze::sidebandSubtractAllTuple(int channel, int dataset,int major,
       if(ev->isGood==1){
 	auto spec = TUtil::FFT::spectrogram(ev->scope->ch[channel], nfft, overlap, zeroPadLength, window, dbFlag);
 	double err=0.;
-	if(norm=1){
+	if(norm==1){
 	  TUtil::normalize(spec, 0, ev->analogBandwidth);
 	} //	spec->Scale(scale);
 	auto sig=TUtil::sidebandSubtraction2DWithErrors(spec, xmin, xmax, ymin, ymax, err);
@@ -480,6 +480,23 @@ double TAnalyze::getSignalDTOA(int ch, int major, int minor, int dataset){
 
   auto t_3=((ev->targetCenter-ev->scope->pos[ch]).Mag()-d_2)/TUtil::c_light;
   return t_1+t_2+t_3-t_0;
-
-
 }
+
+TH1F* TAnalyze::bootstrapSidebandSubtract(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh){
+  auto vec=TAnalyze::sidebandSubtractAll(channel, dataset, major, minor, nfft, overlap, zeroPadLength, window, dbFlag, xmin, xmax, ymin, ymax, 0);
+
+  auto rann=new TRandom3();
+    rann->SetSeed();
+    auto histt=new TH1F("asdf", "asdf", nbins, binlow, binhigh);
+    for(int i=0;i<n;i++){
+      auto avg=0.;
+      for(int j=0;j<100;j++){
+        auto val=rann->Integer(100);
+        avg+=vec[val][0]*1000.;
+      }
+      histt->Fill(avg/100);
+    }
+    histt->SetDirectory(0);
+    return histt;
+
+  }

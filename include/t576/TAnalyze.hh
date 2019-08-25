@@ -91,5 +91,8 @@ namespace TAnalyze{
 
   double getSignalTOA(int ch, int major, int minor, int dataset=1);
   double getSignalDTOA(int ch, int major, int minor, int dataset);
+
+  TH1F* bootstrapSidebandSubtract(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh);
+
 }
 #endif
