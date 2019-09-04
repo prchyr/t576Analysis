@@ -193,6 +193,8 @@ public:
   //the tx-rx direct path
   double txrx[3]={0.,0.,0.};
   double rawTxrx[3]={0.,0.,0.};
+  double rawTXIntegratedSpectrogram[3]={0.,0.,0.};
+
   
   TVector3 pos[3];
   //unused currently

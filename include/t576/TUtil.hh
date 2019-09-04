@@ -52,6 +52,7 @@ charge: nC
 #include "TTreeIndex.h"
 #include "TGraph.h"
 #include "TGraph2D.h"
+#include "TGraphErrors.h"
 #include "TMath.h"
 #include "TVirtualFFT.h"
 #include "Math/Interpolator.h"
@@ -320,6 +321,8 @@ utilities.
   TGraph * divide(TGraph *g1, TGraph *g2, double constant);
   //shift a graph along the y axis by the factor
   TGraph * shiftY(TGraph *g1, double factor);
+  //shift a tprofile along the y axis by the factor
+  TGraphErrors * shiftY(TProfile *g1, double factor);
   //shift a graph along the x axis by the factor
   TGraph * shiftX(TGraph *g1, double factor);
   //scale a TGraph by a constant factor

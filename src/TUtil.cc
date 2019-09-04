@@ -1337,6 +1337,25 @@ TGraph * TUtil::shiftY(TGraph *g1, double factor){
   return outGr;
   
 }
+
+TGraphErrors * TUtil::shiftY(TProfile *g1, double factor){
+  TGraphErrors *outGr=new TGraphErrors();
+  g1->SetErrorOption("i");
+  for(int i=0;i<g1->GetNbinsX();i++){
+    if(g1->GetBinContent(i)!=0){
+      outGr->SetPoint(outGr->GetN(), g1->GetBinCenter(i), g1->GetBinContent(i)+factor);
+      outGr->SetPointError(outGr->GetN()-1, (g1->GetBinCenter(1)-g1->GetBinCenter(0))/2.,g1->GetBinError(i) );
+    }
+  }
+  //  outGr->SetName(g1->GetName());
+  //outGr->SetTitle(g1->GetTitle());
+  outGr->GetXaxis()->SetTitle(g1->GetXaxis()->GetTitle());
+  outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
+
+  return outGr;
+  
+}
+
 TGraph * TUtil::shiftX(TGraph *g1, double factor){
   TGraph *outGr=new TGraph(g1->GetN());
   for(int i=0;i<g1->GetN();i++){
