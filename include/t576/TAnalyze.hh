@@ -84,6 +84,7 @@ namespace TAnalyze{
 
   TNtuple * integrateAllWithSideband(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double sbxmin, double sbxmax, double sbymin, double sbymax, int norm);
   vector<vector<double>> sidebandSubtractAll(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
+  vector<vector<double>> sidebandSubtractAllXAxis(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
   TNtuple * sidebandSubtractAllTuple(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
 
   TH2D * nullSubtractedSpectrogram(int ch, int major, int minor, int event, int nfft, int nOverlap, int padTo, int window, int log);
@@ -93,6 +94,8 @@ namespace TAnalyze{
   double getSignalDTOA(int ch, int major, int minor, int dataset);
 
   TH1F* bootstrapSidebandSubtract(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh);
+
+  TH1F* bootstrapSidebandSubtractXAxis(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh);
 
 }
 #endif
