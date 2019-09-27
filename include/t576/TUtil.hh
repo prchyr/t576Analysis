@@ -421,6 +421,7 @@ utilities.
   TGraph * makeNullDataFixedLength(TGraph *sig, TGraph *back, double t_min, int nSamps);
   double sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0, Color_t color=kRed);
   double sidebandSubtractionXAxisWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double &err, int draw=0, Color_t color=kRed);
+  double sidebandSubtractionYAxisWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double &err, int draw=0, Color_t color=kRed);
   double sidebandSubtraction2DDev(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0, Color_t color=kRed);
   double sidebandSubtraction2D(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, int draw=0, Color_t color=kRed);
 
@@ -448,6 +449,12 @@ utilities.
   void ranges(TGraph *inGr, double x1, double x2, double y1, double y2);
   void xrange(TGraph *inGr, double x1, double x2);
   void yrange(TGraph *inGr, double y1, double y2);
+
+  void titles(TGraphErrors *inGr, TString title, TString xtitle, TString ytitle);
+  void ranges(TGraphErrors *inGr, double x1, double x2, double y1, double y2);
+  void xrange(TGraphErrors *inGr, double x1, double x2);
+  void yrange(TGraphErrors *inGr, double y1, double y2);
+  
   void titles(TProfile *inGr, TString title, TString xtitle, TString ytitle);
   void ranges(TProfile *inGr, double x1, double x2, double y1, double y2);
   void xrange(TProfile *inGr, double x1, double x2);

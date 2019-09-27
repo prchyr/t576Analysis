@@ -328,7 +328,7 @@ TNtuple * TAnalyze::integrateAllWithSideband(int channel, int dataset, int major
   }
   return tup;
 }
-vector<vector<double>> TAnalyze::sidebandSubtractAll(int channel, int dataset,int major, int minor, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm){
+vector<vector<double>> TAnalyze::sidebandSubtractAll(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm){
   auto ev=new T576Event(50, dataset);
   ev->loadScopeEvent(major, minor, 0);
   int number=0;
@@ -358,7 +358,7 @@ vector<vector<double>> TAnalyze::sidebandSubtractAll(int channel, int dataset,in
   return tup;
 }
 
-vector<vector<double>> TAnalyze::sidebandSubtractAllXAxis(int channel, int dataset,int major, int minor, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm){
+vector<vector<double>> TAnalyze::sidebandSubtractAllXAxis(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm){
   auto ev=new T576Event(50, dataset);
   ev->loadScopeEvent(major, minor, 0);
   int number=0;
@@ -388,7 +388,37 @@ vector<vector<double>> TAnalyze::sidebandSubtractAllXAxis(int channel, int datas
   return tup;
 }
 
-TNtuple * TAnalyze::sidebandSubtractAllTuple(int channel, int dataset,int major, int minor, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm){
+vector<vector<double>> TAnalyze::sidebandSubtractAllYAxis(int major, int minor, int channel, int dataset ,int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm){
+  auto ev=new T576Event(50, dataset);
+  ev->loadScopeEvent(major, minor, 0);
+  int number=0;
+  //  TNtuple *tup=new TNtuple("tup", "tup", "sig:err");
+  auto graphs=vector<TGraph*>();
+  auto tup=vector<vector<double>>(ev->scopeNEvents, vector<double>(2));
+    //    loadScopeEvent(major, minor, 0);
+    for(int i=0;i<ev->scopeNEvents;i++){
+      ev->loadScopeEvent(major, minor, i);
+      if(ev->isGood==1){
+	auto spec = TUtil::FFT::spectrogram(ev->scope->ch[channel], nfft, overlap, zeroPadLength, window, dbFlag);
+	double err=0.;
+	if(norm==1){
+	  TUtil::normalize(spec, 0, ev->analogBandwidth);
+	} //	spec->Scale(scale);
+	auto sig=TUtil::sidebandSubtractionYAxisWithErrors(spec, xmin, xmax, ymin, ymax, err);
+	//	auto sb=TUtil::integrate(spec, sbxmin, sbxmax, sbymin, sbymax);
+	delete spec;
+	//	tup->Fill(sig, err);
+	tup[i][0]=sig;
+	tup[i][1]=err;
+	number++;
+      }
+      //      if(number>=num)break;
+      
+  }
+  return tup;
+}
+
+TNtuple * TAnalyze::sidebandSubtractAllTuple(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm){
   auto ev=new T576Event(50, dataset);
   ev->loadScopeEvent(major, minor, 0);
   int number=0;
@@ -512,8 +542,8 @@ double TAnalyze::getSignalDTOA(int ch, int major, int minor, int dataset){
   return t_1+t_2+t_3-t_0;
 }
 
-TH1F* TAnalyze::bootstrapSidebandSubtract(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh){
-  auto vec=TAnalyze::sidebandSubtractAll(channel, dataset, major, minor, nfft, overlap, zeroPadLength, window, dbFlag, xmin, xmax, ymin, ymax, 0);
+TH1F* TAnalyze::bootstrapSidebandSubtract(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh, double constant){
+  auto vec=TAnalyze::sidebandSubtractAll(major, minor, channel, dataset, nfft, overlap, zeroPadLength, window, dbFlag, xmin, xmax, ymin, ymax, 0);
 
   auto rann=new TRandom3();
     rann->SetSeed();
@@ -522,9 +552,9 @@ TH1F* TAnalyze::bootstrapSidebandSubtract(int major, int minor, int channel, int
       auto avg=0.;
       for(int j=0;j<100;j++){
         auto val=rann->Integer(100);
-        avg+=vec[val][0]*1000.;
+        avg+=vec[val][0]*constant;
       }
-      histt->Fill(avg/100);
+      histt->Fill(avg/100.);
     }
     histt->SetDirectory(0);
     return histt;
@@ -532,21 +562,113 @@ TH1F* TAnalyze::bootstrapSidebandSubtract(int major, int minor, int channel, int
   }
 
 
-TH1F* TAnalyze::bootstrapSidebandSubtractXAxis(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh){
-  auto vec=TAnalyze::sidebandSubtractAllXAxis(channel, dataset, major, minor, nfft, overlap, zeroPadLength, window, dbFlag, xmin, xmax, ymin, ymax, 0);
+TH1F* TAnalyze::bootstrapSidebandSubtractYAxis(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh, double constant){
+  auto vec=TAnalyze::sidebandSubtractAllYAxis(major, minor, channel, dataset, nfft, overlap, zeroPadLength, window, dbFlag, xmin, xmax, ymin, ymax, 0);
 
   auto rann=new TRandom3();
     rann->SetSeed();
     auto histt=new TH1F("asdf", "asdf", nbins, binlow, binhigh);
     for(int i=0;i<n;i++){
       auto avg=0.;
+      double num=0.;
       for(int j=0;j<100;j++){
         auto val=rann->Integer(100);
-        avg+=vec[val][0]*1000.;
+	if(vec[val][0]!=0){
+	  avg+=vec[val][0]*constant;
+	  num+=1.;
+	}
       }
-      histt->Fill(avg/100);
+      histt->Fill(avg/num);
+    }
+    histt->SetDirectory(0);
+    return histt;
+    
+    }
+
+TH1F* TAnalyze::bootstrapSidebandSubtractXAxis(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh, double constant){
+  auto vec=TAnalyze::sidebandSubtractAllXAxis(major, minor, channel, dataset, nfft, overlap, zeroPadLength, window, dbFlag, xmin, xmax, ymin, ymax, 0);
+
+  auto rann=new TRandom3();
+    rann->SetSeed();
+    auto histt=new TH1F("asdf", "asdf", nbins, binlow, binhigh);
+    for(int i=0;i<n;i++){
+      auto avg=0.;
+      double num=0.;
+      for(int j=0;j<100;j++){
+        auto val=rann->Integer(100);
+	if(vec[val][0]!=0){
+	  avg+=vec[val][0]*constant;
+	  num+=1.;
+	}
+      }
+      histt->Fill(avg/num);
     }
     histt->SetDirectory(0);
     return histt;
 
+  }
+
+
+
+int TAnalyze::bootstrapSidebandSubtractXAxisVersusPower(TGraph * gr, int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n){
+  auto vec=TAnalyze::sidebandSubtractAllXAxis(major, minor, channel, dataset, nfft, overlap, zeroPadLength, window, dbFlag, xmin, xmax, ymin, ymax, 0);
+
+  auto span=xmax-xmin;
+  auto vec2=TAnalyze::sidebandSubtractAllYAxis(major, minor, channel, 0,  nfft, overlap, zeroPadLength, window, dbFlag, span+1., span+span+1., ymin, ymax, 0);
+  
+  auto rann=new TRandom3();
+    rann->SetSeed();
+    //    auto histt=new TGraph();//, nbins, binlow, binhigh);
+    for(int i=0;i<n;i++){
+      auto avg=0.;
+      auto avg2=0.;
+      double num=0.;
+      for(int j=0;j<100;j++){
+        auto val=rann->Integer(100);
+	if(vec[val][0]!=0&&vec2[val][0]!=0){
+	  avg+=vec[val][0];
+	  avg2+=vec2[val][0];
+	  num+=1.;
+	}
+      }
+      gr->SetPoint(gr->GetN(), avg2/num, avg/num);
+    }
+    //    histt->SetDirectory(0);
+    //return histt;
+    return 0;
+  }
+
+vector<double> TAnalyze::getCharge(int major, int minor){
+  auto ev=new T576Event();
+  vector<double> outvec;
+  for(int i=0;i<ev->scopeNEvents;i++){
+    ev->loadScopeEvent(major, minor, i);
+    outvec.push_back(ev->charge);
+  }
+  return outvec;
+}
+
+
+int TAnalyze::bootstrap2D(TGraph * gr,vector<double> vec0, vector<vector<double>> vec1, int n){
+  
+  auto rann=new TRandom3();
+    rann->SetSeed();
+    //    auto histt=new TGraph();//, nbins, binlow, binhigh);
+    for(int i=0;i<n;i++){
+      auto avg=0.;
+      auto avg2=0.;
+      double num=0.;
+      for(int j=0;j<100;j++){
+        auto val=rann->Integer(100);
+	if(vec0[val]!=0&&vec1[val][0]!=0){
+	  avg+=vec0[val];
+	  avg2+=vec1[val][0];
+	  num+=1.;
+	}
+      }
+      gr->SetPoint(gr->GetN(), avg2/num, avg/num);
+    }
+    //    histt->SetDirectory(0);
+    //return histt;
+    return 0;
   }

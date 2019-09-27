@@ -82,10 +82,11 @@ namespace TAnalyze{
   int drawAvgHilbert(int ch, int major, int minor, int datset=0);
   //utility functions
 
-  TNtuple * integrateAllWithSideband(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double sbxmin, double sbxmax, double sbymin, double sbymax, int norm);
-  vector<vector<double>> sidebandSubtractAll(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
-  vector<vector<double>> sidebandSubtractAllXAxis(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
-  TNtuple * sidebandSubtractAllTuple(int major, int minor, int scopeOrSurf, int channel, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
+  TNtuple * integrateAllWithSideband(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, double sbxmin, double sbxmax, double sbymin, double sbymax, int norm);
+  vector<vector<double>> sidebandSubtractAll(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
+  vector<vector<double>> sidebandSubtractAllXAxis(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
+  vector<vector<double>> sidebandSubtractAllYAxis(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
+  TNtuple * sidebandSubtractAllTuple(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int norm);
 
   TH2D * nullSubtractedSpectrogram(int ch, int major, int minor, int event, int nfft, int nOverlap, int padTo, int window, int log);
   TH2D * avgNullSubtractedSpectrogram(int ch, int major, int minor, int nfft, int nOverlap, int padTo, int window, int log);
@@ -93,9 +94,17 @@ namespace TAnalyze{
   double getSignalTOA(int ch, int major, int minor, int dataset=1);
   double getSignalDTOA(int ch, int major, int minor, int dataset);
 
-  TH1F* bootstrapSidebandSubtract(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh);
+  TH1F* bootstrapSidebandSubtract(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh, double constant=1.);
 
-  TH1F* bootstrapSidebandSubtractXAxis(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh);
+  TH1F* bootstrapSidebandSubtractXAxis(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh, double constant=1.);
+  TH1F* bootstrapSidebandSubtractYAxis(int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n, int nbins, int binlow, int binhigh, double constant=1.);
+  int bootstrapSidebandSubtractXAxisVersusPower(TGraph * gr, int major, int minor, int channel, int dataset, int nfft, int overlap, int zeroPadLength, int window, int dbFlag, double xmin, double xmax, double ymin, double ymax, int n);
+  vector<double> getCharge(int major, int minor);
+  int bootstrap2D(TGraph *gr, vector<double> vec0, vector<double>vec1);
+  int bootstrap2D(TGraph *gr, vector<double> vec0, vector<vector<double>> vec1, int n);
 
+
+
+  
 }
 #endif

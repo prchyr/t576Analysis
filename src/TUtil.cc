@@ -2490,6 +2490,112 @@ double TUtil::sidebandSubtractionXAxisWithErrors(TH2D *h, double sband_x1, doubl
 
   
   return sig;
+}
+
+double TUtil::sidebandSubtractionYAxisWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw, Color_t color){
+
+  double x1, x2, x3, x4, y1, y2, y3, y4, bandwidth_x, bandwidth_y,ix1, ix2, iy1, iy2, isig, ib1, ib2, ib3, ib4, background, bandy, bandx, avg_x, avg_y, sig;
+  double ix1_err, ix2_err, iy1_err, iy2_err, isig_err, ib1_err, ib2_err, ib3_err, ib4_err, background_err, bandy_err, bandx_err, avg_x_err, avg_y_err, sig_err;
+  //assign the cordinates of the signal and sidebands
+  x2 = sband_x1;
+  x3 = sband_x2;
+  y2 = sband_y1;
+  y3 = sband_y2;
+  bandwidth_x = x3-x2;
+  bandwidth_y = y3-y2;
+  x1 = x2-bandwidth_x;
+  x4 = x3+bandwidth_x;
+  y1 = y2-bandwidth_y;
+  y4 = y3+bandwidth_y;
+  //make the background integrals and average
+  // ib1 = integrateWithError(h, x1, x2, y1, y2, ib1_err);
+  // ib2 = integrateWithError(h, x3, x4, y1, y2, ib2_err);
+  // ib3 = integrateWithError(h, x1, x2, y3, y4, ib3_err);
+  // ib4 = integrateWithError(h, x3, x4, y3, y4, ib4_err);
+
+  // background =(ib1+ib2+ib3+ib4)/4;
+
+  //make the signal band backgrounds
+  //ix1 = integrateWithError(h, x1, x2, y2, y3, ix1_err);
+  //ix2 = integrateWithError(h, x3, x4, y2, y3, ix2_err);
+  iy1 = integrateWithError(h, x2, x3, y1, y2, iy1_err);
+  iy2 = integrateWithError(h, x2, x3, y3, y4, iy2_err);
+
+  //bandx = ((ix1)+(ix2))/2.;
+  bandy = ((iy1)+(iy2))/2.;
+ 
+ 
+  //make the signal integral
+  isig = integrateWithError(h, x2, x3, y2, y3, isig_err);
+  
+  //cout<<isig<<" "<<isig_err<<endl;
+  //cout<<ix1<<" "<<ix1_err<<endl;
+  //cout<<iy1<<" "<<iy1_err<<endl;
+  //errors. add in quadrature and average.
+  //background_err = sqrt(pow(ib1_err, 2)+pow(ib2_err, 2)+pow(ib3_err, 2)+pow(ib4_err, 2))/4.;
+  //bandx_err = sqrt(pow(ix1_err, 2)+pow(ix2_err, 2))/2.;
+  bandy_err = sqrt(pow(iy1_err, 2)+pow(iy2_err, 2))/2.;
+
+
+  // background_err = (ib1_err+ib2_err+ib3_err+ib4_err)/4.;
+  // bandx_err = (ix1_err+ix2_err)/2.;
+  // bandy_err = (iy1_err+iy2_err)/2.;
+
+  sig_err = sqrt(pow(bandy_err, 2));
+  err=sig_err;
+  //construct signal
+  sig = isig-(bandy);
+  //  sig = isig-((ix1+ix2+iy1+iy2)/4);
+
+  //  cout<<"total events: "<<sig<<"+/-"<<sig_err<<endl;
+  //  TString tit = std::to_string(sig);
+
+  if(draw==1){
+    h->Draw("colz0");
+    double ymin = gPad->GetUymin();//h->GetYaxis()->GetXmin();
+    double ymax = gPad->GetUymax();//h->GetYaxis()->GetXmax();
+    double xmin = gPad->GetUxmin();//h->GetXaxis()->GetXmin();
+    double xmax = gPad->GetUxmax();//h->GetXaxis()->GetXmax();
+
+    TLine *l1 = new TLine(x2, ymin, x2, ymax);
+    TLine *l2 = new TLine(x3, ymin, x3, ymax);
+    TLine *l3 = new TLine(xmin, y2, xmax, y2);
+    TLine *l4 = new TLine(xmin, y3, xmax, y3);
+    TLine *l5 = new TLine(x1, ymin, x1, ymax);
+    TLine *l6 = new TLine(x4, ymin, x4, ymax);
+    TLine *l7 = new TLine(xmin, y1, xmax, y1);
+    TLine *l8 = new TLine(xmin, y4, xmax, y4);
+    l1->SetLineColor(color);
+    l2->SetLineColor(color);
+    l3->SetLineColor(color);
+    l4->SetLineColor(color);
+
+    l5->SetLineColor(color);
+    l6->SetLineColor(color);
+    l7->SetLineColor(color);
+    l8->SetLineColor(color);
+    l5->SetLineStyle(7);
+    l6->SetLineStyle(7);
+    l7->SetLineStyle(7);
+    l8->SetLineStyle(7);
+    
+    l1->Draw();
+    l2->Draw();
+    l3->Draw();
+    l4->Draw();
+    l5->Draw();
+    l6->Draw();
+    l7->Draw();
+    l8->Draw();
+    char title[100];
+
+    h->SetStats(0);
+    ((TCanvas*)gROOT->GetListOfCanvases()->At(0))->SetRightMargin(0.15);
+  }
+
+
+  
+  return sig;
 } 
 
 
@@ -2787,6 +2893,24 @@ void TUtil::yrange(TGraph *inGr, double y1, double y2){
 }
 
 void TUtil::xrange(TGraph *inGr, double x1, double x2){
+  inGr->GetXaxis()->SetRangeUser(x1, x2);
+}
+
+void TUtil::titles(TGraphErrors *inGr, TString title, TString xtitle, TString ytitle){
+  inGr->SetTitle(title);
+  inGr->GetXaxis()->SetTitle(xtitle);
+  inGr->GetYaxis()->SetTitle(ytitle);
+}
+
+void TUtil::ranges(TGraphErrors *inGr,double x1, double x2, double y1, double y2){
+  TUtil::yrange(inGr, y1, y2);
+  TUtil::xrange(inGr, x1, x2);
+}
+void TUtil::yrange(TGraphErrors *inGr, double y1, double y2){
+  inGr->GetYaxis()->SetRangeUser(y1, y2);
+}
+
+void TUtil::xrange(TGraphErrors *inGr, double x1, double x2){
   inGr->GetXaxis()->SetRangeUser(x1, x2);
 }
 
