@@ -84,6 +84,7 @@ public:
   ULong64_t timestamp, scopeTime, surfTime;
   double frequency;
   double power;
+  double linPower;
   double analogBandwidth;
   /*the type of antenna for:
     antennaType[0] = TX, 
@@ -130,9 +131,11 @@ public:
   int isGood=0;
 
   double charge=0;
+  double r1=0.;
 
   /* some useful power and field quantities for this particular dataset*/
 
+  double r2[3]={0.,0.,0.};
   double pow_0_10[3]={0.,0.,0.};
   double pow_10_20[3]={0.,0.,0.};
   double pow_20_30[3]={0.,0.,0.};
