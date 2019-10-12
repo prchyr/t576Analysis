@@ -23,7 +23,15 @@ FFTW calculates the fastest and most optimal way to do
 an FFT the first time it is initialized with new parameters. after that,
 each subsequent fft of the same size is very fast. 
 
+NORMALIZATION:
 
+FFTW doesn't normalize their FFTs, meaning that if you take a signal, FFT it, then IFFT it, it will be scaled by a factor of N. the question is, what is the right way to normalize the signal? 
+
+we use Parseval's theorem to do this:
+
+\sum_0^N V^2 = (1/N) \sum_0^N |H|^2 
+
+where V are the input voltages, and H are the complex output values. for this to hold, given the way FFTW calculates a real-valued to complex-valued FFT, the normalization constant is sqrt(2./N). The overall normalization for power must be 2/N, because FFTW only calculates the positive frequencies (for speed, since for real-valued signals, the negative freqs are the same as the positive) so you need a factor of 2 in there. and the 1/N comes from Parseval's. 
 
 
 **************************************************/
@@ -57,7 +65,9 @@ TGraph2D * TUtil::FFT::fft(TGraph * inGr){
 
   double df=fs/(n);
 
-  double norm=1./sqrt((double)n);
+  double norm=sqrt(2./(double)n);
+  
+
   TGraph2D *outGr=new TGraph2D(n, makeIndices(n, df), &re[0], &im[0]);
   for (int i=0;i<outGr->GetN();i++){
     outGr->GetY()[i] *= norm;
@@ -95,7 +105,8 @@ TGraph * TUtil::FFT::ifft(TGraph2D * inGr){
   
   double re[n];
   fftc2r->GetPoints(re);
-  double norm=1./sqrt((double)n);
+
+  double norm=sqrt(1./(2.*(double)n));
 
 
   TGraph *outGr=new TGraph(n, makeIndices(n, dt), re);
@@ -111,7 +122,7 @@ TGraph * TUtil::FFT::ifft(TGraph2D * inGr){
 psd, returns a tgraph in dbm/hz from an input tgraph
 
 */
-
+//assumes a 50ohm system
 TGraph * TUtil::FFT::psd(TGraph * inGr, int dbFlag, double rBW ){
   auto xfrm=fft(inGr);
   int n=xfrm->GetN();
@@ -124,12 +135,12 @@ TGraph * TUtil::FFT::psd(TGraph * inGr, int dbFlag, double rBW ){
   //resolution bandwidth defaults to nyquist
   rBW=rBW==0?xx[n-1]/2.:rBW;
   
-  yy[0]=dbFlag==1?vToDbmHz(rBW,re[0]):re[0];
+  yy[0]=dbFlag==1?vToDbmHz(rBW,re[0]):re[0]/50.;
   for(int i=1;i<(n+1)/2;i++){
-    yy[i]=vToDbmHz(rBW, re[i], im[i]);
-    yy[i]=dbFlag==1?vToDbmHz(rBW,re[i], im[i]):(re[i]*re[i]+im[i]*im[i]);
+    // yy[i]=vToDbmHz(rBW, re[i], im[i]);
+    yy[i]=dbFlag==1?vToDbmHz(rBW,re[i], im[i]):(re[i]*re[i]+im[i]*im[i])/50.;
   }
-  yy[n/2]=dbFlag==1?vToDbmHz(rBW,re[n/2], im[n/2]):(re[n/2]*re[n/2]+im[n/2]*im[n/2]);
+  yy[n/2]=dbFlag==1?vToDbmHz(rBW,re[n/2], im[n/2]):(re[n/2]*re[n/2]+im[n/2]*im[n/2])/50.;
 
   TGraph * outGr=new TGraph((n/2), xx, yy);
   outGr->SetTitle("psd");
@@ -378,6 +389,7 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   double xmax = gr->GetX()[gr->GetN()-1];
   double xmin = gr->GetX()[0];
   zero_pad_length=zero_pad_length<=binsize?binsize:zero_pad_length;
+  double scale=sqrt((double)zero_pad_length/(double)binsize);
   Int_t num_zeros=(zero_pad_length-binsize)/2;
   //  Int_t nbins = size/overlap;
   int nbins=size/(binsize-overlap);
@@ -408,7 +420,7 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
 	}
 	else if(j>=num_zeros&&j<binsize+num_zeros){
 	  if(sampnum+start<size){
-	    in->SetPoint(j, gr->GetX()[j], gr->GetY()[sampnum+start]*window(sampnum, binsize, win_type));
+	    in->SetPoint(j, gr->GetX()[j], gr->GetY()[sampnum+start]*window(sampnum, binsize, win_type)*scale);
 	  }
 	  else{
 	    in->SetPoint(j, gr->GetX()[j], 0.);
@@ -453,10 +465,10 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   spectrogramHist->GetXaxis()->SetTitle("Time [ns]");
   spectrogramHist->GetYaxis()->SetTitle("Frequency [GHz]");
   if(dbFlag){
-    spectrogramHist->GetZaxis()->SetTitle("dBm/Hz");
+    spectrogramHist->GetZaxis()->SetTitle("dBm GHz^{-1}");
   }
   else{
-    spectrogramHist->GetZaxis()->SetTitle("W");
+    spectrogramHist->GetZaxis()->SetTitle("W GHz^{-1}");
   }
   spectrogramHist->GetZaxis()->SetTitleOffset(1.5);
   spectrogramHist->GetXaxis()->SetTitleSize(.05);
@@ -994,12 +1006,31 @@ int TUtil::removeMeanInPlace(TGraph *gr, double t_low, double t_high){
 TGraph * TUtil::power(TGraph *gr){
   auto outGr=(TGraph*)gr->Clone();
   for(int i=0;i<outGr->GetN();i++){
+    outGr->SetPoint(i, outGr->GetX()[i], outGr->GetY()[i]*outGr->GetY()[i]/50.);
+  }
+  return outGr;
+}
+
+TGraph * TUtil::squared(TGraph *gr){
+  auto outGr=(TGraph*)gr->Clone();
+  for(int i=0;i<outGr->GetN();i++){
     outGr->SetPoint(i, outGr->GetX()[i], outGr->GetY()[i]*outGr->GetY()[i]);
   }
   return outGr;
 }
 
+double TUtil::sum(TGraph *gr, double t_low, double t_high){
+  t_low=t_low>0.?t_low:0.;
+  t_high>gr->GetX()[gr->GetN()-1]?gr->GetX()[gr->GetN()-1]:t_high;
 
+  double sum=0.;
+  for(int i=0;i<gr->GetN();i++){
+    if(gr->GetX()[i]<t_low||gr->GetX()[i]>t_high)continue;
+    sum+=gr->GetY()[i];
+  }
+  return sum;
+
+}
 double TUtil::integrate(TGraph * gr, double t_low, double t_high){
   t_low=t_low>0.?t_low:0.;
   t_high>gr->GetX()[gr->GetN()-1]?gr->GetX()[gr->GetN()-1]:t_high;
@@ -1155,6 +1186,20 @@ double TUtil::integratePower(TGraph * gr, double t_low, double t_high){
     integral+=(gr->GetY()[i]*gr->GetY()[i])*dt;
   }
   return integral;
+}
+
+double TUtil::avgPower(TGraph * gr, double t_low, double t_high){
+  t_low=t_low>0.?t_low:0.;
+  t_high>gr->GetX()[gr->GetN()-1]?gr->GetX()[gr->GetN()-1]:t_high;
+  double dt = gr->GetX()[1]-gr->GetX()[0];
+  double integral=0.;
+  double count=0.;
+  for(int i=0;i<gr->GetN();i++){
+    if(gr->GetX()[i]<t_low||gr->GetX()[i]>t_high)continue;
+    integral+=(gr->GetY()[i]*gr->GetY()[i]/50.);
+    count+=1.;
+  }
+  return integral/count;
 }
 
 

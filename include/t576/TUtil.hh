@@ -350,8 +350,10 @@ utilities.
   int getIndex(TGraph2D * gr, double t);
 
 
-  //get the power (square all values of a graph)
+  //get the power (square all values of a graph and divide by 50 ohms)
   TGraph * power(TGraph *gr);
+  //square all values of a graph
+  TGraph * squared(TGraph *gr);
   //remove the mean of a TGraph. range to compute the mean over is optional.
   //the mean computed within a sub-range will be removed from the full graph.
   TGraph * removeMean(TGraph *gr, double t_low=0., double t_high=999999.);
@@ -369,9 +371,12 @@ utilities.
   TGraph * sampledCW(double freq,  double amp, int N, double * times, double phase);
   TGraph * sampledCW(double freq,  double amp, vector<double> times, double phase);
   //integrate a TGraph. lower and upper bounds are optional.
-  double integrate(TGraph * gr, double t_low=0, double t_high=999999.);  
+  double integrate(TGraph * gr, double t_low=0, double t_high=999999.); //get the sum
+  double sum(TGraph * gr, double t_low=0, double t_high=999999.);
   //get the RMS
   double rms(TGraph * gr, double t_low, double t_high);
+  //get the power
+  double avgPower(TGraph *gr, double t_low, double t_high);
   //get the amplitude
   double amplitude(TGraph * gr, double t_low, double t_high);
 //take the derivative. if direction=-1, takes derivative along other direction of axis.
@@ -380,6 +385,7 @@ utilities.
   TGraph * gObs(TGraph *inGr, double thetaDeg, double tUnits=1.);
   //integrate a TGraph but square it first to get units of power.
   double integratePower(TGraph * gr, double t_low=0, double t_high=999999.);
+
   //integrate a histogram
   double integrate(TH2D *h, double xmin, double xmax, double ymin, double ymax);
   double integrateWithError(TH2D *h, double xmin, double xmax, double ymin, double ymax, double & err);

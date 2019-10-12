@@ -304,7 +304,7 @@ TNtuple * TAnalyze::integrateAllWithSideband(int channel, int dataset, int major
   auto ev=new T576Event(50, dataset);
   ev->loadScopeEvent(major, minor, 0);
   int number=0;
-  TNtuple *tup=new TNtuple("tup", "tup", "sig:sb");
+  TNtuple *tup=new TNtuple("tup", "tup", "sig:sb:charge");
   //  auto graphs=vector<TGraph*>();
   //if(scopeOrSurf==0){
     //    loadScopeEvent(major, minor, 0);
@@ -319,7 +319,7 @@ TNtuple * TAnalyze::integrateAllWithSideband(int channel, int dataset, int major
 	spec->SetDirectory(0);
 	auto sig=TUtil::integrate(spec, xmin, xmax, ymin, ymax);
 	auto sb=TUtil::integrate(spec, sbxmin, sbxmax, sbymin, sbymax);
-	tup->Fill(sig, sb);
+	tup->Fill(sig, sb, ev->charge);
 	delete spec;
 	number++;
       }
