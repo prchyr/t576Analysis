@@ -134,13 +134,46 @@ TGraph * TUtil::FFT::psd(TGraph * inGr, int dbFlag, double rBW ){
 
   //resolution bandwidth defaults to nyquist
   rBW=rBW==0?xx[n-1]/2.:rBW;
-  
-  yy[0]=dbFlag==1?vToDbmHz(rBW,re[0]):re[0]/50.;
+  switch (dbFlag){
+  case 0:
+    yy[0]=re[0]/50.;
+    break;
+  case 1:
+    yy[0]=vToDbmHz(rBW,re[0]);
+    break;
+  case 2:
+    yy[0]=vToDbmGHz(rBW,re[0]);
+  default:
+    yy[0]=re[0]/50.;
+    break;
+  }
+    //yy[0]=dbFlag==1?vToDbmHz(rBW,re[0]):re[0]/50.;
+    //yy[0]=dbFlag==2?vToDbmGHz(rBW,re[0]):re[0]/50.;
   for(int i=1;i<(n+1)/2;i++){
     // yy[i]=vToDbmHz(rBW, re[i], im[i]);
-    yy[i]=dbFlag==1?vToDbmHz(rBW,re[i], im[i]):(re[i]*re[i]+im[i]*im[i])/50.;
+    switch (dbFlag){
+    case 0:
+      yy[i]=(re[i]*re[i]+im[i]*im[i])/50.;
+      break;
+    case 1:
+      yy[i]=vToDbmHz(rBW,re[i], im[i]);
+      break;
+    case 2:
+      yy[i]=vToDbmGHz(rBW,re[i], im[i]);
+      break;
+    }
   }
-  yy[n/2]=dbFlag==1?vToDbmHz(rBW,re[n/2], im[n/2]):(re[n/2]*re[n/2]+im[n/2]*im[n/2])/50.;
+  switch (dbFlag){
+  case 0:
+    yy[n/2]=(re[n/2]*re[n/2]+im[n/2]*im[n/2])/50.;
+    break;
+  case 1:
+    yy[n/2]=vToDbmHz(rBW,re[n/2], im[n/2]);
+    break;
+  case 2:
+    yy[n/2]=vToDbmGHz(rBW,re[n/2], im[n/2]);
+    break;
+  }
 
   TGraph * outGr=new TGraph((n/2), xx, yy);
   outGr->SetTitle("psd");
@@ -464,7 +497,10 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   spectrogramHist->GetYaxis()->SetRangeUser(0, spectrogramHist->GetYaxis()->GetXmax()/2.1);
   spectrogramHist->GetXaxis()->SetTitle("Time [ns]");
   spectrogramHist->GetYaxis()->SetTitle("Frequency [GHz]");
-  if(dbFlag){
+  if(dbFlag==1){
+    spectrogramHist->GetZaxis()->SetTitle("dBm Hz^{-1}");
+  }
+  else if (dbFlag==2){
     spectrogramHist->GetZaxis()->SetTitle("dBm GHz^{-1}");
   }
   else{
@@ -757,7 +793,7 @@ make a new tgraph that you'll need to delete on your own.
 double * TUtil::makeIndices(int n, double step, double offset){
   double *out=new double[n];
   for(int i=0;i<n;i++){
-    out[i]=(i*step+offset);
+    out[i]=((double)i*step+offset);
   }
   return out;
 }
@@ -766,6 +802,11 @@ double * TUtil::makeIndices(int n, double step, double offset){
 double TUtil::vToDbmHz(double bandwidthGSs, double re, double im){
   double val=re*re+im*im;
   return (10.*log10(val/50.))+30-(10.*log10(bandwidthGSs*1.e9));
+}
+
+double TUtil::vToDbmGHz(double bandwidthGSs, double re, double im){
+  double val=re*re+im*im;
+  return (10.*log10(val/50.))+30-(10.*log10(bandwidthGSs));
 }
 
 TGraph * TUtil::normalize(TGraph * inGr){
@@ -1019,7 +1060,7 @@ TGraph * TUtil::squared(TGraph *gr){
   return outGr;
 }
 
-double TUtil::sum(TGraph *gr, double t_low, double t_high){
+double TUtil::sumGraph(TGraph *gr, double t_low, double t_high){
   t_low=t_low>0.?t_low:0.;
   t_high>gr->GetX()[gr->GetN()-1]?gr->GetX()[gr->GetN()-1]:t_high;
 
@@ -1116,7 +1157,7 @@ TGraph * TUtil::getZeroCrossGraph(TGraph * inGr, int relative){
   return outGr;
 }
 
-TH1F * TUtil::hist(TGraph *gr, int nbins, TString title, TString name){
+TH1F * TUtil::histogram(TGraph *gr, int nbins, TString title, TString name){
   //auto len=sizeof(vals)/sizeof(vals[0]);
   auto vals=gr->GetY();
   auto len=gr->GetN();
@@ -1129,7 +1170,7 @@ TH1F * TUtil::hist(TGraph *gr, int nbins, TString title, TString name){
   return hh;
 }
 
-int TUtil::fillZeroCrossHist(TGraph * inGr, TH1D* hist, double threshold, double weight){
+int TUtil::fillZeroCrossHist(TGraph * inGr, TH1D* hist, double weight, double threshold){
   double val=0., nextVal=0.;
   double lastVal=0.;
   double lastX=0.;
@@ -1148,6 +1189,13 @@ int TUtil::fillZeroCrossHist(TGraph * inGr, TH1D* hist, double threshold, double
   return num;
 }
 
+int TUtil::assignXOffset(TGraph *inGr, double * offsets, double constant){
+  for(int i=0;i<inGr->GetN();i++){
+    if(offsets[i]==0)continue;
+    inGr->SetPoint(i, inGr->GetX()[i]+constant*offsets[i], inGr->GetY()[i]);
+  }
+  return 1;
+}
 
 TGraph * TUtil::gObs(TGraph *inGr, double thetaDeg, double tUnits){
   auto tRet=inGr->GetX();
@@ -2076,13 +2124,15 @@ TGraph * TUtil::makeCW(double freq,  double amp, double t_min, double t_max, dou
   int n=(t_max-t_min)*GSs;
   TGraph * oG=new TGraph();
   double dt=1./GSs;
-  double t=t_min;
-  while(t<t_max){
-    double temp=amp*sin(2.*pi*freq*t + phase);
+  double t=t_min-(10.*dt);
+  while(t<=t_max+(10.*dt)){
+    double temp=amp*cos(2.*pi*freq*t + phase);
     oG->SetPoint(oG->GetN(), t, temp);
     t+=dt;
   }
-  return oG;
+  auto slice=TUtil::getChunkOfGraph(oG, t_min, t_max);
+  delete oG;
+  return slice;
 }
 
 TGraph * TUtil::sampledCW(double freq,  double amp, int N, double * times, double phase){
@@ -2324,7 +2374,7 @@ signal band backgrounds are subtracted from the signal quadrant to get signal.
  */
 
 
-double TUtil::sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw, Color_t color){
+double TUtil::sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw, Color_t color, double alpha){
 
   double x1, x2, x3, x4, y1, y2, y3, y4, bandwidth_x, bandwidth_y,ix1, ix2, iy1, iy2, isig, ib1, ib2, ib3, ib4, background, bandy, bandx, avg_x, avg_y, sig;
   double ix1_err, ix2_err, iy1_err, iy2_err, isig_err, ib1_err, ib2_err, ib3_err, ib4_err, background_err, bandy_err, bandx_err, avg_x_err, avg_y_err, sig_err;
@@ -2397,15 +2447,15 @@ double TUtil::sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double s
     TLine *l6 = new TLine(x4, ymin, x4, ymax);
     TLine *l7 = new TLine(xmin, y1, xmax, y1);
     TLine *l8 = new TLine(xmin, y4, xmax, y4);
-    l1->SetLineColor(color);
-    l2->SetLineColor(color);
-    l3->SetLineColor(color);
-    l4->SetLineColor(color);
+    l1->SetLineColorAlpha(color, alpha);
+    l2->SetLineColorAlpha(color, alpha);
+    l3->SetLineColorAlpha(color, alpha);
+    l4->SetLineColorAlpha(color, alpha);
 
-    l5->SetLineColor(color);
-    l6->SetLineColor(color);
-    l7->SetLineColor(color);
-    l8->SetLineColor(color);
+    l5->SetLineColorAlpha(color, alpha);
+    l6->SetLineColorAlpha(color, alpha);
+    l7->SetLineColorAlpha(color, alpha);
+    l8->SetLineColorAlpha(color, alpha);
     l5->SetLineStyle(7);
     l6->SetLineStyle(7);
     l7->SetLineStyle(7);

@@ -99,10 +99,11 @@ namespace TUtil{
   */
   //constants
   static constexpr double c_light = .29979246; //  m/ns
-  static constexpr double pi = 3.1415927; //radians
+  static constexpr double pi = 3.14159265358979323846; //radians
   static constexpr double z_0=50; //ohms
   static constexpr double deg=pi/180.; //radians
   static constexpr double kB=8.617343e-11;//MeV/kelvin
+  static constexpr double kBJoulesKelvin=1.38e-23;//J/kelvin
   static constexpr double rho=1.168e-3;//sea level density
   static constexpr double x_0=36.7;//radiation length in air
   static constexpr double e_0=.078;//ionization energy 
@@ -223,8 +224,12 @@ utilities.
   
   //volts to dbm/hz
   double vToDbmHz(double bandwidthGSs, double re, double im=0);
+  //volts to dbm/Ghz
+  double vToDbmGHz(double bandwidthGSs, double re, double im=0);
   //make an axis with linearly increasing values.
   double * makeIndices(int n, double step, double offset=0);
+  //assign an array of offsets to the x axis of a graph. both must be the same length
+  int assignXOffset(TGraph *inGr, double * offsets, double constant=1.);
   //the normalized sinc function: sin(pi x)/(pi x)
   double sinc(double x);
   //return a TGraph interpoltaed using simple sinc interpolation.(slow)
@@ -241,7 +246,7 @@ utilities.
 
     the sinc interpolation is best/most accurate for truly band-limited signals sampled near the nyquist frequency. the fast method works very well, and is usually recommended over the full sinc for most applications. the akima is better for oversampled signals where the frequency of interest is far below the nyquist frequency.
   */
-  int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs, int type=0, int N=10);
+  int getInterpolatedGraph(TGraph * inGraph, TGraph *outGraph, double interpGSs, int type=2, int N=10);
   //return the interpolated graph (memory use) using ROOT's akima method
   TGraph * interpolateGraph(TGraph * inGraph, double interpGSs);
   //return the interpolated graph, evaluated at times. the input graph can be unevenly sampled.
@@ -372,7 +377,7 @@ utilities.
   TGraph * sampledCW(double freq,  double amp, vector<double> times, double phase);
   //integrate a TGraph. lower and upper bounds are optional.
   double integrate(TGraph * gr, double t_low=0, double t_high=999999.); //get the sum
-  double sum(TGraph * gr, double t_low=0, double t_high=999999.);
+  double sumGraph(TGraph * gr, double t_low=0, double t_high=999999.);
   //get the RMS
   double rms(TGraph * gr, double t_low, double t_high);
   //get the power
@@ -425,7 +430,7 @@ utilities.
   TGraph * plotWindow(double peakAmplitude, double len, double GSs, double startt, double endt, int type);
   TGraph * makeNullData(TGraph *sig, TGraph * back, double t_min, double t_max, double scale=1.);
   TGraph * makeNullDataFixedLength(TGraph *sig, TGraph *back, double t_min, int nSamps);
-  double sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0, Color_t color=kRed);
+  double sidebandSubtraction2DWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0, Color_t color=kRed, double alpha=1.);
   double sidebandSubtractionXAxisWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double &err, int draw=0, Color_t color=kRed);
   double sidebandSubtractionYAxisWithErrors(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double &err, int draw=0, Color_t color=kRed);
   double sidebandSubtraction2DDev(TH2D *h, double sband_x1, double sband_x2, double sband_y1, double sband_y2, double & err, int draw=0, Color_t color=kRed);
@@ -440,9 +445,9 @@ utilities.
   //find the x values of zero crossings. can also plot the relative time between subsequent zero crossings if relative = 1
   TGraph * getZeroCrossGraph(TGraph * inGr, int relative=0);
   //find the x values of zero crossings and put them in a histogram. returns the number of zero crossings in that graph.
-  int fillZeroCrossHist(TGraph * inGr, TH1D* hist, double threshold=0., double weight=1.);
+  int fillZeroCrossHist(TGraph * inGr, TH1D* hist, double weight=1., double threshold=0.);
   //fill a histogram with an array
-  TH1F * hist(TGraph *gr, int nbins=20, TString title="hist", TString name="hist");
+  TH1F * histogram(TGraph *gr, int nbins=20, TString title="hist", TString name="hist");
 
   //get the time of the first threshold crossing after after
   double getFirstThresholdCrossing(TGraph *inGr, double thresh, double after=0.);
