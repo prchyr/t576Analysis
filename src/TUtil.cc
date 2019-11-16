@@ -884,6 +884,15 @@ TGraph * TUtil::absGraph(TGraph * inGr){
   return outGr;
 }
 
+int TUtil::absHist(TH2D * inGr){
+  for(int i=0;i<inGr->GetNbinsX();i++){
+    for(int j=0;j<inGr->GetNbinsY();j++){
+      inGr->SetBinContent(i,j, abs(inGr->GetBinContent(i,j)));
+    }
+  }
+  return 1.;
+}
+
 
 double TUtil::getInstPhase(TGraph *inGr, double t, int deg0rad1){
   //auto amp=TUtil::rms(inGr, inGr->GetX()[0], inGr->GetX()[inGr->GetN()-1])*sqrt(2);
@@ -1058,6 +1067,16 @@ TGraph * TUtil::squared(TGraph *gr){
     outGr->SetPoint(i, outGr->GetX()[i], outGr->GetY()[i]*outGr->GetY()[i]);
   }
   return outGr;
+}
+
+int TUtil::squareHist(TH2D *inGr){
+  for(int i=0;i<inGr->GetNbinsX();i++){
+    for(int j=0;j<inGr->GetNbinsY();j++){
+      inGr->SetBinContent(i,j, inGr->GetBinContent(i,j)*inGr->GetBinContent(i,j));
+    }
+  }
+  return 1.;
+
 }
 
 double TUtil::sumGraph(TGraph *gr, double t_low, double t_high){

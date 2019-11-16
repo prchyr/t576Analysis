@@ -313,6 +313,7 @@ utilities.
   TGraph * avgGraph(vector<TGraph*> inGr);
   //get the absolute value of a graph
   TGraph * absGraph(TGraph *inGr);
+  int absHist(TH2D *inGr);
   //add 2 TGraphs. if constant is -1, they are subtracted.
   TGraph * add(TGraph * g1, TGraph * g2, double constant=1.);
   TGraph2D * add(TGraph2D * g1, TGraph2D * g2, double constant=1.);
@@ -359,6 +360,7 @@ utilities.
   TGraph * power(TGraph *gr);
   //square all values of a graph
   TGraph * squared(TGraph *gr);
+  int squareHist(TH2D *inGr);
   //remove the mean of a TGraph. range to compute the mean over is optional.
   //the mean computed within a sub-range will be removed from the full graph.
   TGraph * removeMean(TGraph *gr, double t_low=0., double t_high=999999.);

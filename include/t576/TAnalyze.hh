@@ -68,6 +68,7 @@ namespace TAnalyze{
   int drawAvgRealNull(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0, int norm=0);
 
   TCanvas * avgRealNull(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0, int norm=0, int cursorType=0);
+  TCanvas * avgNullReal(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0, int norm=0, int cursorType=0);
 
   TCanvas* avgRealFull(int ch, int major, int minor, int nfft=512, int nOverlap = 450, int padTo=800, int window=2, int log=0, int cursorType=0);
   
