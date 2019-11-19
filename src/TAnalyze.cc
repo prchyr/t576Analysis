@@ -394,8 +394,10 @@ vector<vector<double>> TAnalyze::sidebandSubtractAll(int major, int minor, int c
 	if(norm==1){
 	  TUtil::normalize(spec, 0, ev->analogBandwidth);
 	} //	spec->Scale(scale);
+	
 	auto sig=TUtil::sidebandSubtraction2DWithErrors(spec, xmin, xmax, ymin, ymax, err);
 	//	auto sb=TUtil::integrate(spec, sbxmin, sbxmax, sbymin, sbymax);
+
 	delete spec;
 	//	tup->Fill(sig, err);
 	tup[i][0]=sig;

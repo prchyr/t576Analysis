@@ -1,4 +1,4 @@
-the basic analysis framework for t576.
+the basic analysis framework for t576. Data available from the author on reasonable request.
 
 TODO:  fix the positions for some remaining events (run 4 mostly). 
 
