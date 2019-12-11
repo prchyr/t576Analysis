@@ -176,9 +176,9 @@ TGraph * TUtil::FFT::psd(TGraph * inGr, int dbFlag, double rBW ){
   }
 
   TGraph * outGr=new TGraph((n/2), xx, yy);
-  outGr->SetTitle("psd");
+    outGr->SetTitle("psd");
   outGr->SetName("psd");
-  *fPSDGr=*outGr;
+  //*fPSDGr=*outGr;
   //delete outGr;
   return outGr;//fPSDGr;
 }
@@ -521,6 +521,116 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
 
   // spectrogramGr->Delevte();
   return spectrogramHist;
+  //return outdat;
+}
+
+
+TGraph2D* TUtil::FFT::spectrogramGraph(TGraph *gr, Int_t binsize , Int_t overlap, Int_t zero_pad_length, int win_type, int dbFlag, double ymin, double ymax){
+  Int_t size = gr->GetN();
+  double dt=(gr->GetX()[1]-gr->GetX()[0]); 
+  double samprate=1./dt;
+  double xmax = gr->GetX()[gr->GetN()-1];
+  double xmin = gr->GetX()[0];
+  zero_pad_length=zero_pad_length<=binsize?binsize:zero_pad_length;
+  double scale=sqrt((double)zero_pad_length/(double)binsize);
+  Int_t num_zeros=(zero_pad_length-binsize)/2;
+  //  Int_t nbins = size/overlap;
+  int nbins=size/(binsize-overlap);
+  //xmax=((double)nbins*((double)binsize-(double)overlap))/samprate;
+  char*timebuff;
+  //double samplerate = size/(xmax-xmin);
+  double bandwidth = 1e9*samprate;
+  // if(zero_pad_length!=fNSpec){
+  //   fNSpec=zero_pad_length;
+  //   fftr2cSpec=TVirtualFFT::FFT(1, &fNSpec, "R2C P K");
+  // }
+  
+
+
+  vector<double> sX, sY, sZ;
+  Int_t start = 0;
+  //  Int_t j=0;
+  //cout<<size<<" "<<nbins<<" "<<zero_pad_length<<" "<<binsize<<" "<<overlap<<" "<<num_zeros<<" "<<xmax*samprate<<endl;
+  TGraph2D *spectrogramGraph=new TGraph2D();
+  spectrogramGraph->SetDirectory(0);
+  for(int i=0;i<nbins;i++){
+    TGraph * in=new TGraph(zero_pad_length);
+    if(start+binsize-1>0){
+      int sampnum=0;
+      for(int j=0;j<zero_pad_length;j++){
+	if(j<num_zeros||j>=binsize+num_zeros){
+	  in->SetPoint(j, gr->GetX()[j], 0.);
+	}
+	else if(j>=num_zeros&&j<binsize+num_zeros){
+	  if(sampnum+start<size){
+	    in->SetPoint(j, gr->GetX()[j], gr->GetY()[sampnum+start]*window(sampnum, binsize, win_type)*scale);
+	  }
+	  else{
+	    in->SetPoint(j, gr->GetX()[j], 0.);
+	  }
+	  sampnum++;
+	}
+      }
+
+	//   for(int j=0;j<num_zeros;j++){
+      // 	//if((j+start)>=size)break;
+      // 	//    for(int j = 0;j<=zero_pad_length;j++){
+      // 	in->SetPoint(j, gr->GetX()[j], 0.);
+      // }
+      // for(int j=num_zeros;j<binsize+num_zeros;j++){
+      // 	//      if((j+start)>=size)break;
+      // 	in->SetPoint(j, gr->GetX()[j], gr->GetY()[j+start]*window(j-num_zeros, binsize, win_type));//
+      // }
+      // for(int j=binsize+num_zeros;j<zero_pad_length;j++){
+      // 	//if((j+start)>=size)break;
+      // 	in->SetPoint(j, gr->GetX()[j], 0);
+      // }
+      
+      auto outt=TUtil::FFT::psd(in, dbFlag,samprate/2.);
+      
+      for(int j = 0;j<outt->GetN();j++){
+	Double_t z = outt->GetY()[j];
+	if(!isfinite(z))z=0.;
+	spectrogramGraph->SetPoint(spectrogramGraph->GetN(), gr->GetX()[start],outt->GetX()[j],z);//dbm/hz
+	//sX.push_back(i*binsize*dt);
+	//sY.push_back(outt->GetX()[j]);
+	//sZ.push_back(z);
+      }
+      delete outt;
+      delete in;
+      //    cout<<sX.size()<<endl;
+    }
+      start+=(binsize-overlap);
+    }
+  //  cout<<dbFlag<<endl;
+
+  spectrogramGraph->GetYaxis()->SetRangeUser(0, spectrogramGraph->GetYaxis()->GetXmax()/2.1);
+  spectrogramGraph->GetXaxis()->SetTitle("Time [ns]");
+  spectrogramGraph->GetYaxis()->SetTitle("Frequency [GHz]");
+  if(dbFlag==1){
+    spectrogramGraph->GetZaxis()->SetTitle("dBm Hz^{-1}");
+  }
+  else if (dbFlag==2){
+    spectrogramGraph->GetZaxis()->SetTitle("dBm GHz^{-1}");
+  }
+  else{
+    spectrogramGraph->GetZaxis()->SetTitle("W GHz^{-1}");
+  }
+  spectrogramGraph->GetZaxis()->SetTitleOffset(1.5);
+  spectrogramGraph->GetXaxis()->SetTitleSize(.05);
+  spectrogramGraph->GetYaxis()->SetTitleSize(.05);
+  spectrogramGraph->GetZaxis()->SetTitleSize(.05);
+  spectrogramGraph->GetXaxis()->SetLabelSize(.05);
+  spectrogramGraph->GetYaxis()->SetLabelSize(.05);
+  spectrogramGraph->GetZaxis()->SetLabelSize(.05);
+  spectrogramGraph->GetYaxis()->SetTitleOffset(1.1);
+  spectrogramGraph->GetYaxis()->SetRangeUser(ymin, ymax);
+  //  delete(in);
+  //  delete(outt);
+
+
+  // spectrogramGr->Delevte();
+  return spectrogramGraph;
   //return outdat;
 }
 
@@ -910,6 +1020,13 @@ double TUtil::getInstPhase(TGraph *inGr, double t, int deg0rad1){
   return val;
 }
 
+vector<double> TUtil::toVector(int *data, int n){
+  vector<double> outD;
+  for(int i=0;i<n;i++){
+    outD.push_back(data[i]);
+  }
+  return outD;
+}
 
 double TUtil::mean(TGraph *gr, double t_low, double t_high){
   auto data=gr->GetY();
@@ -1480,6 +1597,20 @@ TGraph * TUtil::shiftX(TGraph *g1, double factor){
 
   return outGr;
   
+}
+
+vector<pair<int, double>> TUtil::sort(vector<double> inVec, int order){
+  auto indexData=vector<std::pair<int, double>>();
+  for(int i=0;i<inVec.size();i++){
+    std::pair <int, double> var(i, inVec[i]);
+    indexData.push_back(var);
+}
+
+  std::sort(indexData.begin(), indexData.end(),[](const pair<int, double> &a, const pair<int, double> &b) { return a.second < b.second; });
+  if(order==1){
+    std::reverse(indexData.begin(), indexData.end());
+  }
+  return indexData;
 }
 
 // TUtil::dedisperse(TGraph2D * one, TGraph2D * two){
@@ -2996,6 +3127,14 @@ void TUtil::titles(TGraph *inGr, TString title, TString xtitle, TString ytitle){
   inGr->SetTitle(title);
   inGr->GetXaxis()->SetTitle(xtitle);
   inGr->GetYaxis()->SetTitle(ytitle);
+
+  inGr->GetXaxis()->SetTitleSize(.05);
+  inGr->GetYaxis()->SetTitleSize(.05);
+
+  inGr->GetXaxis()->SetLabelSize(.05);
+  inGr->GetYaxis()->SetLabelSize(.05);
+
+  inGr->GetYaxis()->SetTitleOffset(1.);
 }
 
 void TUtil::ranges(TGraph *inGr,double x1, double x2, double y1, double y2){
@@ -3050,6 +3189,7 @@ void TUtil::titles(TH1F *inGr, TString title, TString xtitle, TString ytitle){
   inGr->SetTitle(title);
   inGr->GetXaxis()->SetTitle(xtitle);
   inGr->GetYaxis()->SetTitle(ytitle);
+
 }
 
 void TUtil::ranges(TH1F *inGr,double x1, double x2, double y1, double y2){
@@ -3069,6 +3209,14 @@ void TUtil::titles(TH2D *inGr, TString title, TString xtitle, TString ytitle, TS
   inGr->GetXaxis()->SetTitle(xtitle);
   inGr->GetYaxis()->SetTitle(ytitle);
   inGr->GetZaxis()->SetTitle(ztitle);
+  inGr->GetZaxis()->SetTitleOffset(1.2);
+  inGr->GetXaxis()->SetTitleSize(.05);
+  inGr->GetYaxis()->SetTitleSize(.05);
+  inGr->GetZaxis()->SetTitleSize(.05);
+  inGr->GetXaxis()->SetLabelSize(.05);
+  inGr->GetYaxis()->SetLabelSize(.05);
+  inGr->GetZaxis()->SetLabelSize(.05);
+  inGr->GetYaxis()->SetTitleOffset(1.);
 }
 
 void TUtil::ranges(TH2D *inGr,double x1, double x2, double y1, double y2, double z1, double z2){
@@ -3096,6 +3244,14 @@ void TUtil::titles(TH2F *inGr, TString title, TString xtitle, TString ytitle, TS
   inGr->GetXaxis()->SetTitle(xtitle);
   inGr->GetYaxis()->SetTitle(ytitle);
   inGr->GetZaxis()->SetTitle(ztitle);
+  inGr->GetZaxis()->SetTitleOffset(1.2);
+  inGr->GetXaxis()->SetTitleSize(.05);
+  inGr->GetYaxis()->SetTitleSize(.05);
+  inGr->GetZaxis()->SetTitleSize(.05);
+  inGr->GetXaxis()->SetLabelSize(.05);
+  inGr->GetYaxis()->SetLabelSize(.05);
+  inGr->GetZaxis()->SetLabelSize(.05);
+  inGr->GetYaxis()->SetTitleOffset(1.);
 }
 void TUtil::ranges(TH2F *inGr,double x1, double x2, double y1, double y2){
   TUtil::yrange(inGr, y1, y2);
@@ -3213,6 +3369,7 @@ vector<TLine*> TUtil::drawPeakCursorXY(TH2D* inHist, Color_t color){
 //     inGr[i]->Draw("l same PLC");
 //   }
 // }
+
 
 
 
@@ -3445,4 +3602,78 @@ TGraph * TUtil::DFT::idft(TGraph2D * inGr, double GSs){
 
   TGraph *out=new TGraph(Nt, TUtil::makeIndices(Nt, dt), &vals[0]);  
   return out;
+}
+
+
+void TUtil::demod::normalizedDeChirp(Int_t * one, Int_t * two, int offset, int insize, Float_t * out){
+  int size = insize-offset-offset;
+  //  double out[size];
+  double value, denom, x, y;
+
+  for(int i=0;i<size;i++){
+    x+=one[i];
+    y+=two[i];
+  }
+  x=pow(x, 2)/(double)size;
+  y=pow(y, 2)/(double)size;
+  denom = sqrt(x*y);
+
+  for(int i=0;i<insize;i++){
+    if(i+offset < insize){//sanity check
+      value = ((Float_t)one[i]*(Float_t)two[i+offset])/denom;
+      out[i]=value; 
+    }
+  }
+  //	return out;
+}
+
+
+TGraph * TUtil::demod::normalizedDeChirp(TGraph * one, int offset){
+  int insize=one->GetN();//>two->GetN()?two->GetN():one->GetN();
+  int size = insize-offset-offset;
+  //  double out[size];
+  double value, denom, x, y;
+
+  for(int i=0;i<size;i++){
+    x+=one->GetY()[i];
+    //y+=two->GetY()[i];
+  }
+  //x=pow(x, 2)/(double)size;
+  //y=pow(y, 2)/(double)size;
+  //denom = sqrt(x*y);
+  denom=pow(x, 2)/(double)size;
+  
+  auto outgr=new TGraph();
+  for(int i=0;i<insize;i++){
+    if(i+offset < insize){//sanity check
+      value = (one->GetY()[i]*one->GetY()[i+offset])/denom;
+      outgr->SetPoint(outgr->GetN(), one->GetX()[i], value);
+    }
+  }
+  return outgr;
+}
+
+TGraph * TUtil::demod::deChirp(TGraph * one, int offset){
+  int insize=one->GetN();//>two->GetN()?two->GetN():one->GetN();
+  int size = insize-offset-offset;
+  //  double out[size];
+  double value, denom, x, y;
+
+  // for(int i=0;i<size;i++){
+  //   x+=one->GetY()[i];
+  //   //y+=two->GetY()[i];
+  // }
+  // //x=pow(x, 2)/(double)size;
+  // //y=pow(y, 2)/(double)size;
+  // //denom = sqrt(x*y);
+  // denom=pow(x, 2)/(double)size;
+  
+  auto outgr=new TGraph();
+  for(int i=0;i<insize;i++){
+    if(i+offset < insize){//sanity check
+      value = (one->GetY()[i]*one->GetY()[i+offset]);
+      outgr->SetPoint(outgr->GetN(), one->GetX()[i], value);
+    }
+  }
+  return outgr;
 }

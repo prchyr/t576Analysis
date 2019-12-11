@@ -37,7 +37,8 @@ charge: nC
 #include "TFile.h"
 #include "TSystemDirectory.h"
 #include "TList.h"
-#include "cnpy.h"
+
+//#include "cnpy.h"
 #include "TSystemFile.h"
 #include "TH1F.h"
 #include "TH1D.h"
@@ -65,7 +66,7 @@ charge: nC
 #include <iostream>
 #include <fstream>
 #include <vector>
-
+#include <utility>
 
 
 #include "TUtilGraph.hh"
@@ -348,13 +349,15 @@ utilities.
   //get the x-axis location of t min value (wraper of TMath::LocMin)
   double locMin(TGraph *gr);
   double locMinInRange(TGraph *gr, double t_low=0., double t_high=999999.);
-    //return the phase at a single point, degrees=0, rad=1
+  //sort a vector. returns a vector of pairs with (index, value) sorted by value in order where 0 is ascending, 1 is decending 
+  vector<pair<int, double>> sort(vector<double> inVec, int order=0);
+  //return the phase at a single point, degrees=0, rad=1
     double getInstPhase(TGraph *inGr, double t, int deg0rad1=1);
 
   //get the index of a certain value. will always under-estimate
   int getIndex(TGraph *gr, double t);
   int getIndex(TGraph2D * gr, double t);
-
+  vector<double> toVector(int *data, int n);
 
   //get the power (square all values of a graph and divide by 50 ohms)
   TGraph * power(TGraph *gr);
@@ -579,6 +582,7 @@ zero pad length is the length to which the chunk is symmetrically zero-padded.
 win_type is an enumeration of window types to be applied to each bin. this helps avoid discontinuities and noise in the spectrogram. see the window function for the window types.
      */
     TH2D* spectrogram(TGraph *gr, Int_t binsize = 128, Int_t overlap=32, Int_t zero_pad_length=128, int win_type=0, int dbFlag=1, double ymin=0, double ymax=3.);
+    TGraph2D* spectrogramGraph(TGraph *gr, Int_t binsize=64 , Int_t overlap=32, Int_t zero_pad_length=128, int win_type=0, int dbFlag=1, double ymin=0, double ymax=3.);
     //averages a vector of spectrograms. must be the same size.
     TH2D* avgSpectrograms(vector<TH2D*>  inh);
 
@@ -661,8 +665,14 @@ the SVD namespace, which has useful utilities for SVD filtration methods
     TGraph2D * udft(TGraph * inGr, double fSampMean=1.);
     TGraph * idft(TGraph2D * inGr, double GSs);
   }
-}
 
+  namespace demod{
+    void normalizedDeChirp(Int_t * one, Int_t * two, int offset, int insize, Float_t * out);
+    
+    TGraph * normalizedDeChirp(TGraph * one, int offset);
+    TGraph * deChirp(TGraph * one, int offset);
+  }
+}
 
 
 #endif
