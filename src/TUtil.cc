@@ -178,7 +178,7 @@ TGraph * TUtil::FFT::psd(TGraph * inGr, int dbFlag, double rBW ){
   TGraph * outGr=new TGraph((n/2), xx, yy);
     outGr->SetTitle("psd");
   outGr->SetName("psd");
-  //*fPSDGr=*outGr;
+  *fPSDGr=*outGr;
   //delete outGr;
   return outGr;//fPSDGr;
 }
@@ -604,29 +604,29 @@ TGraph2D* TUtil::FFT::spectrogramGraph(TGraph *gr, Int_t binsize , Int_t overlap
     }
   //  cout<<dbFlag<<endl;
 
-  spectrogramGraph->GetYaxis()->SetRangeUser(0, spectrogramGraph->GetYaxis()->GetXmax()/2.1);
-  spectrogramGraph->GetXaxis()->SetTitle("Time [ns]");
-  spectrogramGraph->GetYaxis()->SetTitle("Frequency [GHz]");
-  if(dbFlag==1){
-    spectrogramGraph->GetZaxis()->SetTitle("dBm Hz^{-1}");
-  }
-  else if (dbFlag==2){
-    spectrogramGraph->GetZaxis()->SetTitle("dBm GHz^{-1}");
-  }
-  else{
-    spectrogramGraph->GetZaxis()->SetTitle("W GHz^{-1}");
-  }
-  spectrogramGraph->GetZaxis()->SetTitleOffset(1.5);
-  spectrogramGraph->GetXaxis()->SetTitleSize(.05);
-  spectrogramGraph->GetYaxis()->SetTitleSize(.05);
-  spectrogramGraph->GetZaxis()->SetTitleSize(.05);
-  spectrogramGraph->GetXaxis()->SetLabelSize(.05);
-  spectrogramGraph->GetYaxis()->SetLabelSize(.05);
-  spectrogramGraph->GetZaxis()->SetLabelSize(.05);
-  spectrogramGraph->GetYaxis()->SetTitleOffset(1.1);
-  spectrogramGraph->GetYaxis()->SetRangeUser(ymin, ymax);
-  //  delete(in);
-  //  delete(outt);
+  // spectrogramGraph->GetYaxis()->SetRangeUser(0, spectrogramGraph->GetYaxis()->GetXmax()/2.1);
+  // spectrogramGraph->GetXaxis()->SetTitle("Time [ns]");
+  // spectrogramGraph->GetYaxis()->SetTitle("Frequency [GHz]");
+  // if(dbFlag==1){
+  //   spectrogramGraph->GetZaxis()->SetTitle("dBm Hz^{-1}");
+  // }
+  // else if (dbFlag==2){
+  //   spectrogramGraph->GetZaxis()->SetTitle("dBm GHz^{-1}");
+  // }
+  // else{
+  //   spectrogramGraph->GetZaxis()->SetTitle("W GHz^{-1}");
+  // }
+  // spectrogramGraph->GetZaxis()->SetTitleOffset(1.5);
+  // spectrogramGraph->GetXaxis()->SetTitleSize(.05);
+  // spectrogramGraph->GetYaxis()->SetTitleSize(.05);
+  // spectrogramGraph->GetZaxis()->SetTitleSize(.05);
+  // spectrogramGraph->GetXaxis()->SetLabelSize(.05);
+  // spectrogramGraph->GetYaxis()->SetLabelSize(.05);
+  // spectrogramGraph->GetZaxis()->SetLabelSize(.05);
+  // spectrogramGraph->GetYaxis()->SetTitleOffset(1.1);
+  // spectrogramGraph->GetYaxis()->SetRangeUser(ymin, ymax);
+  // //  delete(in);
+  // //  delete(outt);
 
 
   // spectrogramGr->Delevte();
