@@ -8,6 +8,7 @@ released under the GNU General Public License version 3
 static int fN=1;
 static int fNSpec=1.;
 static int fNi=1;
+//TVirtualFFT::SetTransform(0);
 static TVirtualFFT * fftr2c=TVirtualFFT::FFT(1, &fN, "R2C ES");
 static TVirtualFFT * fftr2cSpec=TVirtualFFT::FFT(1, &fNSpec, "R2C ES");
 static TVirtualFFT * fftc2r=TVirtualFFT::FFT(1, &fN, "C2R ES");
@@ -47,13 +48,13 @@ and z-axis=imaginary.
 
 */
 TGraph2D * TUtil::FFT::fft(TGraph * inGr){
+
   int n = inGr->GetN();
   if(n!=fN){
     fN=n;
-    fftr2c=TVirtualFFT::FFT(1, &fN, "R2C P K");
-    //    fftc2r=TVirtualFFT::FFT(1, &fN, "C2R P");
+    fftr2c=TVirtualFFT::FFT(1, &fN, "R2C P");
   }
-  
+
   double dt = inGr->GetX()[50]-inGr->GetX()[49];
   double fs = 1./dt;
   
@@ -67,12 +68,15 @@ TGraph2D * TUtil::FFT::fft(TGraph * inGr){
 
   double norm=sqrt(2./(double)n);
   
-
-  TGraph2D *outGr=new TGraph2D(n, makeIndices(n, df), &re[0], &im[0]);
+  double *arr=makeIndices(n, df);
+  TGraph2D *outGr=new TGraph2D(n, arr, &re[0], &im[0]);
   for (int i=0;i<outGr->GetN();i++){
     outGr->GetY()[i] *= norm;
     outGr->GetZ()[i] *= norm;
   }
+  delete arr;
+  //delete TVirtualFFT::GetCurrentTransform();
+  //TVirtualFFT::SetTransform(0);
   *fXfrmGr2D=*outGr;
   delete outGr;
   return fXfrmGr2D;
@@ -108,11 +112,12 @@ TGraph * TUtil::FFT::ifft(TGraph2D * inGr){
 
   double norm=sqrt(1./(2.*(double)n));
 
-
-  TGraph *outGr=new TGraph(n, makeIndices(n, dt), re);
+  double * arr=makeIndices(n, dt);
+  TGraph *outGr=new TGraph(n, arr, re);
 
   for (int i=0;i<outGr->GetN();i++) outGr->GetY()[i] *= norm;
   *fXfrmGr=*outGr;
+  delete arr;
   delete outGr;
   return fXfrmGr;
 }
@@ -537,7 +542,7 @@ TGraph2D* TUtil::FFT::spectrogramGraph(TGraph *gr, Int_t binsize , Int_t overlap
   //  Int_t nbins = size/overlap;
   int nbins=size/(binsize-overlap);
   //xmax=((double)nbins*((double)binsize-(double)overlap))/samprate;
-  char*timebuff;
+  //  char*timebuff;
   //double samplerate = size/(xmax-xmin);
   double bandwidth = 1e9*samprate;
   // if(zero_pad_length!=fNSpec){
@@ -853,10 +858,12 @@ TMatrixD TUtil::SVD::makeFilter(TDecompSVD svd, int below, int above){
 
 TGraph * TUtil::SVD::toGraph(TVectorD v, double samplerate, double delay,TString name){
   double tdiv=1./samplerate;
-  auto  gg=new TGraph(v.GetNrows(), makeIndices(v.GetNrows(), tdiv, delay), &v[0]);
+  double *arr=makeIndices(v.GetNrows(), tdiv, delay);
+  auto  gg=new TGraph(v.GetNrows(), arr, &v[0]);
   gg->SetTitle("");
   gg->SetName(name);
   gg->GetXaxis()->SetRangeUser(0,gg->GetX()[gg->GetN()-1]);
+  delete arr;
   return gg;
 }
 
@@ -901,7 +908,7 @@ make a new tgraph that you'll need to delete on your own.
 // }
 
 double * TUtil::makeIndices(int n, double step, double offset){
-  double *out=new double[n];
+    double *out=new double[n];
   for(int i=0;i<n;i++){
     out[i]=((double)i*step+offset);
   }
