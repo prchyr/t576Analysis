@@ -8,12 +8,21 @@ released under the GNU General Public License version 3
 static int fN=1;
 static int fNSpec=1.;
 static int fNi=1;
+static int fNc=1;
+static int fNci=1;
+static int fTypeSine=4;
+static int fTypeCosine=0;
 //TVirtualFFT::SetTransform(0);
 static TVirtualFFT * fftr2c=TVirtualFFT::FFT(1, &fN, "R2C ES");
+static TVirtualFFT * fftc2cF=TVirtualFFT::FFT(1, &fNc, "C2CF ES");
+static TVirtualFFT * fftc2cB=TVirtualFFT::FFT(1, &fNci, "C2CB ES");
+static TVirtualFFT * sineXfrm=TVirtualFFT::SineCosine(1, &fN, &fTypeSine, "ES");
+static TVirtualFFT * cosineXfrm=TVirtualFFT::SineCosine(1, &fN, &fTypeCosine, "ES");
 static TVirtualFFT * fftr2cSpec=TVirtualFFT::FFT(1, &fNSpec, "R2C ES");
 static TVirtualFFT * fftc2r=TVirtualFFT::FFT(1, &fN, "C2R ES");
 static TGraph2D *fXfrmGr2D = new TGraph2D();
 static TGraph *fXfrmGr = new TGraph();
+static TGraph *sineXfrmGr = new TGraph();
 static TGraph *fPSDGr = new TGraph();
 
 
@@ -82,7 +91,166 @@ TGraph2D * TUtil::FFT::fft(TGraph * inGr){
   return fXfrmGr2D;
 }
 
+int TUtil::FFT::fft(int n, double * in, complex<double> *out){
+  //  int n = inGr->GetN();
+  if(n!=fN){
+    fN=n;
+    fftr2c=TVirtualFFT::FFT(1, &fN, "R2C P");
+  }
 
+
+  for(int i=0;i<n;i++){  
+    fftr2c->SetPoint(i,in[i]);
+  }
+  fftr2c->Transform();
+  
+  double re[n], im[n];
+  fftr2c->GetPointsComplex(re, im);
+
+
+  double norm=sqrt(2./(double)n);
+  
+
+
+  for (int i=0;i<n;i++){
+    out[i]= (re[i]*norm, im[i]*norm);
+  }
+
+  return 1;
+}
+
+int TUtil::FFT::cfft(int n, complex<double> * inVec, complex<double> * outVec){
+
+  //  int n = inVec.size();
+  
+  //  complex<double> out[n];
+  //cout<<"one"<<endl;
+  if(n!=fNc){
+    fNc=n;
+    fftc2cF=TVirtualFFT::FFT(1, &fNc, "C2CF P");
+  }
+  
+  //  cout<<"two"<<endl;
+  for(int i=0;i<n;i++){
+    
+    fftc2cF->SetPoint(i, inVec[i].real(), inVec[i].imag());
+
+  }
+  //cout<<"three"<<endl;
+  fftc2cF->Transform();
+  //cout<<"four"<<endl;
+  double re[n], im[n];
+  fftc2cF->GetPointsComplex(re, im);
+
+
+  double norm=sqrt(2./(double)n);
+  
+
+  for (int i=0;i<n;i++){
+    outVec[i]=(re[i]*norm, im[i]*norm);
+  }
+  return 1;
+}
+
+int TUtil::FFT::cifft(int n, complex<double> * inVec, complex<double> * outVec){
+
+  //int n = inVec.size();
+  
+  //  auto out=new TVec1D<complex<double>>(n, 0.);
+  
+  if(n!=fNci){
+    fNci=n;
+    fftc2cB=TVirtualFFT::FFT(1, &fNci, "C2CB P");
+  }
+
+  for(int i=0;i<n;i++){
+    fftc2cB->SetPoint(i, inVec[i].real(), inVec[i].imag());
+  }
+
+  fftc2cB->Transform();
+
+  double re[n], im[n];
+  fftc2cB->GetPointsComplex(re, im);
+
+
+  double norm=sqrt(2./(double)n);
+  
+
+  for (int i=0;i<n;i++){
+    outVec[i]=(re[i]*norm, im[i]*norm);
+
+  }
+  return 1;
+}
+
+
+TGraph * TUtil::FFT::sineTransform(TGraph * inGr){
+
+  int n = inGr->GetN();
+  if(n!=fN){
+    fN=n;
+    sineXfrm=TVirtualFFT::SineCosine(1, &fN, &fTypeSine,"P");
+  }
+
+  double dt = inGr->GetX()[50]-inGr->GetX()[49];
+  double fs = 1./dt;
+  
+  sineXfrm->SetPoints(inGr->GetY());
+  sineXfrm->Transform();
+  
+  double re[n], im[n];
+  //sineXfrm->GetPointsComplex(re, im);
+  sineXfrm->GetPoints(re);
+
+  double df=fs/(2.*n);
+
+  double norm=.5*sqrt(2./(double)n);
+  
+  double *arr=makeIndices(n, df);
+  TGraph *outGr=new TGraph(n, arr, &re[0]);
+  for (int i=0;i<outGr->GetN();i++){
+    outGr->GetY()[i] *= norm;
+  }
+  delete arr;
+  //delete TVirtualFFT::GetCurrentTransform();
+  //TVirtualFFT::SetTransform(0);
+  *sineXfrmGr=*outGr;
+  delete outGr;
+  return sineXfrmGr;
+}
+
+double * TUtil::FFT::sineTransform(int n, double * in){
+
+
+  if(n!=fN){
+    fN=n;
+    sineXfrm=TVirtualFFT::SineCosine(1, &fN, &fTypeSine,"P");
+  }
+
+  double dt = in[50]-in[49];
+  double fs = 1./dt;
+  
+  sineXfrm->SetPoints(in);
+  sineXfrm->Transform();
+  
+  double re[n], im[n];
+  //sineXfrm->GetPointsComplex(re, im);
+  sineXfrm->GetPoints(re);
+
+  double df=fs/(2.*n);
+
+  double norm=.5*sqrt(2./(double)n);
+  
+
+  double *out= new double[n];
+  for (int i=0;i<n;i++){
+    out[i]=re[i]*norm;
+  }
+
+
+
+  return out;
+}
 
 /*
 
@@ -120,6 +288,34 @@ TGraph * TUtil::FFT::ifft(TGraph2D * inGr){
   delete arr;
   delete outGr;
   return fXfrmGr;
+}
+
+int TUtil::FFT::ifft(int n, complex<double> * in, double *out){
+  //  int n = inGr->GetN();
+  if(n!=fNi){
+    fNi=n;
+    fftc2r=TVirtualFFT::FFT(1, &fNi, "C2R P");
+  }
+
+
+  for(int i=0;i<n;i++){  
+    fftc2r->SetPoint(i,in[i].real(), in[i].imag());
+  }
+  fftc2r->Transform();
+  
+  double re[n];
+  fftc2r->GetPoints(re);
+
+
+  double norm=sqrt(2./(double)n);
+  
+
+
+  for (int i=0;i<n;i++){
+    out[i]= (re[i]*norm);
+  }
+
+  return 1;
 }
 
 /*
@@ -1011,20 +1207,39 @@ int TUtil::absHist(TH2D * inGr){
 }
 
 
-double TUtil::getInstPhase(TGraph *inGr, double t, int deg0rad1){
-  //auto amp=TUtil::rms(inGr, inGr->GetX()[0], inGr->GetX()[inGr->GetN()-1])*sqrt(2);
-  auto norm=TUtil::normToPeak(inGr);
-  //  auto tIndex=TUtil::getIndex(norm, t);
-  auto amp=norm->Eval(t);
-  auto val=asin(amp);
+// double TUtil::getInstPhase(TGraph *inGr, double t, int deg0rad1){
+//   //auto amp=TUtil::rms(inGr, inGr->GetX()[0], inGr->GetX()[inGr->GetN()-1])*sqrt(2);
+//   auto norm=TUtil::normToPeak(inGr);
+//   //  auto tIndex=TUtil::getIndex(norm, t);
+//   auto amp=norm->Eval(t);
+//   auto val=asin(amp);
   
-  if(norm->Eval(t+.05)<amp){
-    val=TUtil::pi-val;
-  }
-  if(deg0rad1==0){
-    return val/TUtil::deg;
-  }
-  return val;
+//   if(norm->Eval(t+.05)<amp){
+//     val=TUtil::pi-val;
+//   }
+//   if(deg0rad1==0){
+//     return val/TUtil::deg;
+//   }
+//   return val;
+// }
+
+int TUtil::getInitPhaseAmp(TGraph *event, double freq, double * amp, double *phase){
+  auto omega=TUtil::twoPi*freq;
+  auto t1 = event->GetX()[0];
+  auto t2 = event->GetX()[1];
+  
+  auto y1 = event->GetY()[0];
+  auto y2 = event->GetY()[1];
+  
+  auto A = (y2*cos(omega*t1)-y1*cos(omega*t2))/sin(omega*(t2-t1));
+  auto B = (y1*sin(omega*t2)-y2*sin(omega*t1))/sin(omega*(t2-t1));
+  
+  *amp = sqrt(A*A+B*B);
+  
+  *phase = fmod(atan2(B,A), TUtil::twoPi);
+  
+  
+  return 1;
 }
 
 vector<double> TUtil::toVector(int *data, int n){
@@ -1034,6 +1249,15 @@ vector<double> TUtil::toVector(int *data, int n){
   }
   return outD;
 }
+
+vector<double> TUtil::toVector(double *data, int n){
+  vector<double> outD;
+  for(int i=0;i<n;i++){
+    outD.push_back(data[i]);
+  }
+  return outD;
+}
+
 
 double TUtil::mean(TGraph *gr, double t_low, double t_high){
   auto data=gr->GetY();
@@ -1620,6 +1844,14 @@ vector<pair<int, double>> TUtil::sort(vector<double> inVec, int order){
   return indexData;
 }
 
+double TUtil::peakiness(TGraph *inGr){
+  auto mmax=TUtil::max(inGr);
+  auto locmmax=TUtil::locMax(inGr);
+  auto dt=inGr->GetX()[1]-inGr->GetX()[0];
+  auto meanPre=TUtil::mean(inGr, 0, locmmax-dt);
+  auto meanPost=TUtil::mean(inGr, locmmax+dt, inGr->GetX()[inGr->GetN()-1]);
+  return mmax/((meanPre+meanPost)/2.);
+}
 // TUtil::dedisperse(TGraph2D * one, TGraph2D * two){
 //   auto re1=
 
@@ -3561,6 +3793,9 @@ double TUtil::SIM::n(double x, double E, double x_0, double e_0){
 TGraph2D * TUtil::DFT::udft(TGraph * inGr, double fSampMean){
   int N=inGr->GetN();
   double fStep=(fSampMean/(double)N);
+  double fudge=0.*(fStep/1000.)*(((double)rand()/RAND_MAX));
+  auto xx=inGr->GetX();
+
   auto sinT=vector<vector<double>>(N, vector<double>(N, 0.));
   auto cosT=vector<vector<double>>(N, vector<double>(N, 0.)); 
 
@@ -3570,35 +3805,52 @@ TGraph2D * TUtil::DFT::udft(TGraph * inGr, double fSampMean){
   
   for(int f=0;f<N;f++){
     for(int t=0;t<N;t++){
-      sinT[f][t]=2*sin(fStep*2.*TUtil::pi*inGr->GetX()[t]*f)/N;
-      cosT[f][t]=2*cos(fStep*2.*TUtil::pi*inGr->GetX()[t]*f)/N;
+      sinT[f][t]=2.*sin(fStep*2.*TUtil::pi*inGr->GetX()[t]*f)/N;
+      cosT[f][t]=2.*cos(fStep*2.*TUtil::pi*inGr->GetX()[t]*f)/N;     
     }
+    //    cout<<f*fStep<<endl;
   }
 
   
 
-  TGraph2D *out=new TGraph2D(N);
+  TGraph2D *out=new TGraph2D();
 
   for(int f=0;f<N;f++){
     double S=0.;
     double C=0.;
     for(int t=0;t<N;t++){
-      S+=4.*TUtil::pi*sinT[f][t]*inGr->GetY()[t];
-      C+=4.*TUtil::pi*cosT[f][t]*inGr->GetY()[t];
+      S+=sinT[f][t]*inGr->GetY()[t];
+      C+=cosT[f][t]*inGr->GetY()[t];
     }
     out->SetPoint(f, fStep*f, S, C);
   }
-  
+  //TGraph2D *out=new TGraph2D();
+  // auto normGr=TUtil::normalize(inGr);
+  // //auto amp=TUtil::amplitude(inGr, 0, 20);
+  // out->SetPoint(out->GetN(), 0,0,0);
+  // for(int f=1;f<N;f++){
+  //   //auto val=0;
+  //   auto cwSin=TUtil::sampledCW(f*fStep, 1., N, xx, 0.);
+  //   auto cwCos=TUtil::sampledCW(f*fStep, 1., N, xx, TUtil::pi/2.);
+  //   auto S=TUtil::dot(normGr, cwSin);
+  //   auto C=TUtil::dot(normGr, cwCos);
+  //   //    cout<<xx[0]<<" "<<cwSin->GetY()[0]<<" "<<cwCos->GetY()[0]<<" "<<S<<" "<<C<<endl;
+  //   //if(inGr->GetN()!=cwCos->GetN())cout<<cwCos->GetN();
+  //   out->SetPoint(out->GetN(), fStep*f, S, C);
+  //   delete cwSin;
+  //   delete cwCos;
+  // }
   return out;
 }
 
-TGraph * TUtil::DFT::idft(TGraph2D * inGr, double GSs){
+
+TGraph * TUtil::DFT::iudft(TGraph2D * inGr, double GSs){
   int N=inGr->GetN();
   int Nt=N*(GSs/inGr->GetX()[N-1]);
   double dt=1./GSs;
 
-  double prefactor=1./(4.*TUtil::pi);
-  auto  vals=vector<double>(Nt);
+  double prefactor=1.;///(4.*TUtil::pi);
+  auto  vals=vector<double>(Nt, 0.);
   for(int f=0;f<N/2+1;f++){
     for(int t=0;t<Nt;t++){
       double T=(double)t*dt;
@@ -3606,8 +3858,70 @@ TGraph * TUtil::DFT::idft(TGraph2D * inGr, double GSs){
       vals[t]+=prefactor*inGr->GetZ()[f]*cos(2.*TUtil::pi*inGr->GetX()[f]*T);
     }
   }
+  auto ind=TUtil::makeIndices(Nt, dt);
+  TGraph *out=new TGraph(Nt, ind, &vals[0]);
+  delete ind;
+  return out;
+}
 
-  TGraph *out=new TGraph(Nt, TUtil::makeIndices(Nt, dt), &vals[0]);  
+
+
+//unevenly sampled (in time) psd
+TGraph * TUtil::DFT::upsd(TGraph * inGr, double fSampMean, int log){
+  int N=inGr->GetN();
+  double fStep=(fSampMean/(double)N);
+  double fudge=0.*(fStep/100.)*(double)rand()/RAND_MAX;
+  auto xx=inGr->GetX();
+
+  auto sinT=vector<vector<double>>(N, vector<double>(N, 0.));
+  auto cosT=vector<vector<double>>(N, vector<double>(N, 0.)); 
+
+  //auto S=vector<double>(N, 0.);
+  //auto C=vector<double>(N, 0.);
+
+  
+  for(int f=0;f<N;f++){
+    for(int t=0;t<N;t++){
+      sinT[f][t]=2.*sin((fStep+fudge)*2.*TUtil::pi*inGr->GetX()[t]*f)/N;
+      cosT[f][t]=2.*cos((fStep+fudge)*2.*TUtil::pi*inGr->GetX()[t]*f)/N;     
+    }
+    //    cout<<f*fStep<<endl;
+  }
+
+  
+
+  TGraph *out=new TGraph();
+
+  for(int f=0;f<N;f++){
+    double S=0.;
+    double C=0.;
+    for(int t=0;t<N;t++){
+      S+=sinT[f][t]*inGr->GetY()[t];
+      C+=cosT[f][t]*inGr->GetY()[t];
+    }
+    if(log==1){
+      out->SetPoint(f, fStep*f, TUtil::vToDbmHz(fSampMean/2.,sqrt(S*S+C*C)));
+    }
+    else{
+      out->SetPoint(f, fStep*f,  sqrt(S*S+C*C));
+    }
+  }
+  //TGraph2D *out=new TGraph2D();
+  // auto normGr=TUtil::normalize(inGr);
+  // //auto amp=TUtil::amplitude(inGr, 0, 20);
+  // out->SetPoint(out->GetN(), 0,0,0);
+  // for(int f=1;f<N;f++){
+  //   //auto val=0;
+  //   auto cwSin=TUtil::sampledCW(f*fStep, 1., N, xx, 0.);
+  //   auto cwCos=TUtil::sampledCW(f*fStep, 1., N, xx, TUtil::pi/2.);
+  //   auto S=TUtil::dot(normGr, cwSin);
+  //   auto C=TUtil::dot(normGr, cwCos);
+  //   //    cout<<xx[0]<<" "<<cwSin->GetY()[0]<<" "<<cwCos->GetY()[0]<<" "<<S<<" "<<C<<endl;
+  //   //if(inGr->GetN()!=cwCos->GetN())cout<<cwCos->GetN();
+  //   out->SetPoint(out->GetN(), fStep*f, S, C);
+  //   delete cwSin;
+  //   delete cwCos;
+  // }
   return out;
 }
 

@@ -67,7 +67,7 @@ charge: nC
 #include <fstream>
 #include <vector>
 #include <utility>
-
+#include <complex>
 
 #include "TUtilGraph.hh"
 
@@ -99,8 +99,10 @@ namespace TUtil{
     and then freq will have units of GHz, as it should.
   */
   //constants
+  static complex<double> I=sqrt(complex<double>(-1));//imaginary unit, used for complex stuff
   static constexpr double c_light = .29979246; //  m/ns
   static constexpr double pi = 3.14159265358979323846; //radians
+  static constexpr double twoPi = 2.*pi; //radians
   static constexpr double z_0=50; //ohms
   static constexpr double deg=pi/180.; //radians
   static constexpr double kB=8.617343e-11;//MeV/kelvin
@@ -166,6 +168,7 @@ can be extended to use other 'vector' features in the future. there is certainly
       vec=std::vector<T>(N, init);
     }
     void push_back(T const & elem);
+    T size();
     T  & operator[]( int index);
     void clear();
     
@@ -177,6 +180,9 @@ can be extended to use other 'vector' features in the future. there is certainly
   }
   template <class T> T & TVec1D<T>::operator[]( int index){
     return vec[index];
+  }
+  template <class T> T TVec1D<T>::size( ){
+    return vec.size();
   }
   template <class T> void TVec1D<T>::clear(){
     vec.clear();
@@ -203,6 +209,7 @@ can be extended to use other 'vector' features in the future. there is certainly
     }
      
     TUtil::TVec1D<T> & operator[](const int index);
+    //    T & operator[][](int ind1, int ind2);
     void clear();
 
     ClassDef(TVec2D, 1);
@@ -211,6 +218,9 @@ can be extended to use other 'vector' features in the future. there is certainly
   template <class T> TUtil::TVec1D<T> & TVec2D<T>::operator[](const int index){
     return vec[index];
   }
+  //template <class T> T & TVec1D<T>::operator[][]( int ind1, int ind2){
+  // return vec[ind1][ind2];
+  // }
   template <class T> void TVec2D<T>::clear(){
     for(int i=0;i<vec.size();i++){
       vec[i].clear();
@@ -338,6 +348,8 @@ utilities.
   TGraph *stretch(TGraph *g1, double factor);
   //find the mean of a TGraph. range is optional
   double mean(TGraph *gr, double t_low=0., double t_high=999999.);
+  //get the 'peakiness' of a graph
+  double peakiness(TGraph *inGr);
   //get the max value (wrapper of TMath::max)
   double max(TGraph *gr);
   double maxInRange(TGraph *gr, double t_low=0., double t_high=999999.);
@@ -352,12 +364,16 @@ utilities.
   //sort a vector. returns a vector of pairs with (index, value) sorted by value in order where 0 is ascending, 1 is decending 
   vector<pair<int, double>> sort(vector<double> inVec, int order=0);
   //return the phase at a single point, degrees=0, rad=1
-    double getInstPhase(TGraph *inGr, double t, int deg0rad1=1);
-
+  /*DON"T USE*/
+  double getInstPhase(TGraph *inGr, double t, int deg0rad1=1);
+  //get the initial phase and amplitude of a graph
+  int getInitPhaseAmp(TGraph *event, double freq, double * amp, double *phase);
   //get the index of a certain value. will always under-estimate
   int getIndex(TGraph *gr, double t);
   int getIndex(TGraph2D * gr, double t);
   vector<double> toVector(int *data, int n);
+  vector<double> toVector(double *data, int n);
+  TVec1D<double> toTVec1D(double *data, int n);
 
   //get the power (square all values of a graph and divide by 50 ohms)
   TGraph * power(TGraph *gr);
@@ -549,8 +565,19 @@ The FFT namespace, for everything to do with FFTs.
 
     //returns a tgraph2d, x axis is the freqs, y axis is the real part of the complex fft, z axis is the imaginary part of the fft.
     TGraph2D * fft(TGraph *inGr);
+    //this version returns a complex vector from real input
+    int fft(int n, double * in, complex<double> * out);
     //returns the inverse fft of the data. must be structured as above (x axis is the freqs, y axis is the real part of the complex fft, z axis is the imaginary part of the fft.)
     TGraph * ifft(TGraph2D *inGr);
+    //complex array to double
+    int ifft(int n, complex<double> * in, double * out);
+    //complex valued forward FFT.
+    int cfft(int n, complex<double> * inVec, complex<double> * outVec);
+    //complex valued backward FFT.
+    int cifft(int n, complex<double> * inVec, complex<double> * outVec);
+    //sine transform
+    TGraph * sineTransform(TGraph * inGr);
+    double * sineTransform(int n, double * in);
     //return the Hilbert transform
     TGraph * hilbertTransform(TGraph *inGr);
     //plot the phase of the full graph 
@@ -663,7 +690,8 @@ the SVD namespace, which has useful utilities for SVD filtration methods
 
   namespace DFT{
     TGraph2D * udft(TGraph * inGr, double fSampMean=1.);
-    TGraph * idft(TGraph2D * inGr, double GSs);
+    TGraph * upsd(TGraph * inGr, double fSampMean=1., int log=0);
+    TGraph * iudft(TGraph2D * inGr, double GSs);
   }
 
   namespace demod{
