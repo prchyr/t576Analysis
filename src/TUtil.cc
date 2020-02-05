@@ -127,7 +127,7 @@ int TUtil::FFT::cfft(int n, complex<double> * inVec, complex<double> * outVec){
   //cout<<"one"<<endl;
   if(n!=fNc){
     fNc=n;
-    fftc2cF=TVirtualFFT::FFT(1, &fNc, "C2CF P");
+    fftc2cF=TVirtualFFT::FFT(1, &fNc, "C2CForward PK");
   }
   
   //  cout<<"two"<<endl;
@@ -160,7 +160,7 @@ int TUtil::FFT::cifft(int n, complex<double> * inVec, complex<double> * outVec){
   
   if(n!=fNci){
     fNci=n;
-    fftc2cB=TVirtualFFT::FFT(1, &fNci, "C2CB P");
+    fftc2cB=TVirtualFFT::FFT(1, &fNci, "C2CBackward PK");
   }
 
   for(int i=0;i<n;i++){
@@ -707,6 +707,7 @@ TH2D* TUtil::FFT::spectrogram(TGraph *gr, Int_t binsize , Int_t overlap, Int_t z
   else{
     spectrogramHist->GetZaxis()->SetTitle("W GHz^{-1}");
   }
+  
   spectrogramHist->GetZaxis()->SetTitleOffset(1.5);
   spectrogramHist->GetXaxis()->SetTitleSize(.05);
   spectrogramHist->GetYaxis()->SetTitleSize(.05);
@@ -3363,17 +3364,19 @@ double TUtil::rad2Deg(double rad) {
 
 
 void TUtil::titles(TGraph *inGr, TString title, TString xtitle, TString ytitle){
+  auto sizeT=.045;
   inGr->SetTitle(title);
+
   inGr->GetXaxis()->SetTitle(xtitle);
   inGr->GetYaxis()->SetTitle(ytitle);
 
-  inGr->GetXaxis()->SetTitleSize(.05);
-  inGr->GetYaxis()->SetTitleSize(.05);
+  inGr->GetXaxis()->SetTitleSize(sizeT);
+  inGr->GetYaxis()->SetTitleSize(sizeT);
 
-  inGr->GetXaxis()->SetLabelSize(.05);
-  inGr->GetYaxis()->SetLabelSize(.05);
-
-  inGr->GetYaxis()->SetTitleOffset(1.);
+  inGr->GetXaxis()->SetLabelSize(sizeT);
+  inGr->GetYaxis()->SetLabelSize(sizeT);
+  inGr->GetXaxis()->SetTitleOffset(1.2);
+  inGr->GetYaxis()->SetTitleOffset(1.2);
 }
 
 void TUtil::ranges(TGraph *inGr,double x1, double x2, double y1, double y2){
@@ -3553,6 +3556,14 @@ void TUtil::draw(int nGraphs, TGraph** inGr, TString option){
 }
 
 TGraph * TUtil::toGraph(TH1D * hist){
+  auto   outGr=new TGraph();
+  for(int i=0;i<hist->GetNbinsX();i++){
+    outGr->SetPoint(outGr->GetN(), hist->GetBinCenter(i), hist->GetBinContent(i));
+  }
+  return outGr;
+}
+
+TGraph * TUtil::toGraph(TH1F * hist){
   auto   outGr=new TGraph();
   for(int i=0;i<hist->GetNbinsX();i++){
     outGr->SetPoint(outGr->GetN(), hist->GetBinCenter(i), hist->GetBinContent(i));
@@ -3773,7 +3784,21 @@ double ** TUtil::dTimeOfFlight(int N, TVector3 one, TVector3 *two, double n){
 }
 
 
-
+double TUtil::lInt(double logE){
+  if(logE>=1&&logE<4){
+    return 14.126+(-.939*logE);
+  }
+  if(logE>=4&&logE<5){
+    return 12.943+(-.636*logE);
+  }
+  if(logE>=5&&logE<7){
+    return 12.19+(-.489*logE);
+  }
+  if(logE>=7&&logE<12){
+    return 11.31+(-.3642*logE);
+  }
+  return 0;
+}
 
 
 double TUtil::SIM::ss(double x, double E, double x_0, double e_0){

@@ -515,6 +515,7 @@ utilities.
   void draw(vector<TH1D*> inGr, TString drawOption1);
   //cast a th1d to a tgraph
   TGraph * toGraph(TH1D * hist);
+  TGraph * toGraph(TH1F * hist);
   //draw cursors centered on the peak of a spectrogram.
   //before use, must draw the canvas or update with can->Update()
   //so that the gPad calls work correctly.
@@ -553,6 +554,8 @@ utilities.
   //offset a bunch of antennas for the correct delta t's for single source
   //  TGraph ** delayGraphs
 
+  //return the neutrino interaction length for a neutrino with log10(E) in GeV logE=6 is 1PeV, for example
+  double lInt(double logE);
 
   /*******************************************************
 
