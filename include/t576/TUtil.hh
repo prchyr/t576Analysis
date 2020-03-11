@@ -581,6 +581,8 @@ The FFT namespace, for everything to do with FFTs.
     //sine transform
     TGraph * sineTransform(TGraph * inGr);
     double * sineTransform(int n, double * in);
+
+    void fftshift(int N, complex<double>* in);
     //return the Hilbert transform
     TGraph * hilbertTransform(TGraph *inGr);
     //plot the phase of the full graph 

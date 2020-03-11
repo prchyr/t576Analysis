@@ -127,7 +127,7 @@ int TUtil::FFT::cfft(int n, complex<double> * inVec, complex<double> * outVec){
   //cout<<"one"<<endl;
   if(n!=fNc){
     fNc=n;
-    fftc2cF=TVirtualFFT::FFT(1, &fNc, "C2CForward PK");
+    fftc2cF=TVirtualFFT::FFT(1, &fNc, "C2CF P");
   }
   
   //  cout<<"two"<<endl;
@@ -145,9 +145,12 @@ int TUtil::FFT::cfft(int n, complex<double> * inVec, complex<double> * outVec){
 
   double norm=sqrt(2./(double)n);
   
-
+  //cout<<"here"<<endl;
   for (int i=0;i<n;i++){
-    outVec[i]=(re[i]*norm, im[i]*norm);
+    auto val=complex<double>(re[i]*norm, im[i]*norm);
+    //    cout<<val<<" ";
+    outVec[i]=val;
+    //cout<<outVec<<" ";
   }
   return 1;
 }
@@ -160,7 +163,7 @@ int TUtil::FFT::cifft(int n, complex<double> * inVec, complex<double> * outVec){
   
   if(n!=fNci){
     fNci=n;
-    fftc2cB=TVirtualFFT::FFT(1, &fNci, "C2CBackward PK");
+    fftc2cB=TVirtualFFT::FFT(1, &fNci, "C2CB P");
   }
 
   for(int i=0;i<n;i++){
@@ -177,9 +180,11 @@ int TUtil::FFT::cifft(int n, complex<double> * inVec, complex<double> * outVec){
   
 
   for (int i=0;i<n;i++){
-    outVec[i]=(re[i]*norm, im[i]*norm);
+    outVec[i]=complex<double>(re[i]*norm, im[i]*norm);
 
   }
+
+  //delete temp;
   return 1;
 }
 
@@ -317,6 +322,17 @@ int TUtil::FFT::ifft(int n, complex<double> * in, double *out){
 
   return 1;
 }
+
+void TUtil::FFT::fftshift(int N, complex<double>* in){
+  for(int j=N/2;j<N;j++){
+     auto temp=in[j];
+     in[j]=in[j-(N/2)];
+     in[j-(N/2)]=temp;
+  }
+}
+
+
+
 
 /*
 
@@ -3364,7 +3380,7 @@ double TUtil::rad2Deg(double rad) {
 
 
 void TUtil::titles(TGraph *inGr, TString title, TString xtitle, TString ytitle){
-  auto sizeT=.045;
+  auto sizeT=.055;
   inGr->SetTitle(title);
 
   inGr->GetXaxis()->SetTitle(xtitle);
@@ -3376,7 +3392,8 @@ void TUtil::titles(TGraph *inGr, TString title, TString xtitle, TString ytitle){
   inGr->GetXaxis()->SetLabelSize(sizeT);
   inGr->GetYaxis()->SetLabelSize(sizeT);
   inGr->GetXaxis()->SetTitleOffset(1.2);
-  inGr->GetYaxis()->SetTitleOffset(1.2);
+  inGr->GetYaxis()->SetLabelOffset(.01);
+  inGr->GetYaxis()->SetTitleOffset(0.7);
 }
 
 void TUtil::ranges(TGraph *inGr,double x1, double x2, double y1, double y2){
