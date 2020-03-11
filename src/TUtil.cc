@@ -3391,9 +3391,9 @@ void TUtil::titles(TGraph *inGr, TString title, TString xtitle, TString ytitle){
 
   inGr->GetXaxis()->SetLabelSize(sizeT);
   inGr->GetYaxis()->SetLabelSize(sizeT);
-  inGr->GetXaxis()->SetTitleOffset(1.2);
+  //inGr->GetXaxis()->SetTitleOffset(1.2);
   inGr->GetYaxis()->SetLabelOffset(.01);
-  inGr->GetYaxis()->SetTitleOffset(0.7);
+  inGr->GetYaxis()->SetTitleOffset(1.2);
 }
 
 void TUtil::ranges(TGraph *inGr,double x1, double x2, double y1, double y2){
