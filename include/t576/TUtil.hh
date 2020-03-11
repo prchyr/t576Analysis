@@ -532,6 +532,7 @@ utilities.
   void setColdPalette();
   void setHotPalette();
   void set2DPalette();
+  TCanvas * canvas(TString title, TString name, int xdim, int ydim);
   //miscellaneous TGraph things
 
 
