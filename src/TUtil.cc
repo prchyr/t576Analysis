@@ -1402,7 +1402,11 @@ int TUtil::getIndex(TGraph2D * gr, double t){
   return index;
 }
 
-
+double TUtil::snr(TGraph *gr){
+  auto noise=TUtil::rms(gr, 0, TUtil::locMax(gr));
+  auto sig=TUtil::max(gr)/sqrt(2);
+  return sig/noise;
+}
 
 
 TGraph * TUtil::removeMean(TGraph *gr, double t_low, double t_high){

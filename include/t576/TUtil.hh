@@ -361,6 +361,8 @@ utilities.
   //get the x-axis location of t min value (wraper of TMath::LocMin)
   double locMin(TGraph *gr);
   double locMinInRange(TGraph *gr, double t_low=0., double t_high=999999.);
+  //this snr is a ratio of the rms of the peak (e.g. the peak value/sqrt(2)) over the rms of the waveform up to the peak
+  double snr(TGraph *gr);
   //sort a vector. returns a vector of pairs with (index, value) sorted by value in order where 0 is ascending, 1 is decending 
   vector<pair<int, double>> sort(vector<double> inVec, int order=0);
   //return the phase at a single point, degrees=0, rad=1
@@ -532,7 +534,7 @@ utilities.
   void setColdPalette();
   void setHotPalette();
   void set2DPalette();
-  TCanvas * canvas(TString title, TString name, int xdim, int ydim);
+  TCanvas * canvas(TString title="can", TString name="can", int xdim=700, int ydim=600);
   //miscellaneous TGraph things
 
 
