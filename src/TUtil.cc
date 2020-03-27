@@ -3507,7 +3507,7 @@ void TUtil::titles(TH2F *inGr, TString title, TString xtitle, TString ytitle, TS
   inGr->GetXaxis()->SetTitle(xtitle);
   inGr->GetYaxis()->SetTitle(ytitle);
   inGr->GetZaxis()->SetTitle(ztitle);
-  inGr->GetZaxis()->SetTitleOffset(1.2);
+  inGr->GetZaxis()->SetTitleOffset(1.1);
   inGr->GetXaxis()->SetTitleSize(.05);
   inGr->GetYaxis()->SetTitleSize(.05);
   inGr->GetZaxis()->SetTitleSize(.05);
@@ -3677,7 +3677,7 @@ TCanvas * TUtil::canvas(TString title, TString name, int xdim, int ydim){
   auto can=new TCanvas(title, name, xdim, ydim);
   can->SetLeftMargin(.15);
   can->SetBottomMargin(.12);
-  can->SetRightMargin(.15);
+  can->SetRightMargin(.18);
   return can;
 }
 void TUtil::setColdPalette(){
