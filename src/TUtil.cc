@@ -1402,8 +1402,14 @@ int TUtil::getIndex(TGraph2D * gr, double t){
   return index;
 }
 
-double TUtil::snr(TGraph *gr){
-  auto noise=TUtil::rms(gr, 0, TUtil::locMax(gr));
+double TUtil::snr(TGraph *gr, double noiseStart, double noiseEnd){
+  double noise=1;
+  if(noiseStart==0.||noiseEnd==0.){
+    noise=TUtil::rms(gr, 0, TUtil::locMax(gr));
+  }
+  else{
+    noise=TUtil::rms(gr, noiseStart, noiseEnd);
+  }
   auto sig=TUtil::max(gr)/sqrt(2);
   return sig/noise;
 }

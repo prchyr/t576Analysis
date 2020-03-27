@@ -362,7 +362,7 @@ utilities.
   double locMin(TGraph *gr);
   double locMinInRange(TGraph *gr, double t_low=0., double t_high=999999.);
   //this snr is a ratio of the rms of the peak (e.g. the peak value/sqrt(2)) over the rms of the waveform up to the peak
-  double snr(TGraph *gr);
+  double snr(TGraph *gr, double noiseStart=0., double noiseEnd=0.);
   //sort a vector. returns a vector of pairs with (index, value) sorted by value in order where 0 is ascending, 1 is decending 
   vector<pair<int, double>> sort(vector<double> inVec, int order=0);
   //return the phase at a single point, degrees=0, rad=1
