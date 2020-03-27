@@ -3677,7 +3677,7 @@ TCanvas * TUtil::canvas(TString title, TString name, int xdim, int ydim){
   auto can=new TCanvas(title, name, xdim, ydim);
   can->SetLeftMargin(.15);
   can->SetBottomMargin(.12);
-  can->SetRightMargin(.18);
+  can->SetRightMargin(.15);
   return can;
 }
 void TUtil::setColdPalette(){
