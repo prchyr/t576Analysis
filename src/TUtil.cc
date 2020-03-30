@@ -1404,7 +1404,7 @@ int TUtil::getIndex(TGraph2D * gr, double t){
 
 double TUtil::snr(TGraph *gr, double noiseStart, double noiseEnd){
   double noise=1;
-  if(noiseStart==0.||noiseEnd==0.){
+  if(noiseEnd==0.){
     noise=TUtil::rms(gr, 0, TUtil::locMax(gr));
   }
   else{
