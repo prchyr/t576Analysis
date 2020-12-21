@@ -3786,7 +3786,7 @@ void TUtil::setWarmPalette(double alpha){
   Double_t red[rgb]   = {0.00, 1., 0.90};
   Double_t green[rgb] = {0., 0.0, 1.0};
   Double_t blue[rgb]  = {0.00, 0.0, 0.00};
-  TColor::CreateGradientColorTable(rgb, stops, red, green, blue, N);
+  TColor::CreateGradientColorTable(rgb, stops, red, green, blue, N, alpha);
   gStyle->SetNumberContours(N);
 
 }
