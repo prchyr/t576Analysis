@@ -335,7 +335,9 @@ utilities.
   TGraph * mult(TGraph *g1, TGraph *g2, double constant=1.);
   //divide 2 graphs: out(t)=g1(t)/constant*g2(t). if there is a divide
   //by zero, that entry will just be 0.
-  TGraph * divide(TGraph *g1, TGraph *g2, double constant);
+  TGraph * divide(TGraph *g1, TGraph *g2, double constant=1.);
+  //same but with vectors. must be the same length.
+  vector<double> divide(vector<double> v1, vector<double> v2, double constant);
   //shift a graph along the y axis by the factor
   TGraph * shiftY(TGraph *g1, double factor);
   //shift a tprofile along the y axis by the factor
@@ -375,6 +377,8 @@ utilities.
   int getIndex(TGraph2D * gr, double t);
   vector<double> toVector(int *data, int n);
   vector<double> toVector(double *data, int n);
+  vector<double> toVector(TH1F * data);
+  vector<double> toVector(TH1D * data);
   TVec1D<double> toTVec1D(double *data, int n);
 
   //get the power (square all values of a graph and divide by 50 ohms)
@@ -464,7 +468,7 @@ utilities.
   //radians to degrees
   double rad2Deg(double rad);
   //add some noise to a graph
-  TGraph * addNoise(TGraph * inGr, double level);
+  TGraph * addNoise(TGraph * inGr, double level, TString type="Gaus");
   //find the x values of zero crossings. can also plot the relative time between subsequent zero crossings if relative = 1
   TGraph * getZeroCrossGraph(TGraph * inGr, int relative=0);
   //find the x values of zero crossings and put them in a histogram. returns the number of zero crossings in that graph.
@@ -477,7 +481,9 @@ utilities.
 
 
   //drawing things
-
+  void style(TGraph *inGr, Color_t color, double lineWidth=1., int lineStyle=1);
+  void style(TH1F *inGr, Color_t color, double lineWidth=1., int lineStyle=1);
+    void style(TH1D *inGr, Color_t color, double lineWidth=1., int lineStyle=1);
   //utilities for common stuff such as titles and axes
   void titles(TGraph *inGr, TString title, TString xtitle, TString ytitle);
   void ranges(TGraph *inGr, double x1, double x2, double y1, double y2);
@@ -497,6 +503,11 @@ utilities.
   void ranges(TH1F *inGr, double x1, double x2, double y1, double y2);
   void xrange(TH1F *inGr, double x1, double x2);
   void yrange(TH1F *inGr, double y1, double y2);
+
+  void titles(TH1D *inGr, TString title, TString xtitle, TString ytitle);
+  void ranges(TH1D *inGr, double x1, double x2, double y1, double y2);
+  void xrange(TH1D *inGr, double x1, double x2);
+  void yrange(TH1D *inGr, double y1, double y2);
 
   void titles(TH2D *inGr, TString title, TString xtitle, TString ytitle, TString ztitle);
   void ranges(TH2D *inGr, double x1, double x2, double y1, double y2, double z1=0, double z2=0);
@@ -527,12 +538,12 @@ utilities.
   //get many slices
   vector<TGraph*> getSlicesY(TH2D * hist, int nSlices, double ylow, double yhigh, TString name="name", TString title="title");
   //a pretty warm palette
-  void setWarmPalette();
+  void setWarmPalette(double alpha=1.);
   //a pretty cool palette
-  void setCoolPalette();
+  void setCoolPalette(double alpha=1.);
   //cold palette
-  void setColdPalette();
-  void setHotPalette();
+  void setColdPalette(double alpha=1.);
+  void setHotPalette(double alpha=1.);
   void set2DPalette();
   TCanvas * canvas(TString title="can", TString name="can", int xdim=700, int ydim=600);
   //miscellaneous TGraph things
@@ -557,6 +568,8 @@ utilities.
   //offset a bunch of antennas for the correct delta t's for single source
   //  TGraph ** delayGraphs
 
+  double dBToLinear(double dB);
+  double linearToDBPower(double linear);
   //return the neutrino interaction length for a neutrino with log10(E) in GeV logE=6 is 1PeV, for example
   double lInt(double logE);
 

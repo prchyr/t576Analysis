@@ -1275,6 +1275,22 @@ vector<double> TUtil::toVector(double *data, int n){
   return outD;
 }
 
+vector<double> TUtil::toVector(TH1F * data){
+  vector<double> outD;
+  for(int i=0;i<data->GetNbinsX();i++){
+    outD.push_back(data->GetBinContent(i));
+  }
+  return outD;
+}
+
+vector<double> TUtil::toVector(TH1D * data){
+  vector<double> outD;
+  for(int i=0;i<data->GetNbinsX();i++){
+    outD.push_back(data->GetBinContent(i));
+  }
+  return outD;
+}
+
 
 double TUtil::mean(TGraph *gr, double t_low, double t_high){
   auto data=gr->GetY();
@@ -1779,6 +1795,23 @@ TGraph * TUtil::divide(TGraph *g1, TGraph *g2, double constant){
   outGr->GetYaxis()->SetTitle(g1->GetYaxis()->GetTitle());
 
   return outGr;
+}
+
+vector<double> TUtil::divide(vector<double> v1, vector<double> v2, double constant){
+
+  int len=v1.size()<v2.size()?v1.size():v2.size();
+  vector<double> outV;
+  for(int i=0;i<len;i++){
+    auto val=v1[i]/(constant*v2[i]);
+  if(isfinite(val)){
+    outV.push_back(val);
+  }
+  else{
+    outV.push_back(0);
+  }
+  }
+
+  return outV;
 }
 
 
@@ -2703,12 +2736,25 @@ TGraph * TUtil::brickWallFilter(TGraph * inGr, double low, double high){
   return outGr;
 }
 
-TGraph * TUtil::addNoise(TGraph * inGr, double level){
+TGraph * TUtil::addNoise(TGraph * inGr, double level, TString type){
+  cout<<type<<endl;
   auto outGr=new TGraph();
   auto rand=new TRandom3();
   rand->SetSeed();
   for(int i=0;i<inGr->GetN();i++){
-    auto ranN=rand->Gaus(0, level);
+    auto ranN=0.;
+    if(type.Contains("Poisson")){
+      ranN=rand->PoissonD(level);
+    }
+    else if(type.Contains("Gaus")){
+      ranN=rand->Gaus(0, level);
+    }
+    else if(type.Contains("Uniform")){
+      ranN=rand->Uniform(-level, level);
+    }
+    //else{
+    //ranN=rand->Uniform(-level, level);
+    //}
     outGr->SetPoint(outGr->GetN(), inGr->GetX()[i], inGr->GetY()[i]+ranN);
   }
   delete rand;
@@ -3388,6 +3434,23 @@ double TUtil::rad2Deg(double rad) {
 
 /*************some plotting things****************/
 
+void TUtil::style(TGraph *inGr, Color_t color, double lineWidth, int lineStyle){
+  inGr->SetLineColor(color);
+  inGr->SetLineWidth(lineWidth);
+  inGr->SetLineStyle(lineStyle);
+}
+
+void TUtil::style(TH1F *inGr, Color_t color, double lineWidth, int lineStyle){
+  inGr->SetLineColor(color);
+  inGr->SetLineWidth(lineWidth);
+  inGr->SetLineStyle(lineStyle);
+}
+
+void TUtil::style(TH1D *inGr, Color_t color, double lineWidth, int lineStyle){
+  inGr->SetLineColor(color);
+  inGr->SetLineWidth(lineWidth);
+  inGr->SetLineStyle(lineStyle);
+}
 
 void TUtil::titles(TGraph *inGr, TString title, TString xtitle, TString ytitle){
   auto sizeT=.055;
@@ -3420,8 +3483,19 @@ void TUtil::xrange(TGraph *inGr, double x1, double x2){
 
 void TUtil::titles(TGraphErrors *inGr, TString title, TString xtitle, TString ytitle){
   inGr->SetTitle(title);
-  inGr->GetXaxis()->SetTitle(xtitle);
+inGr->GetXaxis()->SetTitle(xtitle);
   inGr->GetYaxis()->SetTitle(ytitle);
+    inGr->GetXaxis()->SetTitle(xtitle);
+  inGr->GetYaxis()->SetTitle(ytitle);
+  auto sizeT=.055;
+  inGr->GetXaxis()->SetTitleSize(sizeT);
+  inGr->GetYaxis()->SetTitleSize(sizeT);
+
+  inGr->GetXaxis()->SetLabelSize(sizeT);
+  inGr->GetYaxis()->SetLabelSize(sizeT);
+  //inGr->GetXaxis()->SetTitleOffset(1.2);
+  inGr->GetYaxis()->SetLabelOffset(.01);
+  inGr->GetYaxis()->SetTitleOffset(1.2);
 }
 
 void TUtil::ranges(TGraphErrors *inGr,double x1, double x2, double y1, double y2){
@@ -3440,6 +3514,17 @@ void TUtil::titles(TProfile *inGr, TString title, TString xtitle, TString ytitle
   inGr->SetTitle(title);
   inGr->GetXaxis()->SetTitle(xtitle);
   inGr->GetYaxis()->SetTitle(ytitle);
+    inGr->GetXaxis()->SetTitle(xtitle);
+  inGr->GetYaxis()->SetTitle(ytitle);
+  auto sizeT=.055;
+  inGr->GetXaxis()->SetTitleSize(sizeT);
+  inGr->GetYaxis()->SetTitleSize(sizeT);
+
+  inGr->GetXaxis()->SetLabelSize(sizeT);
+  inGr->GetYaxis()->SetLabelSize(sizeT);
+  //inGr->GetXaxis()->SetTitleOffset(1.2);
+  inGr->GetYaxis()->SetLabelOffset(.01);
+  inGr->GetYaxis()->SetTitleOffset(1.2);
 }
 
 void TUtil::ranges(TProfile *inGr,double x1, double x2, double y1, double y2){
@@ -3458,6 +3543,17 @@ void TUtil::titles(TH1F *inGr, TString title, TString xtitle, TString ytitle){
   inGr->SetTitle(title);
   inGr->GetXaxis()->SetTitle(xtitle);
   inGr->GetYaxis()->SetTitle(ytitle);
+    inGr->GetXaxis()->SetTitle(xtitle);
+  inGr->GetYaxis()->SetTitle(ytitle);
+  auto sizeT=.055;
+  inGr->GetXaxis()->SetTitleSize(sizeT);
+  inGr->GetYaxis()->SetTitleSize(sizeT);
+
+  inGr->GetXaxis()->SetLabelSize(sizeT);
+  inGr->GetYaxis()->SetLabelSize(sizeT);
+  //inGr->GetXaxis()->SetTitleOffset(1.2);
+  inGr->GetYaxis()->SetLabelOffset(.01);
+  inGr->GetYaxis()->SetTitleOffset(1.2);
 
 }
 
@@ -3470,6 +3566,37 @@ void TUtil::yrange(TH1F *inGr, double y1, double y2){
 }
 
 void TUtil::xrange(TH1F *inGr, double x1, double x2){
+  inGr->GetXaxis()->SetRangeUser(x1, x2);
+}
+
+void TUtil::titles(TH1D *inGr, TString title, TString xtitle, TString ytitle){
+  inGr->SetTitle(title);
+  inGr->GetXaxis()->SetTitle(xtitle);
+  inGr->GetYaxis()->SetTitle(ytitle);
+    inGr->GetXaxis()->SetTitle(xtitle);
+  inGr->GetYaxis()->SetTitle(ytitle);
+  auto sizeT=.055;
+  inGr->GetXaxis()->SetTitleSize(sizeT);
+  inGr->GetYaxis()->SetTitleSize(sizeT);
+
+  inGr->GetXaxis()->SetLabelSize(sizeT);
+  inGr->GetYaxis()->SetLabelSize(sizeT);
+  //inGr->GetXaxis()->SetTitleOffset(1.2);
+  inGr->GetYaxis()->SetLabelOffset(.01);
+  inGr->GetYaxis()->SetTitleOffset(1.2);
+
+}
+
+void TUtil::ranges(TH1D *inGr,double x1, double x2, double y1, double y2){
+  TUtil::yrange(inGr, y1, y2);
+  TUtil::xrange(inGr, x1, x2);
+}
+void TUtil::yrange(TH1D *inGr, double y1, double y2){
+  inGr->GetYaxis()->SetRangeUser(y1, y2);
+}
+
+
+void TUtil::xrange(TH1D *inGr, double x1, double x2){
   inGr->GetXaxis()->SetRangeUser(x1, x2);
 }
 
@@ -3650,7 +3777,7 @@ vector<TLine*> TUtil::drawPeakCursorXY(TH2D* inHist, Color_t color){
 
 
 
-void TUtil::setWarmPalette(){
+void TUtil::setWarmPalette(double alpha){
 
   const Int_t rgb = 3;
   const Int_t N = 255;
@@ -3664,7 +3791,7 @@ void TUtil::setWarmPalette(){
 
 }
 
-void TUtil::setCoolPalette(){
+void TUtil::setCoolPalette(double alpha){
 
   const Int_t rgb = 3;
   const Int_t N = 255;
@@ -3674,7 +3801,7 @@ void TUtil::setCoolPalette(){
   Double_t green[]  = {0., .1, .9, .0, 1.0};
   Double_t blue[]   = {0., .80, .90, 0.20, 1.0};
   Double_t stops[] = {0., .25, .50, .75, 1.0};
-  TColor::CreateGradientColorTable(rgb, stops, red, green, blue, N);
+  TColor::CreateGradientColorTable(rgb, stops, red, green, blue, N, alpha);
   gStyle->SetNumberContours(N);
 
 }
@@ -3686,7 +3813,7 @@ TCanvas * TUtil::canvas(TString title, TString name, int xdim, int ydim){
   can->SetRightMargin(.18);
   return can;
 }
-void TUtil::setColdPalette(){
+void TUtil::setColdPalette(double alpha){
 
   const Int_t rgb = 3;
   const Int_t N = 255;
@@ -3696,12 +3823,12 @@ void TUtil::setColdPalette(){
   double blue[]=  { 0.00, 0.40, 0.80, 0.90, 1.00};
   double stops[]={ 0.00, 0.30, 0.50, 0.90, 1.00};
 
-  TColor::CreateGradientColorTable(5, stops, red, green, blue, N);
+  TColor::CreateGradientColorTable(5, stops, red, green, blue, N, alpha);
   gStyle->SetNumberContours(N);
 
 }
 
-void TUtil::setHotPalette(){
+void TUtil::setHotPalette(double alpha){
 
   const Int_t rgb = 5;
   const Int_t N = 255;
@@ -3711,7 +3838,7 @@ void TUtil::setHotPalette(){
   double blue[]=  {0.00, 0.10, 0.00, 0.00, 1.00};
   double stops[]={0.00, 0.35, 0.60, 0.85, 1.00};
 
-  TColor::CreateGradientColorTable(rgb, stops, red, green, blue, N);
+  TColor::CreateGradientColorTable(rgb, stops, red, green, blue, N, alpha);
   gStyle->SetNumberContours(N);
 
 }
@@ -3815,6 +3942,15 @@ double ** TUtil::dTimeOfFlight(int N, TVector3 one, TVector3 *two, double n){
     }
   }
   return out;
+}
+
+
+double TUtil::dBToLinear(double dB){
+  return pow(10, dB/10.);
+}
+
+double TUtil::linearToDBPower(double linear){
+  return 10.*log10(linear);
 }
 
 
