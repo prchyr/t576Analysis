@@ -993,12 +993,22 @@ TMatrixD TUtil::SVD::buildBasis(TMatrixD m, int num){
     auto avg=avgVector(recon);
     //cout<<avg.GetNrows()<<endl;//" "<<avg.GetNcols()<<endl;
     auto vec=normalize(avg);
+    //auto vec=avg;
     //cout<<vec.GetNrows()<<endl;
     for(int j=0;j<cols;j++){
       M[i][j]=vec[j];
     }
   }
   return rows>cols?M.T():M;
+}
+
+TGraph* TUtil::SVD::drawBasisVector(TMatrixD M, int row, double dt){
+  auto gr=new TGraph();
+  auto indices=makeIndices(M.GetNcols(), dt);
+  for(int i=0;i<M.GetNcols();i++){
+    gr->SetPoint(gr->GetN(), indices[i], M[row][i]);
+  }
+  return gr;
 }
 
 TVectorD TUtil::SVD::getCoefficients(TVectorD V, TMatrixD B){
@@ -1915,17 +1925,49 @@ double TUtil::peakiness(TGraph *inGr){
 // TUtil::dedisperse(TGraph2D * one, TGraph2D * two){
 //   auto re1=
 
-double TUtil::getFirstThresholdCrossing(TGraph *inGr, double thresh, double after){
+double TUtil::getFirstThresholdCrossing(TGraph *inGr, double thresh, double after, int rising){
   double thisVal;
   double lastVal;
   double crossTime=0.;
   for(int i=0;i<inGr->GetN();i++){
     if(inGr->GetX()[i]<after)continue;
     thisVal=inGr->GetY()[i];
-    if(thisVal>thresh&&lastVal<=thresh){
-      crossTime=inGr->GetX()[i];
-      break;
+    if(rising==1){
+      if(thisVal>thresh&&lastVal<=thresh){
+	crossTime=inGr->GetX()[i];
+	break;
+      }
     }
+    else{
+      if(thisVal<thresh&&lastVal>=thresh){
+        crossTime=inGr->GetX()[i];
+        break;
+      }
+    }
+  }
+    return crossTime;
+}
+
+double TUtil::getLastThresholdCrossing(TGraph *inGr, double thresh, double after, int rising){
+  double thisVal;
+  double lastVal;
+  double crossTime=0.;
+  for(int i=0;i<inGr->GetN();i++){
+    if(inGr->GetX()[i]<after)continue;
+    thisVal=inGr->GetY()[i];
+    if(rising==1){
+      if(thisVal>thresh&&lastVal<=thresh){
+	crossTime=inGr->GetX()[i];
+	//break;
+      }
+    }
+    else{
+      if(thisVal<thresh&&lastVal>=thresh){
+        crossTime=inGr->GetX()[i];
+	// break;
+      }
+    }
+
   }
     return crossTime;
 }
@@ -3469,6 +3511,23 @@ void TUtil::titles(TGraph *inGr, TString title, TString xtitle, TString ytitle){
   inGr->GetYaxis()->SetTitleOffset(1.2);
 }
 
+void TUtil::titles(TF1 *inGr, TString title, TString xtitle, TString ytitle){
+  auto sizeT=.055;
+  inGr->SetTitle(title);
+
+  inGr->GetXaxis()->SetTitle(xtitle);
+  inGr->GetYaxis()->SetTitle(ytitle);
+
+  inGr->GetXaxis()->SetTitleSize(sizeT);
+  inGr->GetYaxis()->SetTitleSize(sizeT);
+
+  inGr->GetXaxis()->SetLabelSize(sizeT);
+  inGr->GetYaxis()->SetLabelSize(sizeT);
+  //inGr->GetXaxis()->SetTitleOffset(1.2);
+  inGr->GetYaxis()->SetLabelOffset(.01);
+  inGr->GetYaxis()->SetTitleOffset(1.2);
+}
+
 void TUtil::ranges(TGraph *inGr,double x1, double x2, double y1, double y2){
   TUtil::yrange(inGr, y1, y2);
   TUtil::xrange(inGr, x1, x2);
@@ -3708,6 +3767,8 @@ void TUtil::draw(int nGraphs, TGraph** inGr, TString option){
     
   }
 }
+
+
 
 TGraph * TUtil::toGraph(TH1D * hist){
   auto   outGr=new TGraph();

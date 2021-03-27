@@ -42,6 +42,7 @@ charge: nC
 #include "TSystemFile.h"
 #include "TH1F.h"
 #include "TH1D.h"
+#include "TF1.h"
 #include "TH2F.h"
 #include "TH2D.h"
 #include "THStack.h"
@@ -476,8 +477,11 @@ utilities.
   //fill a histogram with an array
   TH1F * histogram(TGraph *gr, int nbins=20, TString title="hist", TString name="hist");
 
-  //get the time of the first threshold crossing after after
-  double getFirstThresholdCrossing(TGraph *inGr, double thresh, double after=0.);
+  //get the time of the first threshold crossing after after, rising or falling
+  double getFirstThresholdCrossing(TGraph *inGr, double thresh, double after=0., int rising=1);
+    //get the time of the last threshold crossing after after, rising or falling
+  double getLastThresholdCrossing(TGraph *inGr, double thresh, double after=0., int rising=1);
+
 
 
   //drawing things
@@ -489,6 +493,11 @@ utilities.
   void ranges(TGraph *inGr, double x1, double x2, double y1, double y2);
   void xrange(TGraph *inGr, double x1, double x2);
   void yrange(TGraph *inGr, double y1, double y2);
+
+  void titles(TF1 *inGr, TString title, TString xtitle, TString ytitle);
+  void ranges(TF1 *inGr, double x1, double x2, double y1, double y2);
+  void xrange(TF1 *inGr, double x1, double x2);
+  void yrange(TF1 *inGr, double y1, double y2);
 
   void titles(TGraphErrors *inGr, TString title, TString xtitle, TString ytitle);
   void ranges(TGraphErrors *inGr, double x1, double x2, double y1, double y2);
@@ -674,6 +683,8 @@ the SVD namespace, which has useful utilities for SVD filtration methods
     //builds a basis of patterns from the matrix m, up to the number of
     //patterns num
     TMatrixD buildBasis(TMatrixD m, int num=10);
+    //draw a basis vector
+    TGraph* drawBasisVector(TMatrixD M, int row=0, double dt=1);
     //returns the expansion coeffs for a vector in a basis B
     TVectorD getCoefficients(TVectorD V, TMatrixD B);
     //expands a vector in a basis B
